@@ -508,6 +508,12 @@
             header { margin-bottom: 0.5rem !important; }
         }
 
+        /* Hide mobile menu on desktop, show on mobile */
+        .hidden-desktop { display: none; }
+        @media (max-width: 767px) {
+            .hidden-desktop { display: block; }
+        }
+
         /* Hide downloads/share section on mobile (Preview tab has its own buttons) */
         @media (max-width: 767px) {
             .mobile-hidden { display: none !important; }
@@ -711,7 +717,7 @@
         <div class="max-w-7xl mx-auto w-full main-container">
 
             <!-- ── Header ─────────────────────────────────── -->
-            <header class="flex items-center gap-4 py-2">
+            <header class="flex items-center gap-4 py-2 relative">
                 <div class="logo-icon w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg flex-shrink-0"
                     style="box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);">
                     <svg width="26" height="26" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -731,6 +737,31 @@
                     <h1 class="header-title text-3xl md:text-4xl font-black tracking-tight leading-tight">QRtist</h1>
                     <p class="header-subtitle text-sm md:text-base text-gray-300 mt-1.5 font-medium tracking-wide">
                         Create beautiful, stylish QR codes</p>
+                </div>
+                <!-- Mobile Overflow Menu Button -->
+                <div class="relative hidden-desktop" id="mobileMenuContainer">
+                    <button id="mobileMenuBtn" class="p-2.5 rounded-lg hover:bg-gray-700 text-gray-400 hover:text-white transition-colors" aria-label="More options">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="12" cy="5" r="2"/>
+                            <circle cx="12" cy="12" r="2"/>
+                            <circle cx="12" cy="19" r="2"/>
+                        </svg>
+                    </button>
+                    <div id="mobileMenu" class="hidden absolute right-0 top-full mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-40">
+                        <button id="importSettingsBtn" class="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white flex items-center gap-3 text-sm font-medium">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                            </svg>
+                            Import Settings
+                        </button>
+                        <button id="advancedOptionsBtn" class="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white flex items-center gap-3 text-sm font-medium border-t border-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m6.08 0l4.24-4.24M1 12h6m6 0h6m-1.78 7.78l-4.24-4.24m-6.08 0l-4.24 4.24"/>
+                            </svg>
+                            Advanced
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -924,26 +955,49 @@
 
                     <!-- Mobile-only download buttons (desktop download is in the Data panel) -->
                     <div class="mobile-preview-actions">
-                        <button id="downloadPngMobile"
-                            class="flex-1 flex items-center justify-center gap-1.5 py-3 text-white text-sm font-semibold rounded-xl transition-all"
-                            style="background: linear-gradient(135deg, #2563eb, #1d4ed8); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                            PNG
-                        </button>
-                        <button id="downloadSvgMobile"
-                            class="flex-1 flex items-center justify-center gap-1.5 py-3 text-white text-sm font-semibold rounded-xl transition-all"
-                            style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                            SVG
-                        </button>
+                        <!-- Row 1: PNG/SVG downloads -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                            <button id="downloadPngMobile"
+                                class="flex items-center justify-center gap-1.5 py-3 text-white text-sm font-semibold rounded-xl transition-all"
+                                style="background: linear-gradient(135deg, #2563eb, #1d4ed8); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                PNG
+                            </button>
+                            <button id="downloadSvgMobile"
+                                class="flex items-center justify-center gap-1.5 py-3 text-white text-sm font-semibold rounded-xl transition-all"
+                                style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                SVG
+                            </button>
+                        </div>
+                        <!-- Row 2: Export settings & Share link -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.5rem;">
+                            <button id="exportSettingsMobile"
+                                class="flex items-center justify-center gap-1.5 py-2.5 text-white text-xs font-semibold rounded-lg transition-all"
+                                style="background: rgba(139, 92, 246, 0.8); box-shadow: 0 2px 6px rgba(139, 92, 246, 0.2);">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="12 3 20 9 20 20 4 20 4 9 12 3"></polyline>
+                                </svg>
+                                Export
+                            </button>
+                            <button id="shareLinkMobile"
+                                class="flex items-center justify-center gap-1.5 py-2.5 text-white text-xs font-semibold rounded-lg transition-all"
+                                style="background: rgba(168, 85, 247, 0.8); box-shadow: 0 2px 6px rgba(168, 85, 247, 0.2);">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.47 1.47"/>
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.47-1.47"/>
+                                </svg>
+                                Share
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -1939,6 +1993,139 @@
         <div id="mobileQrChip" class="mobile-qr-chip" role="button" aria-label="Tap to view QR preview" tabindex="0">
             <img id="mobileQrThumb" src="" alt="Live QR preview" aria-hidden="true">
         </div>
+
+        <!-- ── Export Settings Modal ─────────────────────── -->
+        <div id="exportSettingsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-200">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm">
+                <div class="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-700">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Export Settings</h2>
+                    <button id="closeExportSettingsModal" class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-5 space-y-4">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Copy your QR design settings as JSON. Share or save for later.</p>
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 max-h-48 overflow-y-auto break-all text-xs font-mono text-gray-700 dark:text-gray-300" id="exportSettingsJson" style="word-break: break-word; white-space: pre-wrap;"></div>
+                </div>
+                <div class="flex gap-2 p-5 border-t border-gray-100 dark:border-gray-700">
+                    <button id="copyExportSettingsBtn" class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        <span id="copyExportSettingsLabel">Copy</span>
+                    </button>
+                    <button id="downloadExportSettingsBtn" class="flex-1 px-4 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Share Link Modal ─────────────────────── -->
+        <div id="shareLinkModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-200">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm">
+                <div class="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-700">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Share QR Design</h2>
+                    <button id="closeShareLinkModal" class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div class="flex justify-center">
+                        <div id="shareLinkQr" class="w-40 h-40 bg-gray-100 dark:bg-gray-900 rounded-lg flex items-center justify-center text-xs text-gray-500">Generating QR...</div>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 text-center">Share this link to let others open your design:</p>
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 flex items-center gap-2">
+                        <input type="text" id="shareLinkInput" readonly class="flex-1 text-xs bg-transparent border-0 text-gray-700 dark:text-gray-300" style="outline: none;">
+                        <button id="copyShareLinkBtn" class="p-2 text-blue-600 hover:text-blue-700 dark:hover:text-blue-400 transition-colors" title="Copy link">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex gap-2 p-5 border-t border-gray-100 dark:border-gray-700">
+                    <button id="openShareLinkBtn" class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">Open</button>
+                    <button id="closeShareLinkModal2" class="flex-1 px-4 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold rounded-lg transition-colors">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Advanced Options Mobile Modal ─────────────────────── -->
+        <div id="advancedModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center transition-all duration-300" style="opacity: 0; transition-property: opacity;">
+            <div class="bg-white dark:bg-gray-800 w-full rounded-t-3xl shadow-2xl max-h-[80vh] overflow-y-auto" style="animation: slideUp 0.3s ease-out;">
+                <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Advanced Options</h2>
+                    <button id="closeAdvancedModal" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <!-- Import Settings -->
+                    <div class="pb-4 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Import Settings</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-4">Load a previously exported JSON settings file.</p>
+                        <input type="file" id="importSettingsInput" accept=".json" class="hidden">
+                        <button id="importSettingsChooseFile" class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            Choose File
+                        </button>
+                    </div>
+                    <!-- Reset Design -->
+                    <div class="pb-4 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Reset Design</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-4">Restore all settings to default values.</p>
+                        <button id="resetDesignBtn" class="w-full px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors">
+                            Reset to Defaults
+                        </button>
+                    </div>
+                    <!-- Export as CSV (Data) -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Export Data</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-4">Export current text/data as CSV.</p>
+                        <button id="exportCsvBtn" class="w-full px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+                            Export as CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            @keyframes slideUp {
+                from {
+                    transform: translateY(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+            #advancedModal.visible {
+                opacity: 1 !important;
+            }
+        </style>
 
         <script>
             // Register service worker for offline support using Blob URL (more robust)
@@ -3587,6 +3774,219 @@
                 updateQRCode();
             }
             renderTemplates();
+
+            // ── Export/Share Settings (Mobile Preview Panel) ───────────────────────
+            (function exportShareModals() {
+                const exportBtn = document.getElementById('exportSettingsMobile');
+                const shareBtn = document.getElementById('shareLinkMobile');
+                const exportModal = document.getElementById('exportSettingsModal');
+                const shareModal = document.getElementById('shareLinkModal');
+                const closeExportBtn = document.getElementById('closeExportSettingsModal');
+                const closeShareBtn = document.getElementById('closeShareLinkModal');
+                const closeShareBtn2 = document.getElementById('closeShareLinkModal2');
+                const copyExportBtn = document.getElementById('copyExportSettingsBtn');
+                const downloadExportBtn = document.getElementById('downloadExportSettingsBtn');
+                const copyShareBtn = document.getElementById('copyShareLinkBtn');
+                const openShareBtn = document.getElementById('openShareLinkBtn');
+
+                // Gather current settings for export
+                function gatherSettings() {
+                    return {
+                        text: inputText.value,
+                        errorCorrection: errorCorrectionSelect.value,
+                        width: parseInt(inputWidthField.value),
+                        height: parseInt(inputHeightField.value),
+                        type: errorCorrectionSelect.value,
+                        dataPattern: currentPattern,
+                        dataColor: fgColorInput.value,
+                        cornerSquareType: currentOuterCorner,
+                        cornerSquareColor: fgColorInput.value,
+                        cornerDotType: currentInnerCorner,
+                        cornerDotColor: fgColorInput.value,
+                        backgroundColor: bgColorInput.value,
+                        logoEnabled: document.getElementById('showLogo')?.checked || false,
+                        logoUrl: logoDataUrl || '',
+                        logoSize: parseInt(logoSize.value || 20),
+                        logoMargin: parseInt(logoMargin.value || 10),
+                        frameLabel: document.getElementById('frameLabel')?.checked || false,
+                        frameText: frameTextInput.value || '',
+                        frameColor: frameColorInput.value || '#000000',
+                        selectedFrame: selectedFrame || 'none',
+                        useGradient: useGradient || false,
+                        gradientColor2: gradientColor2 || '#3b82f6'\n                    };\n                }
+
+                // Export Settings Modal
+                if (exportBtn) {
+                    exportBtn.addEventListener('click', () => {
+                        const settings = gatherSettings();
+                        const json = JSON.stringify(settings, null, 2);
+                        document.getElementById('exportSettingsJson').textContent = json;
+                        exportModal.classList.remove('hidden');
+                    });
+                }
+
+                if (closeExportBtn) {
+                    closeExportBtn.addEventListener('click', () => exportModal.classList.add('hidden'));
+                }
+                exportModal.addEventListener('click', (e) => {
+                    if (e.target === exportModal) exportModal.classList.add('hidden');
+                });
+
+                if (copyExportBtn) {
+                    copyExportBtn.addEventListener('click', () => {
+                        const text = document.getElementById('exportSettingsJson').textContent;
+                        navigator.clipboard.writeText(text).then(() => {
+                            const label = document.getElementById('copyExportSettingsLabel');
+                            const orig = label.textContent;
+                            label.textContent = 'Copied!';
+                            setTimeout(() => label.textContent = orig, 2000);
+                        }).catch(err => alert('Failed to copy: ' + err.message));
+                    });
+                }
+
+                if (downloadExportBtn) {
+                    downloadExportBtn.addEventListener('click', () => {
+                        const text = document.getElementById('exportSettingsJson').textContent;
+                        const blob = new Blob([text], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `qrtist-settings-${new Date().toISOString().slice(0,10)}.json`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    });
+                }
+
+                // Share Link Modal
+                if (shareBtn) {
+                    shareBtn.addEventListener('click', () => {
+                        const settings = gatherSettings();
+                        const encoded = btoa(JSON.stringify(settings));
+                        const baseUrl = window.location.origin + window.location.pathname;
+                        const fullUrl = baseUrl + '#settings=' + encoded;
+                        
+                        document.getElementById('shareLinkInput').value = fullUrl;
+                        shareModal.classList.remove('hidden');
+                        
+                        // Generate QR for the share link
+                        const qrContainer = document.getElementById('shareLinkQr');
+                        qrContainer.innerHTML = '';
+                        const qr = new QRCodeStyling({ text: fullUrl, width: 160, height: 160 });
+                        qr.append(qrContainer);
+                    });
+                }
+
+                if (closeShareBtn) {
+                    closeShareBtn.addEventListener('click', () => shareModal.classList.add('hidden'));
+                }
+                if (closeShareBtn2) {
+                    closeShareBtn2.addEventListener('click', () => shareModal.classList.add('hidden'));
+                }
+                shareModal.addEventListener('click', (e) => {
+                    if (e.target === shareModal) shareModal.classList.add('hidden');
+                });
+
+                if (copyShareBtn) {
+                    copyShareBtn.addEventListener('click', () => {
+                        const url = document.getElementById('shareLinkInput').value;
+                        navigator.clipboard.writeText(url).then(() => {
+                            copyShareBtn.style.color = '#10b981';
+                            setTimeout(() => copyShareBtn.style.color = '', 2000);
+                        }).catch(err => alert('Failed to copy: ' + err.message));
+                    });
+                }
+
+                if (openShareBtn) {
+                    openShareBtn.addEventListener('click', () => {
+                        const url = document.getElementById('shareLinkInput').value;
+                        window.open(url, '_blank');
+                    });
+                }
+            })();
+
+            // ── Mobile Menu & Advanced Options ───────────────────────────────────────
+            (function mobileMenuAndAdvanced() {
+                const menuBtn = document.getElementById('mobileMenuBtn');
+                const menu = document.getElementById('mobileMenu');
+                const importBtn = document.getElementById('importSettingsBtn');
+                const advancedBtn = document.getElementById('advancedOptionsBtn');
+                const advancedModal = document.getElementById('advancedModal');
+                const closeAdvancedBtn = document.getElementById('closeAdvancedModal');
+                const importSettingsInput = document.getElementById('importSettingsInput');
+                const importChooseFileBtn = document.getElementById('importSettingsChooseFile');
+                const resetBtn = document.getElementById('resetDesignBtn');
+                const csvBtn = document.getElementById('exportCsvBtn');
+
+                // Mobile menu toggle
+                if (menuBtn) {
+                    menuBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        menu.classList.toggle('hidden');
+                    });
+                }
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!menu.contains(e.target) && menuBtn && !menuBtn.contains(e.target)) {
+                        menu.classList.add('hidden');
+                    }
+                });
+
+                // Import Settings from menu
+                if (importBtn) {
+                    importBtn.addEventListener('click', () => {
+                        menu.classList.add('hidden');\n                        advancedModal.classList.remove('hidden');
+                        advancedModal.classList.add('visible');
+                    });
+                }
+
+                // Advanced Options
+                if (advancedBtn) {
+                    advancedBtn.addEventListener('click', () => {
+                        menu.classList.add('hidden');
+                        advancedModal.classList.remove('hidden');
+                        advancedModal.classList.add('visible');
+                    });
+                }
+
+                // Close advanced modal
+                if (closeAdvancedBtn) {
+                    closeAdvancedBtn.addEventListener('click', () => {
+                        advancedModal.classList.add('hidden');
+                        advancedModal.classList.remove('visible');
+                    });
+                }
+
+                advancedModal.addEventListener('click', (e) => {
+                    if (e.target === advancedModal) {
+                        advancedModal.classList.add('hidden');
+                        advancedModal.classList.remove('visible');
+                    }
+                });
+
+                // Import Settings File
+                if (importChooseFileBtn) {
+                    importChooseFileBtn.addEventListener('click', () => {
+                        importSettingsInput.click();
+                    });
+                }
+
+                if (importSettingsInput) {
+                    importSettingsInput.addEventListener('change', (e) => {
+                        if (!e.target.files[0]) return;
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            try {
+                                const settings = JSON.parse(event.target.result);
+                                // Apply settings
+                                inputText.value = settings.text || '';
+                                errorCorrectionSelect.value = settings.errorCorrection || 'M';\n                                inputWidthField.value = settings.width || 300;\n                                inputHeightField.value = settings.height || 300;\n                                fgColorInput.value = settings.dataColor || '#000000';\n                                fgColorText.value = settings.dataColor || '#000000';\n                                bgColorInput.value = settings.backgroundColor || '#ffffff';\n                                bgColorText.value = settings.backgroundColor || '#ffffff';\n                                currentPattern = settings.dataPattern || 'square';\n                                currentOuterCorner = settings.cornerSquareType || 'square';\n                                currentInnerCorner = settings.cornerDotType || 'square';\n                                useGradient = settings.useGradient || false;\n                                gradientColor2 = settings.gradientColor2 || '#3b82f6';\n                                if (gradColor2Input) gradColor2Input.value = gradientColor2;\n                                if (gradientToggleBtn) {\n                                    gradientToggleBtn.setAttribute('aria-pressed', useGradient);\n                                    gradientToggleBtn.classList.toggle('active', useGradient);\n                                }\n                                if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !useGradient);\n                                logoSize.value = settings.logoSize || 20;\n                                logoSizeValue.textContent = settings.logoSize || 20;\n                                logoMargin.value = settings.logoMargin || 10;\n                                logoMarginValue.textContent = settings.logoMargin || 10;\n                                frameColorInput.value = settings.frameColor || '#000000';\n                                frameColorTextInput.value = settings.frameColor || '#000000';\n                                frameTextInput.value = settings.frameText || '';\n                                selectedFrame = settings.selectedFrame || 'none';\n                                if (document.getElementById('showLogo')) {\n                                    document.getElementById('showLogo').checked = settings.logoEnabled || false;\n                                }\n                                if (document.getElementById('frameLabel')) {\n                                    document.getElementById('frameLabel').checked = settings.frameLabel || false;\n                                }\n                                updateQRCode();\n                                advancedModal.classList.add('hidden');\n                                advancedModal.classList.remove('visible');\n                                alert('Settings imported successfully!');\n                            } catch (err) {\n                                alert('Error importing settings: ' + err.message);\n                            }\n                        };\n                        reader.readAsText(e.target.files[0]);\n                    });\n                }
+
+                // Reset Design to Defaults
+                if (resetBtn) {\n                    resetBtn.addEventListener('click', () => {\n                        if (!confirm('Are you sure? This will reset all settings to defaults.')) return;\n                        inputText.value = '';\n                        errorCorrectionSelect.value = 'M';\n                        inputWidthField.value = 300;\n                        inputHeightField.value = 300;\n                        fgColorInput.value = '#000000';\n                        fgColorText.value = '#000000';\n                        bgColorInput.value = '#ffffff';\n                        bgColorText.value = '#ffffff';\n                        currentPattern = 'square';\n                        currentOuterCorner = 'square';\n                        currentInnerCorner = 'square';\n                        useGradient = false;\n                        gradientColor2 = '#3b82f6';\n                        if (gradColor2Input) gradColor2Input.value = gradientColor2;\n                        if (gradientToggleBtn) {\n                            gradientToggleBtn.setAttribute('aria-pressed', 'false');\n                            gradientToggleBtn.classList.remove('active');\n                        }\n                        if (gradColor2Row) gradColor2Row.classList.add('hidden');\n                        if (document.getElementById('showLogo')) document.getElementById('showLogo').checked = false;\n                        if (document.getElementById('frameLabel')) document.getElementById('frameLabel').checked = false;\n                        logoDataUrl = null;\n                        currentLogoPreset = 'none';\n                        updateQRCode();\n                        advancedModal.classList.add('hidden');\n                        advancedModal.classList.remove('visible');\n                    });\n                }
+
+                // Export as CSV
+                if (csvBtn) {\n                    csvBtn.addEventListener('click', () => {\n                        const text = inputText.value || 'Empty QR Code';\n                        const csv = 'Text,Value\\n\"QR Data\",\"' + text.replace(/\"/g, '\"\"') + '\"';\n                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });\n                        const url = URL.createObjectURL(blob);\n                        const a = document.createElement('a');\n                        a.href = url;\n                        a.download = `qrtist-data-${new Date().toISOString().slice(0,10)}.csv`;\n                        a.click();\n                        URL.revokeObjectURL(url);\n                    });\n                }\n            })();
 
             // ── Mobile Tab Navigation ───────────────────────────────────────────────
             (function () {
