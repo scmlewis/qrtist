@@ -498,6 +498,185 @@
                 margin-bottom: 2.5rem;
             }
         }
+
+        /* ══ Mobile UX Redesign ══════════════════════════════════ */
+
+        /* Compact header on small phones */
+        @media (max-width: 480px) {
+            .header-title { font-size: 1.5rem !important; }
+            .header-subtitle { display: none !important; }
+            header { margin-bottom: 0.5rem !important; }
+        }
+
+        /* Hide downloads/share section on mobile (Preview tab has its own buttons) */
+        @media (max-width: 767px) {
+            .mobile-hidden { display: none !important; }
+        }
+
+        /* Bottom padding to clear the fixed tab bar */
+        @media (max-width: 767px) {
+            .main-container {
+                padding-bottom: calc(5.5rem + max(12px, env(safe-area-inset-bottom, 0px)));
+            }
+            /* Larger touch targets for style picker grids */
+            .shape-btn, .corner-btn, .frame-btn, .logo-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            /* Easier-to-grab slider thumb */
+            input[type="range"]::-webkit-slider-thumb {
+                width: 22px;
+                height: 22px;
+            }
+            input[type="range"]::-moz-range-thumb {
+                width: 22px;
+                height: 22px;
+            }
+        }
+
+        /* Panel gating: one panel visible at a time on mobile */
+        @media (max-width: 767px) {
+            .grid-layout > .panel-card { display: none !important; }
+            .grid-layout > .panel-card.mobile-active-panel { display: flex !important; }
+        }
+
+        /* ── Bottom Tab Bar ──────────────────────────────────── */
+        .mobile-tab-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(55, 65, 81, 0.8);
+            padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+        }
+
+        .mobile-tab-bar-inner {
+            display: flex;
+            height: 60px;
+        }
+
+        .mobile-tab-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 6px 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            transition: color 0.15s;
+            position: relative;
+        }
+
+        .mobile-tab-btn svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            margin-bottom: 1px;
+        }
+
+        .mobile-tab-btn.tab-active { color: var(--primary); }
+
+        .mobile-tab-btn .tab-indicator {
+            position: absolute;
+            top: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 2px;
+            border-radius: 9999px;
+            background: var(--primary);
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .mobile-tab-btn.tab-active .tab-indicator { opacity: 1; }
+
+        /* Preview tab update badge */
+        .mobile-tab-btn.tab-badge::after {
+            content: '';
+            position: absolute;
+            top: 7px;
+            right: calc(50% - 17px);
+            width: 7px;
+            height: 7px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 1.5px solid #111827;
+            animation: badge-pop 0.25s ease;
+        }
+
+        @keyframes badge-pop {
+            from { transform: scale(0); }
+            60%  { transform: scale(1.4); }
+            to   { transform: scale(1); }
+        }
+
+        /* ── Floating Live QR Chip ───────────────────────────── */
+        .mobile-qr-chip {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 40;
+            width: 90px;
+            height: 90px;
+            background: rgba(17, 24, 39, 0.9);
+            border: 1.5px solid rgba(59, 130, 246, 0.5);
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.12s;
+        }
+
+        .mobile-qr-chip:active { transform: scale(0.9); }
+
+        .mobile-qr-chip img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+            display: block;
+        }
+
+        .mobile-qr-chip.chip-pulse { animation: chip-pulse-anim 0.4s ease; }
+
+        @keyframes chip-pulse-anim {
+            0%   { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 0   rgba(59,130,246,0.7); }
+            50%  { box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 0 8px  rgba(59,130,246,0.1); }
+            100% { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 0   rgba(59,130,246,0); }
+        }
+
+        /* ── Mobile Download Row inside Preview Panel ────────── */
+        .mobile-preview-actions {
+            display: none;
+            width: 100%;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Activate all mobile-specific elements on phones */
+        @media (max-width: 767px) {
+            .mobile-tab-bar          { display: block; }
+            .mobile-qr-chip          { display: block; }
+            .mobile-preview-actions  { display: flex; }
+        }
     </style>
 </head>
 
@@ -557,7 +736,7 @@
 
             <div class="grid-layout">
                 <!-- ── Left Panel: Input ─────────────────────── -->
-                <div class="panel-card bg-gray-800 rounded-2xl shadow-sm border border-gray-700 p-5 flex flex-col gap-5"
+                <div id="panelData" class="panel-card bg-gray-800 rounded-2xl shadow-sm border border-gray-700 p-5 flex flex-col gap-5"
                     style="background: rgba(31, 41, 55, 0.8); border-color: rgba(55, 65, 81, 0.8);">
 
                     <!-- Panel title -->
@@ -603,6 +782,8 @@
                         <input type="range" id="qrSize" min="200" max="600" value="300" class="w-full">
                     </div>
 
+                    <!-- Downloads + Share: hidden on mobile (Preview tab has download buttons) -->
+                    <div class="mobile-hidden">
                     <!-- Downloads -->
                     <div>
                         <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Download</p>
@@ -669,11 +850,12 @@
                             </div>
                         </div>
                     </div>
+                    </div><!-- /mobile-hidden -->
                     <input type="file" id="importConfigInput" accept=".json" class="hidden">
                 </div>
 
                 <!-- ── Center Panel: Preview ─────────────────── -->
-                <div class="panel-card bg-gray-800 rounded-2xl shadow-lg border border-blue-500/30 p-5 flex flex-col items-center justify-between gap-4"
+                <div id="panelPreview" class="panel-card bg-gray-800 rounded-2xl shadow-lg border border-blue-500/30 p-5 flex flex-col items-center justify-between gap-4"
                     style="background: linear-gradient(135deg, rgba(31, 41, 55, 0.9), rgba(15, 23, 41, 0.8)); box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);">
                     <div class="flex items-center gap-2 w-full">
                         <div
@@ -739,10 +921,34 @@
                         </svg>
                         <span>Label: <strong id="frameLabelText"></strong></span>
                     </div>
+
+                    <!-- Mobile-only download buttons (desktop download is in the Data panel) -->
+                    <div class="mobile-preview-actions">
+                        <button id="downloadPngMobile"
+                            class="flex-1 flex items-center justify-center gap-1.5 py-3 text-white text-sm font-semibold rounded-xl transition-all"
+                            style="background: linear-gradient(135deg, #2563eb, #1d4ed8); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            PNG
+                        </button>
+                        <button id="downloadSvgMobile"
+                            class="flex-1 flex items-center justify-center gap-1.5 py-3 text-white text-sm font-semibold rounded-xl transition-all"
+                            style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            SVG
+                        </button>
+                    </div>
                 </div>
 
                 <!-- ── Right Panel: Design Controls ─────────── -->
-                <div class="panel-card design-panel bg-gray-800 rounded-2xl shadow-sm border border-gray-700 flex flex-col"
+                <div id="panelDesign" class="panel-card design-panel bg-gray-800 rounded-2xl shadow-sm border border-gray-700 flex flex-col"
                     style="background: rgba(31, 41, 55, 0.6); border-left: 3px solid rgba(59, 130, 246, 0.3);">
 
                     <!-- Pinned header -->
@@ -1694,7 +1900,44 @@
                     </div><!-- /scrollable sections -->
                 </div><!-- /design-panel -->
 
-            </div>
+            </div><!-- /grid-layout -->
+
+            <!-- ── Mobile Bottom Tab Bar ──────────────────── -->
+            <nav id="mobileTabBar" class="mobile-tab-bar" aria-label="Section navigation">
+                <div class="mobile-tab-bar-inner">
+                    <button class="mobile-tab-btn tab-active" data-tab="0" aria-label="Data">
+                        <span class="tab-indicator" aria-hidden="true"></span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <line x1="9" y1="1" x2="9" y2="23"/><line x1="15" y1="1" x2="15" y2="23"/>
+                            <path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2"/>
+                            <path d="M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2"/>
+                        </svg>
+                        <span>Data</span>
+                    </button>
+                    <button class="mobile-tab-btn" data-tab="1" aria-label="Preview">
+                        <span class="tab-indicator" aria-hidden="true"></span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <path d="M21 15l-5-5L5 21"/>
+                        </svg>
+                        <span>Preview</span>
+                    </button>
+                    <button class="mobile-tab-btn" data-tab="2" aria-label="Design">
+                        <span class="tab-indicator" aria-hidden="true"></span>
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <circle cx="6" cy="6" r="1.5"/><circle cx="12" cy="4" r="1.5"/><circle cx="18" cy="6" r="1.5"/>
+                            <path d="M12 2v20M4 12h16" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        </svg>
+                        <span>Design</span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+
+        <!-- ── Mobile Floating QR Chip ─────────────────────── -->
+        <div id="mobileQrChip" class="mobile-qr-chip" role="button" aria-label="Tap to view QR preview" tabindex="0">
+            <img id="mobileQrThumb" src="" alt="Live QR preview" aria-hidden="true">
         </div>
 
         <script>
@@ -2005,6 +2248,17 @@
                             ctx.fillRect(logoX - logoMargin, logoY - logoMargin,
                                 logoWidth + logoMargin * 2, logoWidth + logoMargin * 2);
                             ctx.drawImage(img, logoX, logoY, logoWidth, logoWidth);
+                            // Refresh mobile chip thumbnail now that logo is painted
+                            const mChip = document.getElementById('mobileQrChip');
+                            const mThumb = document.getElementById('mobileQrThumb');
+                            if (mChip && mThumb && this.canvas) {
+                                try {
+                                    mThumb.src = this.canvas.toDataURL('image/png');
+                                    mChip.classList.remove('chip-pulse');
+                                    void mChip.offsetWidth;
+                                    mChip.classList.add('chip-pulse');
+                                } catch(e) {}
+                            }
                         };
                         img.src = opts.image;
                     }
@@ -2760,6 +3014,17 @@
 
                 checkContrast();
                 checkScannability();
+                // Badge the Preview tab on mobile when QR updates while user is on another tab
+                if (window.__isMobilePreviewTab && !window.__isMobilePreviewTab()) {
+                    const previewTabBtn = document.querySelector('.mobile-tab-btn[data-tab="1"]');
+                    if (previewTabBtn) {
+                        previewTabBtn.classList.add('tab-badge');
+                        clearTimeout(previewTabBtn._badgeTimer);
+                        previewTabBtn._badgeTimer = setTimeout(
+                            () => previewTabBtn.classList.remove('tab-badge'), 3000
+                        );
+                    }
+                }
             }
 
             // Scales the preview canvas display size to fit inside the panel
@@ -2781,6 +3046,17 @@
                 } else {
                     canvas.style.width = '';
                     canvas.style.height = '';
+                }
+                // Update mobile floating thumbnail chip with latest QR render
+                const mChip = document.getElementById('mobileQrChip');
+                const mThumb = document.getElementById('mobileQrThumb');
+                if (mChip && mThumb) {
+                    try {
+                        mThumb.src = canvas.toDataURL('image/png');
+                        mChip.classList.remove('chip-pulse');
+                        void mChip.offsetWidth; // reflow to restart animation
+                        mChip.classList.add('chip-pulse');
+                    } catch (e) { /* cross-origin canvas taint — ignore */ }
                 }
             }
 
@@ -3311,6 +3587,76 @@
                 updateQRCode();
             }
             renderTemplates();
+
+            // ── Mobile Tab Navigation ───────────────────────────────────────────────
+            (function () {
+                const panels = [
+                    document.getElementById('panelData'),
+                    document.getElementById('panelPreview'),
+                    document.getElementById('panelDesign')
+                ];
+                const tabBtns = document.querySelectorAll('.mobile-tab-btn');
+                const qrChip  = document.getElementById('mobileQrChip');
+                let currentMobileTab = 0;
+
+                function switchMobileTab(index) {
+                    currentMobileTab = index;
+                    panels.forEach((p, i) => {
+                        if (!p) return;
+                        p.classList.toggle('mobile-active-panel', i === index);
+                    });
+                    tabBtns.forEach((btn, i) => {
+                        btn.classList.toggle('tab-active', i === index);
+                    });
+                    // Hide chip when Preview tab is active (full-size QR is visible)
+                    if (qrChip) qrChip.style.display = (index === 1) ? 'none' : '';
+                    // When switching to Preview: clear badge & refresh thumbnail
+                    if (index === 1) {
+                        const previewBtn = document.querySelector('.mobile-tab-btn[data-tab="1"]');
+                        if (previewBtn) previewBtn.classList.remove('tab-badge');
+                        constrainPreviewCanvas();
+                    }
+                }
+
+                function applyMobileLayout() {
+                    if (window.innerWidth < 768) {
+                        switchMobileTab(currentMobileTab);
+                    } else {
+                        // Desktop: show all panels, remove mobile gating
+                        panels.forEach(p => { if (p) p.classList.remove('mobile-active-panel'); });
+                        if (qrChip) qrChip.style.display = '';
+                    }
+                }
+
+                // Expose so updateQRCode badge logic can query current tab
+                window.__isMobilePreviewTab = () => currentMobileTab === 1 && window.innerWidth < 768;
+
+                // Tab button clicks
+                tabBtns.forEach((btn, i) => {
+                    btn.addEventListener('click', () => switchMobileTab(i));
+                });
+
+                // Chip tap → jump to Preview tab
+                if (qrChip) {
+                    qrChip.addEventListener('click', () => switchMobileTab(1));
+                    qrChip.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchMobileTab(1); }
+                    });
+                }
+
+                window.addEventListener('resize', applyMobileLayout);
+                applyMobileLayout();
+
+                // Wire mobile-only duplicate download buttons (Preview tab)
+                const dlPngM = document.getElementById('downloadPngMobile');
+                const dlSvgM = document.getElementById('downloadSvgMobile');
+                if (dlPngM) dlPngM.addEventListener('click', () => {
+                    if (qrCode) qrCode.download({ name: generateQRFilename(), extension: 'png' });
+                });
+                if (dlSvgM) dlSvgM.addEventListener('click', () => {
+                    if (qrCode) qrCode.download({ name: generateQRFilename(), extension: 'svg' });
+                });
+            })();
         </script>
 </body>
 
