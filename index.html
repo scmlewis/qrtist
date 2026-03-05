@@ -1420,7 +1420,7 @@
                                     </button>
                                 </div>
 
-                                <!-- Logo Size & Margin -->
+                                <!-- Logo Size & Margin & Color -->
                                 <div id="logoControls"
                                     class="hidden mt-3 space-y-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3">
                                     <div>
@@ -1440,6 +1440,21 @@
                                                     id="logoMarginValue">10</span>px</span>
                                         </div>
                                         <input type="range" id="logoMargin" min="0" max="50" value="10" class="w-full">
+                                    </div>
+                                    <div id="logoColorRow" class="hidden">
+                                        <div class="flex justify-between items-center mb-1.5">
+                                            <label for="logoColor" class="text-xs font-medium text-gray-500 dark:text-gray-400">Logo Color</label>
+                                            <button id="logoColorReset" type="button" class="text-xs text-amber-600 dark:text-amber-400 hover:underline font-medium">
+                                                Use Original
+                                            </button>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="color" id="logoColor" value="#000000"
+                                                class="w-10 h-9 border border-gray-300 dark:border-gray-500 rounded-lg flex-shrink-0 cursor-pointer">
+                                            <input type="text" id="logoColorText" value="#000000"
+                                                class="flex-1 px-2 py-1.5 border border-gray-300 dark:border-gray-500 rounded-lg text-xs bg-white dark:bg-gray-600 text-gray-900 dark:text-white font-mono"
+                                                placeholder="#000000">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2059,6 +2074,9 @@
             // Memoization cache for foreground mask (key: "w_h", value: ImageData)
             const foregroundMaskCache = new Map();
 
+            // Logo color overrides: stores user-selected colors keyed by preset name
+            const logoColorOverrides = {};
+
             const LOGO_PRESETS = {
                 'globe': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
                 'scan-brackets': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 56" fill="none"><g stroke="currentColor" stroke-width="5"><polyline points="4,16 4,4 16,4"/><polyline points="44,4 56,4 56,16"/><polyline points="4,40 4,52 16,52"/><polyline points="44,52 56,52 56,40"/></g><text x="30" y="24" font-size="12" text-anchor="middle" font-weight="900" font-family="Arial,sans-serif" fill="currentColor">SCAN</text><text x="30" y="40" font-size="12" text-anchor="middle" font-weight="900" font-family="Arial,sans-serif" fill="currentColor">ME</text></svg>`,
@@ -2074,10 +2092,16 @@
                 'youtube': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" fill="currentColor"/></svg>`,
             };
 
-            function getLogoPresetDataUrl(preset) {
+            function getLogoPresetDataUrl(preset, color) {
                 const svg = LOGO_PRESETS[preset];
                 if (!svg) return null;
-                return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+                // If color is provided, replace currentColor with the specified color
+                let modifiedSvg = svg;
+                if (color && color !== '' && preset !== 'custom') {
+                    modifiedSvg = svg.replace(/fill="currentColor"/g, `fill="${color}"`)
+                                      .replace(/stroke="currentColor"/g, `stroke="${color}"`);
+                }
+                return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(modifiedSvg);
             }
 
             // ── Design Templates ──────────────────────────────────────────────────
@@ -2299,6 +2323,23 @@
                 });
             }
 
+            function updateLogoColorUI() {
+                const logoColorRow = document.getElementById('logoColorRow');
+                const logoColorInput = document.getElementById('logoColor');
+                const logoColorText = document.getElementById('logoColorText');
+                
+                // Show color picker only for preset logos (not custom uploads or none)
+                const isPresetLogo = currentLogoPreset !== 'none' && currentLogoPreset !== 'custom';
+                logoColorRow.classList.toggle('hidden', !isPresetLogo);
+                
+                if (isPresetLogo) {
+                    // Get the current color for this logo (or empty if not overridden)
+                    const currentColor = logoColorOverrides[currentLogoPreset] || '';
+                    logoColorInput.value = currentColor || '#000000';
+                    logoColorText.value = currentColor || '';
+                }
+            }
+
             function handleLogoUpload(file) {
                 if (!file.type.startsWith('image/')) return;
 
@@ -2312,6 +2353,7 @@
                     logoControls.classList.remove('hidden');
                     currentLogoPreset = 'custom';
                     updateLogoSelection();
+                    updateLogoColorUI();
                     updateQRCode();
                     checkScannability();
                 };
@@ -2326,6 +2368,7 @@
                 currentLogoPreset = preset;
                 updateLogoSelection();
                 logoControls.classList.toggle('hidden', preset === 'none');
+                updateLogoColorUI();
                 updateQRCode();
             });
 
@@ -2593,8 +2636,9 @@
 
                 const fgColor = fgColorInput.value;
                 const bgColor = bgColorInput.value;
+                const logoColor = logoColorOverrides[currentLogoPreset] || '';
                 const activeLogoUrl = currentLogoPreset === 'custom' ? logoDataUrl
-                    : currentLogoPreset !== 'none' ? getLogoPresetDataUrl(currentLogoPreset)
+                    : currentLogoPreset !== 'none' ? getLogoPresetDataUrl(currentLogoPreset, logoColor)
                         : null;
                 const logoPercent = activeLogoUrl ? parseInt(logoSize.value) : undefined;
                 const logoMarginVal = activeLogoUrl ? parseInt(logoMargin.value) : undefined;
@@ -2941,6 +2985,37 @@
                 updateQRCode();
             });
 
+            // Logo color picker listeners
+            const logoColorInput = document.getElementById('logoColor');
+            const logoColorText = document.getElementById('logoColorText');
+            const logoColorReset = document.getElementById('logoColorReset');
+
+            if (logoColorInput) {
+                logoColorInput.addEventListener('input', (e) => {
+                    const color = e.target.value;
+                    logoColorOverrides[currentLogoPreset] = color;
+                    if (logoColorText) logoColorText.value = color;
+                    updateQRCode();
+                });
+            }
+            if (logoColorText) {
+                logoColorText.addEventListener('change', (e) => {
+                    const color = e.target.value.trim();
+                    if (color === '' || /^#[0-9A-F]{6}$/i.test(color)) {
+                        logoColorOverrides[currentLogoPreset] = color;
+                        if (logoColorInput) logoColorInput.value = color || '#000000';
+                        updateQRCode();
+                    }
+                });
+            }
+            if (logoColorReset) {
+                logoColorReset.addEventListener('click', () => {
+                    delete logoColorOverrides[currentLogoPreset];
+                    updateLogoColorUI();
+                    updateQRCode();
+                });
+            }
+
             // URL Hash Serialization
             function getConfigHash() {
                 const type = qrType.value;
@@ -2960,6 +3035,7 @@
                     logoSize: logoSize.value,
                     logoMargin: logoMargin.value,
                     logoPreset: currentLogoPreset,
+                    logoColors: { ...logoColorOverrides },
                     frame: selectedFrame,
                     frameColor: frameColorInput.value,
                     frameText: frameTextInput.value,
@@ -3007,10 +3083,12 @@
                     frameColorTextInput.value = configObj.frameColor || '#000000';
                     frameTextInput.value = configObj.frameText || '';
                     currentLogoPreset = configObj.logoPreset || 'none';
+                    Object.assign(logoColorOverrides, configObj.logoColors || {});
                     updateShapeSelection();
                     updateCornerSelection();
                     updateFrameSelection();
                     updateLogoSelection();
+                    updateLogoColorUI();
                     logoControls.classList.toggle('hidden', currentLogoPreset === 'none');
                     updateQRCode();
                 } catch (e) {
@@ -3092,6 +3170,7 @@
                     logoSize: logoSize.value,
                     logoMargin: logoMargin.value,
                     logoPreset: currentLogoPreset,
+                    logoColors: { ...logoColorOverrides },
                     frame: selectedFrame,
                     frameColor: frameColorInput.value,
                     frameText: frameTextInput.value,
@@ -3151,6 +3230,7 @@
                         frameTextInput.value = configObj.frameText || '';
 
                         currentLogoPreset = configObj.logoPreset || 'none';
+                        Object.assign(logoColorOverrides, configObj.logoColors || {});
                         if (configObj.logo) {
                             logoDataUrl = configObj.logo;
                             logoImg.src = logoDataUrl;
@@ -3164,6 +3244,7 @@
                         updateCornerSelection();
                         updateFrameSelection();
                         updateLogoSelection();
+                        updateLogoColorUI();
                         updateQRCode();
                     } catch (e) {
                         alert('Error importing config: ' + e.message);
