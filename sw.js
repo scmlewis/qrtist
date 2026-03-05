@@ -61,6 +61,12 @@ self.addEventListener('fetch', (event) => {
     }
 
     const url = new URL(event.request.url);
+    
+    // Skip non-http(s) schemes (chrome-extension, etc.) to avoid Cache API errors
+    if (!url.protocol.startsWith('http')) {
+        return;
+    }
+    
     const isExternal = !url.origin.includes(self.location.origin);
 
     event.respondWith(
@@ -72,7 +78,9 @@ self.addEventListener('fetch', (event) => {
                     if (networkResponse && networkResponse.status === 200) {
                         // Cache successful CDN responses
                         const cache = await caches.open(RUNTIME_CACHE);
-                        cache.put(event.request, networkResponse.clone());
+                        cache.put(event.request, networkResponse.clone()).catch(() => {
+                            // Silently ignore cache errors for problematic requests
+                        });
                     }
                     return networkResponse;
                 } catch (err) {
@@ -95,7 +103,9 @@ self.addEventListener('fetch', (event) => {
                 const networkResponse = await fetch(event.request);
                 if (networkResponse && networkResponse.status === 200) {
                     const cache = await caches.open(CACHE_NAME);
-                    cache.put(event.request, networkResponse.clone());
+                    cache.put(event.request, networkResponse.clone()).catch(() => {
+                        // Silently ignore cache errors
+                    });
                 }
                 return networkResponse;
             } catch (err) {
