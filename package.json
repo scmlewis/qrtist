@@ -1,0 +1,19 @@
+{
+  "name": "qr_generator",
+  "version": "1.0.0",
+  "description": "A beautiful, fully client-side QR code generator with customizable designs, logos, frames, and multiple QR types. **100% offline-capable** — no server required!",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 8080 --cors",
+    "dev": "npx http-server . -p 8080 --cors --gzip",
+    "serve": "npx http-server . -p 8000 --cors",
+    "build": "echo \"No build step required - static files ready!\"",
+    "test": "echo \"No tests configured yet\""
+  },
+  "keywords": ["qr-code", "generator", "customizable", "offline"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

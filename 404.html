@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRtist - Redirecting...</title>
+    <script>
+        // Redirect to index.html for deep links in GitHub Pages PWA
+        // This allows proper SPA routing
+        if (location.pathname !== '/' && !location.pathname.includes('.')) {
+            let path = location.pathname;
+            // Remove repo name if it exists in path
+            let parts = path.split('/').filter(Boolean);
+            // Keep original path and redirect to root
+            sessionStorage.redirect = path;
+            location.replace('./');
+        }
+    </script>
+</head>
+<body>
+    <h1>Loading QRtist...</h1>
+    <p>If you're not redirected, please <a href="./">click here</a>.</p>
+</body>
+</html>
