@@ -10,10 +10,18 @@
     "build": "echo \"No build step required - static files ready!\"",
     "test": "echo \"No tests configured yet\""
   },
-  "keywords": ["qr-code", "generator", "customizable", "offline"],
+  "keywords": [
+    "qr-code",
+    "generator",
+    "customizable",
+    "offline"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "jsdom": "^20.0.3"
   }
 }
