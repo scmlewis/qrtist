@@ -50,3 +50,7 @@ env/
 test-output/
 debug.log
 *.log
+
+# Project-specific files to ignore
+refactor_complete.py
+mockup/
