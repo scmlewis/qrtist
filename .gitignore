@@ -22,3 +22,31 @@ yarn-error.log*
 # Build output (if using a build tool in future)
 dist/
 build/
+
+# Old / backup / temp files
+*.old
+*.bak
+*.orig
+*.tmp
+*.temp
+
+# Editor swap / backup (already partially covered)
+*~
+
+# Python cache / test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+coverage/
+
+# Virtual envs
+venv/
+ENV/
+env/
+.venv/
+
+# Misc test/debug artifacts
+test-output/
+debug.log
+*.log
