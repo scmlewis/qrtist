@@ -51,6 +51,9 @@ test-output/
 debug.log
 *.log
 
+# Local JS tests
+tests/
+
 # Project-specific files to ignore
 refactor_complete.py
 mockup/

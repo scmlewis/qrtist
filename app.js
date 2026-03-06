@@ -2352,6 +2352,24 @@ renderTemplates();
         });
     }
 
+    // Mobile 3-dot menu toggle (re-enabled)
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const menu = document.getElementById('mobileMenu');
+    if (menuBtn && menu) {
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('hidden');
+        });
+
+        // Prevent clicks inside the menu from closing it
+        menu.addEventListener('click', (e) => e.stopPropagation());
+
+        // Close menu when clicking outside
+        document.addEventListener('click', () => {
+            if (!menu.classList.contains('hidden')) menu.classList.add('hidden');
+        });
+    }
+
     // Reset design handler (all variants)
     const resetDesignInModal = document.getElementById('resetDesignBtn');
     const resetDesignMain = document.getElementById('resetDesign');
