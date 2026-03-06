@@ -606,9 +606,9 @@
         .mobile-qr-chip {
             display: none;
             position: fixed;
-            top: 1rem;
+            top: 4.5rem;
             right: 1rem;
-            z-index: 40;
+            z-index: 38;
             width: 90px;
             height: 90px;
             background: rgba(17, 24, 39, 0.9);
@@ -670,4 +670,377 @@
 
         #advancedModal.visible {
             opacity: 1 !important;
+        }
+
+        /* ── Toast notification system ───────────────────────────── */
+        #toastContainer {
+            position: fixed;
+            bottom: calc(max(env(safe-area-inset-bottom, 0px), 8px) + 72px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+        }
+        @media (min-width: 768px) {
+            #toastContainer { bottom: 24px; }
+        }
+        .toast {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            white-space: nowrap;
+            pointer-events: all;
+            max-width: calc(100vw - 32px);
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+        }
+        .toast-success { background: linear-gradient(135deg,#10b981,#059669); }
+        .toast-error   { background: linear-gradient(135deg,#ef4444,#dc2626); }
+        .toast-info    { background: linear-gradient(135deg,#3b82f6,#2563eb); }
+        .toast-warn    { background: linear-gradient(135deg,#f59e0b,#d97706); color: #111; }
+        @keyframes toastIn {
+            from { opacity:0; transform:translateY(14px) scale(0.9); }
+            to   { opacity:1; transform:translateY(0) scale(1); }
+        }
+        @keyframes toastOut {
+            from { opacity:1; transform:translateY(0) scale(1); }
+            to   { opacity:0; transform:translateY(-8px) scale(0.95); }
+        }
+
+        /* ── Onboarding welcome banner ───────────────────────────── */
+        #onboardingBanner {
+            animation: bannerFadeIn 0.4s ease;
+        }
+        @keyframes bannerFadeIn {
+            from { opacity:0; transform:translateY(-8px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        /* ── Inline field validation ─────────────────────────────── */
+        .field-input-error {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 2px rgba(239,68,68,0.15);
+        }
+        .field-error-msg {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            color: #f87171;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        /* ── Mobile "Preview my QR" CTA button ──────────────────── */
+        .mobile-next-btn { display: none; }
+        @media (max-width: 767px) {
+            .mobile-next-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                width: 100%;
+                padding: 15px 20px;
+                background: linear-gradient(135deg,#2563eb,#1d4ed8);
+                color: white;
+                font-weight: 700;
+                font-size: 15px;
+                border-radius: 16px;
+                border: none;
+                box-shadow: 0 4px 16px rgba(37,99,235,0.35);
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+                margin-bottom: 4px;
+                transition: transform 0.1s, box-shadow 0.15s;
+            }
+            .mobile-next-btn:active {
+                transform: scale(0.97);
+                box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+            }
+        }
+
+        /* ── Advanced feature badge ──────────────────────────────── */
+        .adv-badge {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            background: rgba(139,92,246,0.15);
+            color: #a78bfa;
+            border: 1px solid rgba(139,92,246,0.3);
+            border-radius: 4px;
+            padding: 1px 5px;
+            margin-left: 5px;
+            vertical-align: middle;
+            line-height: 1.4;
+        }
+
+        /* ── Help (?) button ─────────────────────────────────────── */
+        .help-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.3);
+            color: #60a5fa;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .help-btn:hover {
+            background: rgba(59,130,246,0.22);
+            border-color: rgba(59,130,246,0.55);
+        }
+
+        /* ── History ─────────────────────────────────────────────── */
+        #historyDrawer {
+            position: fixed;
+            top: 0; right: 0;
+            height: 100%;
+            width: 300px;
+            background: #1a2130;
+            border-left: 1px solid rgba(255,255,255,0.08);
+            box-shadow: -8px 0 32px rgba(0,0,0,0.45);
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+            will-change: transform;
+        }
+        #historyDrawer.open { transform: translateX(0); }
+        #historyOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 59;
+            backdrop-filter: blur(2px);
+        }
+        #historyOverlay.open { display: block; }
+
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 14px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
+        }
+        .history-header h2 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: #9ca3af;
+        }
+        .history-close-btn {
+            width: 26px; height: 26px;
+            border-radius: 7px;
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: background 0.13s, color 0.13s;
+        }
+        .history-close-btn:hover { background: rgba(255,255,255,0.08); color: #e5e7eb; }
+
+        .history-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 10px 16px;
+            scrollbar-width: thin;
+            scrollbar-color: #374151 transparent;
+        }
+        .history-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #4b5563;
+            padding: 6px 4px 5px;
+        }
+        .history-empty {
+            text-align: center;
+            color: #4b5563;
+            font-size: 12px;
+            padding: 32px 12px;
+            line-height: 1.7;
+        }
+        .history-card {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 7px 8px;
+            border-radius: 11px;
+            cursor: pointer;
+            transition: background 0.13s;
+            border: 1px solid transparent;
+            margin-bottom: 3px;
+        }
+        .history-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.06); }
+        .history-thumb {
+            width: 46px; height: 46px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #111827;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .history-info { flex: 1; min-width: 0; }
+        .history-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #e5e7eb;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            outline: none;
+            border-radius: 4px;
+            padding: 1px 3px;
+            margin-left: -3px;
+            cursor: text;
+        }
+        .history-name:focus {
+            background: rgba(59,130,246,0.15);
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+        }
+        .history-time { font-size: 10px; color: #6b7280; margin-top: 1px; }
+        .history-actions { display: flex; gap: 1px; flex-shrink: 0; }
+        .history-action-btn {
+            width: 26px; height: 26px;
+            border-radius: 6px;
+            background: transparent;
+            border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: background 0.12s, color 0.12s;
+            color: #6b7280;
+        }
+        .history-action-btn:hover { background: rgba(255,255,255,0.08); color: #e5e7eb; }
+        .history-action-btn.starred { color: #fbbf24; }
+        .history-action-btn.delete-btn:hover { background: rgba(239,68,68,0.12); color: #f87171; }
+
+        .save-snapshot-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #0d9488 0%, #0891b2 100%);
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25);
+            border: none;
+            cursor: pointer;
+            transition: filter 0.15s, box-shadow 0.15s, transform 0.1s;
+            text-align: center;
+        }
+        .save-snapshot-btn:hover { filter: brightness(1.1); box-shadow: 0 4px 14px rgba(13,148,136,0.35); }
+        .save-snapshot-btn:active { transform: scale(0.97); }
+        .save-snapshot-btn svg { flex-shrink: 0; color: #fff; }
+
+        /* ── Desktop Download Buttons ────────────────────────── */
+        .desktop-download-btn {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            will-change: transform, filter, box-shadow;
+        }
+
+        .desktop-download-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+            transform: translateX(-100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .desktop-download-btn:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+            transform: translateY(-2px);
+        }
+
+        .desktop-download-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .desktop-download-btn:active {
+            filter: brightness(0.9);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .desktop-download-btn:focus-visible {
+            outline: 2px solid rgba(255, 255, 255, 0.6);
+            outline-offset: 3px;
+        }
+
+        .history-toggle-btn {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: rgba(139,92,246,0.12);
+            border: 1px solid rgba(139,92,246,0.3);
+            color: #a78bfa;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+            position: relative;
+        }
+        .history-toggle-btn:hover { background: rgba(139,92,246,0.22); border-color: rgba(139,92,246,0.5); }
+        .history-toggle-btn.active { background: rgba(139,92,246,0.3); border-color: rgba(139,92,246,0.7); }
+        .history-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: #8b5cf6;
+            color: white;
+            font-size: 8px;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            border: 1.5px solid #111827;
+            pointer-events: none;
+        }
+
+        @media (max-width: 767px) {
+            #historyDrawer {
+                top: auto; bottom: 0;
+                left: 0; right: 0;
+                width: 100%;
+                height: 72vh;
+                border-left: none;
+                border-top: 1px solid rgba(255,255,255,0.1);
+                border-radius: 20px 20px 0 0;
+                box-shadow: 0 -8px 32px rgba(0,0,0,0.55);
+                transform: translateY(100%);
+            }
+            #historyDrawer.open { transform: translateY(0); }
+            .history-body { padding-bottom: 28px; }
         }

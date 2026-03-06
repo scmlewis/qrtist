@@ -343,6 +343,27 @@ let foregroundOpacity = 0.15;
 // Memoization cache for foreground mask (key: "w_h", value: ImageData)
 const foregroundMaskCache = new Map();
 
+// ── Toast notifications ──────────────────────────────────────────────────
+function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function showToast(message, type = 'info', duration = 3200) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const icons = { success: '&#10003;', error: '&#10007;', warn: '&#9888;', info: '&#8505;' };
+    const icon = icons[type] || icons.info;
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.setAttribute('role', 'status');
+    toast.innerHTML = '<span aria-hidden="true">' + icon + '</span><span>' + _esc(message) + '</span>';
+    container.appendChild(toast);
+    const fadeOut = () => {
+        toast.style.animation = 'toastOut 0.3s ease forwards';
+        setTimeout(() => { if (toast.parentNode) toast.remove(); }, 290);
+    };
+    setTimeout(fadeOut, duration);
+}
+
 // Logo color overrides: stores user-selected colors keyed by preset name
 const logoColorOverrides = {};
 
@@ -537,6 +558,26 @@ function renderInputFields() {
             input.addEventListener('input', updateQRCode);
             input.addEventListener('change', updateQRCode);
             wrapper.appendChild(input);
+            // Inline validation for URL and email fields
+            if (field.type === 'url' || field.id === 'urlInput' || field.id === 'emailInput') {
+                const errEl = document.createElement('p');
+                errEl.className = 'field-error-msg';
+                errEl.setAttribute('aria-live', 'polite');
+                errEl.textContent = (field.id === 'emailInput')
+                    ? '\u26a0 Enter a valid email, e.g. name@example.com'
+                    : '\u26a0 Include a protocol, e.g. https://example.com';
+                wrapper.appendChild(errEl);
+                const valPattern = (field.id === 'emailInput')
+                    ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                    : /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\/.+/;
+                const validate = () => {
+                    const invalid = input.value.trim().length > 0 && !valPattern.test(input.value.trim());
+                    input.classList.toggle('field-input-error', invalid);
+                    errEl.style.display = invalid ? 'flex' : 'none';
+                };
+                input.addEventListener('blur', validate);
+                input.addEventListener('input', () => { if (input.classList.contains('field-input-error')) validate(); });
+            }
         }
         if (field.help) {
             const helpText = document.createElement('p');
@@ -1120,6 +1161,7 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor) {
             };
             logoImg.onerror = () => {
                 console.error('Failed to load logo:', logoUrl);
+                showToast('Failed to load logo image', 'error');
                 constrainPreviewCanvas();
             };
             logoImg.src = logoUrl;
@@ -1632,7 +1674,7 @@ document.getElementById('importConfigInput').addEventListener('change', (e) => {
             updateLogoColorUI();
             updateQRCode();
         } catch (e) {
-            alert('Error importing config: ' + e.message);
+            showToast('Import failed: ' + e.message, 'error');
         }
     };
     reader.readAsText(e.target.files[0]);
@@ -1654,7 +1696,7 @@ if (fullscreenPreviewBtn) {
     fullscreenPreviewBtn.addEventListener('click', () => {
         const qrContainer = document.getElementById('qrCodeContainer');
         if (!qrContainer || !qrContainer.querySelector('canvas')) {
-            alert('QR code not ready yet');
+            showToast('QR code not ready yet', 'warn');
             return;
         }
         const canvas = qrContainer.querySelector('canvas');
@@ -1766,7 +1808,7 @@ renderTemplates();
                 const orig = label.textContent;
                 label.textContent = 'Copied!';
                 setTimeout(() => label.textContent = orig, 2000);
-            }).catch(err => alert('Failed to copy: ' + err.message));
+            }).catch(err => showToast('Failed to copy', 'error'));
         });
     }
 
@@ -1818,7 +1860,7 @@ renderTemplates();
             navigator.clipboard.writeText(url).then(() => {
                 copyShareBtn.style.color = '#10b981';
                 setTimeout(() => copyShareBtn.style.color = '', 2000);
-            }).catch(err => alert('Failed to copy: ' + err.message));
+            }).catch(err => showToast('Failed to copy link', 'error'));
         });
     }
 
@@ -1933,9 +1975,9 @@ renderTemplates();
                     updateQRCode();
                     advancedModal.classList.add('hidden');
                     advancedModal.classList.remove('visible');
-                    alert('Settings imported successfully!');
+                    showToast('Settings imported', 'success');
                 } catch (err) {
-                    alert('Error importing settings: ' + err.message);
+                    showToast('Error importing settings: ' + err.message, 'error');
                 }
             };
             reader.readAsText(e.target.files[0]);
@@ -2266,7 +2308,7 @@ renderTemplates();
                         setConfigFromImport(imported);
                         updateQRCode();
                     } catch (err) {
-                        alert('Invalid JSON file');
+                        showToast('Invalid JSON file', 'error');
                     }
                 };
                 reader.readAsText(file);
@@ -2470,9 +2512,9 @@ renderTemplates();
                     updateLogoColorUI();
                     updateQRCode();
                     document.getElementById('advancedModal').classList.add('hidden');
-                    alert('Settings imported successfully!');
+                    showToast('Settings imported', 'success');
                 } catch (err) {
-                    alert('Error importing settings: ' + err.message);
+                    showToast('Error importing settings: ' + err.message, 'error');
                 }
             };
             reader.readAsText(e.target.files[0]);
@@ -2489,4 +2531,335 @@ renderTemplates();
             updateQRCode();
         }
     }, 10);
+})();
+
+// ── Onboarding banner ──────────────────────────────────────────────────
+(function initOnboarding() {
+    const banner = document.getElementById('onboardingBanner');
+    const dismissBtn = document.getElementById('dismissOnboarding');
+    const helpBtn = document.getElementById('helpBtn');
+    if (!banner) return;
+    if (!localStorage.getItem('qrtist_v1_welcomed')) {
+        banner.style.display = 'block';
+    }
+    if (dismissBtn) {
+        dismissBtn.addEventListener('click', () => {
+            banner.style.display = 'none';
+            localStorage.setItem('qrtist_v1_welcomed', '1');
+        });
+    }
+    if (helpBtn) {
+        helpBtn.addEventListener('click', () => {
+            const visible = banner.style.display !== 'none';
+            banner.style.display = visible ? 'none' : 'block';
+            if (!visible) banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+    }
+})();
+
+// ── Mobile “Preview my QR” CTA ─────────────────────────────────────────
+(function initMobileNextBtn() {
+    const btn = document.getElementById('mobileNextBtn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+        const previewTab = document.querySelector('.mobile-tab-btn[data-tab="1"]');
+        if (previewTab) previewTab.click();
+    });
+})();
+
+// ── History ──────────────────────────────────────────────────────────────────
+const HISTORY_KEY = 'qrtist_history_v1';
+const HISTORY_MAX = 20;
+
+const historyManager = {
+    _load() {
+        try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+        catch { return []; }
+    },
+    _save(entries) {
+        try {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                showToast('Storage full — delete some snapshots to free space', 'warn', 6000);
+            }
+        }
+    },
+    _genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); },
+    _autoName(type) {
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const d = new Date();
+        return type.charAt(0).toUpperCase() + type.slice(1) + ' — ' + months[d.getMonth()] + ' ' + d.getDate();
+    },
+    _thumb() {
+        try {
+            const canvas = document.querySelector('#qrCodeContainer canvas');
+            if (!canvas) return '';
+            const t = document.createElement('canvas');
+            t.width = 80; t.height = 80;
+            t.getContext('2d').drawImage(canvas, 0, 0, 80, 80);
+            return t.toDataURL('image/jpeg', 0.7);
+        } catch { return ''; }
+    },
+    save() {
+        const configObj = JSON.parse(atob(getConfigHash()));
+        if (logoDataUrl) configObj.logo = logoDataUrl;
+        if (foregroundDataUrl) configObj.fgOverlay = foregroundDataUrl;
+        const entry = {
+            id: this._genId(),
+            timestamp: Date.now(),
+            name: this._autoName(configObj.type),
+            starred: false,
+            thumb: this._thumb(),
+            config: configObj
+        };
+        const all = this._load();
+        all.unshift(entry);
+        const starred = all.filter(e => e.starred);
+        const unstarred = all.filter(e => !e.starred).slice(0, HISTORY_MAX);
+        this._save([...starred, ...unstarred]);
+        return entry;
+    },
+    getAll() {
+        const all = this._load();
+        return {
+            favourites: all.filter(e => e.starred).sort((a, b) => b.timestamp - a.timestamp),
+            recents: all.filter(e => !e.starred).sort((a, b) => b.timestamp - a.timestamp)
+        };
+    },
+    star(id) {
+        const all = this._load();
+        const e = all.find(e => e.id === id);
+        if (e) { e.starred = !e.starred; this._save(all); }
+    },
+    rename(id, name) {
+        const all = this._load();
+        const e = all.find(e => e.id === id);
+        if (e && name.trim()) { e.name = name.trim(); this._save(all); }
+    },
+    delete(id) { this._save(this._load().filter(e => e.id !== id)); },
+    restore(id) {
+        const entry = this._load().find(e => e.id === id);
+        if (entry) restoreFromConfig(entry.config);
+    },
+    count() { return this._load().length; }
+};
+
+function restoreFromConfig(configObj) {
+    qrType.value = configObj.type || 'url';
+    renderInputFields();
+    Object.keys(configObj.values || {}).forEach(key => {
+        const el = document.getElementById(key);
+        if (el) el.value = configObj.values[key];
+    });
+    fgColorInput.value = configObj.fg || '#000000';
+    fgColorText.value = configObj.fg || '#000000';
+    bgColorInput.value = configObj.bg || '#ffffff';
+    bgColorText.value = configObj.bg || '#ffffff';
+    currentPattern = configObj.pattern || 'square';
+    currentOuterCorner = configObj.outerCorner || 'square';
+    currentInnerCorner = configObj.innerCorner || 'square';
+    useGradient = !!configObj.useGradient;
+    gradientColor2 = configObj.gradientColor2 || '#3b82f6';
+    foregroundOpacity = (configObj.fgOpacity || 15) / 100;
+    if (gradColor2Input) gradColor2Input.value = gradientColor2;
+    if (gradColor2Text) gradColor2Text.value = gradientColor2;
+    if (gradientToggleBtn) {
+        gradientToggleBtn.setAttribute('aria-pressed', useGradient);
+        gradientToggleBtn.classList.toggle('active', useGradient);
+    }
+    if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !useGradient);
+    if (fgOpacitySlider) fgOpacitySlider.value = Math.round(foregroundOpacity * 100);
+    if (fgOpacityDisplay) fgOpacityDisplay.textContent = Math.round(foregroundOpacity * 100) + '%';
+    currentQRSize = configObj.size || 300;
+    qrSize.value = currentQRSize;
+    qrSizeValue.textContent = currentQRSize;
+    logoSize.value = configObj.logoSize || 20;
+    logoSizeValue.textContent = configObj.logoSize || 20;
+    logoMargin.value = configObj.logoMargin || 10;
+    logoMarginValue.textContent = configObj.logoMargin || 10;
+    selectedFrame = configObj.frame || 'none';
+    frameColorInput.value = configObj.frameColor || '#000000';
+    frameColorTextInput.value = configObj.frameColor || '#000000';
+    frameTextInput.value = configObj.frameText || '';
+    currentLogoPreset = configObj.logoPreset || 'none';
+    Object.keys(logoColorOverrides).forEach(k => delete logoColorOverrides[k]);
+    Object.assign(logoColorOverrides, configObj.logoColors || {});
+    logoDataUrl = configObj.logo || null;
+    foregroundDataUrl = configObj.fgOverlay || null;
+    updateShapeSelection();
+    updateCornerSelection();
+    updateFrameSelection();
+    updateLogoSelection();
+    updateLogoColorUI();
+    logoControls.classList.toggle('hidden', currentLogoPreset === 'none');
+    if (foregroundDataUrl) {
+        const fgC = document.getElementById('fgOverlayControls');
+        const fgR = document.getElementById('fgOverlayRemove');
+        if (fgC) fgC.classList.remove('hidden');
+        if (fgR) { fgR.classList.remove('hidden'); fgR.style.display = 'flex'; }
+    }
+    updateQRCode();
+}
+
+function _relativeTime(ts) {
+    const s = Math.floor((Date.now() - ts) / 1000);
+    if (s < 60) return 'just now';
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + 'm ago';
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + 'h ago';
+    return Math.floor(h / 24) + 'd ago';
+}
+
+function renderHistoryPanel() {
+    const body = document.getElementById('historyBody');
+    if (!body) return;
+    const { favourites, recents } = historyManager.getAll();
+    const total = favourites.length + recents.length;
+
+    const badge = document.getElementById('historyBadge');
+    if (badge) {
+        badge.style.display = total > 0 ? 'flex' : 'none';
+        badge.textContent = total > 9 ? '9+' : String(total);
+    }
+
+    if (total === 0) {
+        body.innerHTML = '<div class="history-empty"><svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" style="color:#374151;margin:0 auto 10px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>No snapshots yet.<br>Click <strong style="color:#e5e7eb">Save Snapshot</strong> to save the current design.</div>';
+        return;
+    }
+
+    const makeCard = (entry) => {
+        const card = document.createElement('div');
+        card.className = 'history-card';
+        card.dataset.id = entry.id;
+
+        if (entry.thumb) {
+            const img = document.createElement('img');
+            img.className = 'history-thumb';
+            img.src = entry.thumb;
+            img.alt = '';
+            img.loading = 'lazy';
+            card.appendChild(img);
+        } else {
+            const ph = document.createElement('div');
+            ph.className = 'history-thumb';
+            ph.style.cssText = 'display:flex;align-items:center;justify-content:center;color:#374151';
+            ph.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+            card.appendChild(ph);
+        }
+
+        const info = document.createElement('div');
+        info.className = 'history-info';
+
+        const nameEl = document.createElement('span');
+        nameEl.className = 'history-name';
+        nameEl.contentEditable = 'true';
+        nameEl.setAttribute('role', 'textbox');
+        nameEl.setAttribute('aria-label', 'Snapshot name');
+        nameEl.textContent = entry.name;
+        nameEl.title = 'Click to rename';
+        nameEl.addEventListener('blur', () => {
+            const n = nameEl.textContent.trim();
+            if (n && n !== entry.name) historyManager.rename(entry.id, n);
+        });
+        nameEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); } });
+        nameEl.addEventListener('click', e => e.stopPropagation());
+        info.appendChild(nameEl);
+
+        const time = document.createElement('div');
+        time.className = 'history-time';
+        time.textContent = _relativeTime(entry.timestamp);
+        info.appendChild(time);
+        card.appendChild(info);
+
+        const actions = document.createElement('div');
+        actions.className = 'history-actions';
+
+        const starBtn = document.createElement('button');
+        starBtn.className = 'history-action-btn' + (entry.starred ? ' starred' : '');
+        starBtn.title = entry.starred ? 'Remove from favourites' : 'Add to favourites';
+        starBtn.setAttribute('aria-label', entry.starred ? 'Unstar' : 'Star');
+        const starFill = entry.starred ? 'currentColor' : 'none';
+        starBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="' + starFill + '" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+        starBtn.addEventListener('click', e => { e.stopPropagation(); historyManager.star(entry.id); renderHistoryPanel(); });
+        actions.appendChild(starBtn);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'history-action-btn delete-btn';
+        delBtn.title = 'Delete snapshot';
+        delBtn.setAttribute('aria-label', 'Delete snapshot');
+        delBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
+        delBtn.addEventListener('click', e => { e.stopPropagation(); historyManager.delete(entry.id); renderHistoryPanel(); });
+        actions.appendChild(delBtn);
+        card.appendChild(actions);
+
+        card.addEventListener('click', e => {
+            if (e.target.closest('.history-action-btn') || e.target.closest('[contenteditable]')) return;
+            restoreFromConfig(entry.config);
+            closeHistoryDrawer();
+            showToast('Snapshot restored', 'success');
+        });
+
+        return card;
+    };
+
+    body.innerHTML = '';
+
+    if (favourites.length > 0) {
+        const lbl = document.createElement('div');
+        lbl.className = 'history-section-label';
+        lbl.textContent = '\u2B50 Favourites';
+        body.appendChild(lbl);
+        favourites.forEach(e => body.appendChild(makeCard(e)));
+    }
+
+    if (recents.length > 0) {
+        const lbl = document.createElement('div');
+        lbl.className = 'history-section-label';
+        lbl.textContent = favourites.length > 0 ? 'Recent' : 'Snapshots';
+        body.appendChild(lbl);
+        recents.forEach(e => body.appendChild(makeCard(e)));
+    }
+}
+
+function openHistoryDrawer() {
+    renderHistoryPanel();
+    document.getElementById('historyDrawer').classList.add('open');
+    document.getElementById('historyOverlay').classList.add('open');
+    const btn = document.getElementById('historyToggleBtn');
+    if (btn) btn.classList.add('active');
+}
+
+function closeHistoryDrawer() {
+    document.getElementById('historyDrawer').classList.remove('open');
+    document.getElementById('historyOverlay').classList.remove('open');
+    const btn = document.getElementById('historyToggleBtn');
+    if (btn) btn.classList.remove('active');
+}
+
+(function initHistory() {
+    const toggleBtn = document.getElementById('historyToggleBtn');
+    const closeBtn  = document.getElementById('historyCloseBtn');
+    const overlay   = document.getElementById('historyOverlay');
+    const saveBtn   = document.getElementById('saveSnapshot');
+    const saveBtnM  = document.getElementById('saveSnapshotMobile');
+
+    if (toggleBtn) toggleBtn.addEventListener('click', () => {
+        document.getElementById('historyDrawer').classList.contains('open')
+            ? closeHistoryDrawer()
+            : openHistoryDrawer();
+    });
+    if (closeBtn) closeBtn.addEventListener('click', closeHistoryDrawer);
+    if (overlay)  overlay.addEventListener('click', closeHistoryDrawer);
+
+    const doSave = () => {
+        historyManager.save();
+        renderHistoryPanel();
+        showToast('Snapshot saved', 'success');
+    };
+    if (saveBtn)  saveBtn.addEventListener('click', doSave);
+    if (saveBtnM) saveBtnM.addEventListener('click', doSave);
+
+    renderHistoryPanel();
 })();

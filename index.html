@@ -80,6 +80,15 @@
                     <p class="header-subtitle text-sm md:text-base text-gray-300 mt-1.5 font-medium tracking-wide">
                         Create beautiful, stylish QR codes</p>
                 </div>
+                <!-- Header action buttons — wrapped so z-index beats the floating QR chip -->
+                <div class="flex items-center gap-2" style="position:relative;z-index:45;flex-shrink:0">
+                <!-- Help button -->
+                <button id="helpBtn" class="help-btn" aria-label="How to use QRtist" title="How to use QRtist">?</button>
+                <!-- History toggle button -->
+                <button id="historyToggleBtn" class="history-toggle-btn" aria-label="View saved snapshots" title="Saved snapshots">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span class="history-badge" id="historyBadge" style="display:none">0</span>
+                </button>
                 <!-- Mobile Overflow Menu Button -->
                 <div class="relative hidden-desktop" id="mobileMenuContainer">
                     <button id="mobileMenuBtn" class="p-2.5 rounded-lg hover:bg-gray-700 text-gray-400 hover:text-white transition-colors" aria-label="More options">
@@ -99,7 +108,36 @@
                         </button>
                     </div>
                 </div>
+                </div><!-- /header action buttons wrapper -->
             </header>
+
+            <!-- ── First-run welcome banner ──────────────────── -->
+            <div id="onboardingBanner" class="mb-5 rounded-2xl" style="display:none" role="region" aria-label="Welcome guide">
+                <div class="bg-gradient-to-r from-blue-900/50 via-indigo-900/40 to-purple-900/30 border border-blue-700/40 rounded-2xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-white mb-2.5">👋 Welcome to QRtist — free, no sign-up needed</p>
+                            <div class="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-gray-300">
+                                <span class="flex items-center gap-1.5 whitespace-nowrap">
+                                    <span class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">1</span>
+                                    Choose type &amp; enter data
+                                </span>
+                                <span class="flex items-center gap-1.5 whitespace-nowrap">
+                                    <span class="w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">2</span>
+                                    Pick a template or customize
+                                </span>
+                                <span class="flex items-center gap-1.5 whitespace-nowrap">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">3</span>
+                                    Download PNG or SVG — free
+                                </span>
+                            </div>
+                        </div>
+                        <button id="dismissOnboarding" class="flex-shrink-0 p-1.5 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10" aria-label="Dismiss welcome message">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <div class="grid-layout">
                 <!-- ── Left Panel: Input ─────────────────────── -->
@@ -153,29 +191,29 @@
                     <div class="mobile-hidden">
                     <!-- Downloads -->
                     <div>
-                        <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Download</p>
-                        <div class="grid grid-cols-2 gap-2">
+                        <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Download</p>
+                        <div class="grid grid-cols-2 gap-3">
                             <button id="downloadPng"
-                                class="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold rounded-xl shadow-sm shadow-none transition-all"
-                                style="background: linear-gradient(135deg, #2563eb, #1d4ed8); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                class="desktop-download-btn flex flex-col items-center justify-center gap-3 px-3 py-4 text-white font-bold rounded-2xl transition-all duration-200 hover:scale-110 active:scale-95 border-2 border-blue-500/30"
+                                style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 flex-shrink-0"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                     <polyline points="7 10 12 15 17 10" />
                                     <line x1="12" y1="15" x2="12" y2="3" />
                                 </svg>
-                                PNG
+                                <span class="text-base leading-tight">PNG</span>
                             </button>
                             <button id="downloadSvg"
-                                class="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-sm shadow-none transition-all"
-                                style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);\">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                class="desktop-download-btn flex flex-col items-center justify-center gap-3 px-3 py-4 text-white font-bold rounded-2xl transition-all duration-200 hover:scale-110 active:scale-95 border-2 border-emerald-500/30"
+                                style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 flex-shrink-0"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                     <polyline points="7 10 12 15 17 10" />
                                     <line x1="12" y1="15" x2="12" y2="3" />
                                 </svg>
-                                SVG
+                                <span class="text-base leading-tight">SVG</span>
                             </button>
                         </div>
                     </div>
@@ -238,7 +276,20 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Save Snapshot -->
+                    <div class="mt-3">
+                        <button id="saveSnapshot" class="save-snapshot-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Save Snapshot
+                        </button>
+                    </div>
                     </div><!-- /mobile-hidden -->
+                    <!-- Mobile CTA: jump to Preview tab -->
+                    <button id="mobileNextBtn" class="mobile-next-btn" aria-label="View QR code preview">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                        Preview my QR
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
                     <input type="file" id="importConfigInput" accept=".json" class="hidden">
                 </div>
 
@@ -363,6 +414,10 @@
                                         <polyline points="14 2 14 8 20 8"/>
                                     </svg>
                                     <span>Export Settings</span>
+                                </button>
+                                <button id="saveSnapshotMobile" class="save-snapshot-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    Save Snapshot
                                 </button>
                             </div>
                         </div>
@@ -507,7 +562,7 @@
                                             <path d="M7 16h10M7 12h10" />
                                         </svg>
                                     </div>
-                                    <span class="text-sm font-semibold text-gray-200">Foreground</span>
+                                    <span class="text-sm font-semibold text-gray-200">Foreground</span><span class="adv-badge">Advanced</span>
                                 </div>
                                 <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2.5">
@@ -719,7 +774,7 @@
                                             <rect x="16" y="16" width="2" height="2" />
                                         </svg>
                                     </div>
-                                    <span class="text-sm font-semibold text-gray-200">Corner Style</span>
+                                    <span class="text-sm font-semibold text-gray-200">Corner Style</span><span class="adv-badge">Advanced</span>
                                 </div>
                                 <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2.5">
@@ -1531,6 +1586,24 @@
             }
         </script>
 
+        <!-- History drawer overlay -->
+        <div id="historyOverlay" aria-hidden="true"></div>
+
+        <!-- History drawer -->
+        <aside id="historyDrawer" aria-label="Saved snapshots" role="complementary">
+            <div class="history-header">
+                <h2>Snapshots</h2>
+                <button id="historyCloseBtn" class="history-close-btn" aria-label="Close history">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="history-body" id="historyBody">
+                <!-- Populated by renderHistoryPanel() -->
+            </div>
+        </aside>
+
+        <!-- Toast notification host -->
+        <div id="toastContainer" aria-live="polite" aria-atomic="false"></div>
         <script src="./qr-bundle.js"></script>
         <script src="./app.js"></script>
     </body>
