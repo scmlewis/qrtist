@@ -1,0 +1,673 @@
+:root {
+            --primary: #3b82f6;
+            --primary-light: #60a5fa;
+            --primary-dark: #1d4ed8;
+            --accent: #10b981;
+            --accent-light: #34d399;
+            --accent-dark: #059669;
+            --background: #111827;
+            --surface: #1f2937;
+            --surface-elevated: #0f1729;
+            --border: #374151;
+            --text: #f3f4f6;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .shape-btn,
+        .corner-btn,
+        .frame-btn {
+            color: var(--text);
+        }
+
+        /* Typography enhancements */
+        .uppercase {
+            letter-spacing: 0.05em;
+        }
+
+        /* ── Range inputs ─────────────────────────────────── */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 5px;
+            border-radius: 9999px;
+            background: var(--border);
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(59, 130, 246, 0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.5), 0 0 12px rgba(16, 185, 129, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 2px solid #fff;
+        }
+
+        /* ── Accordion ────────────────────────────────────── */
+        details>summary {
+            list-style: none;
+        }
+
+        details>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details[open] .acc-chevron {
+            transform: rotate(180deg);
+        }
+
+        .acc-chevron {
+            transition: transform 0.2s ease;
+        }
+
+        .acc-body {
+            animation: accFade 0.15s ease;
+        }
+
+        @keyframes accFade {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Cursor pointers ────────────────────────────── */
+        select,
+        input[type="color"],
+        input[type="range"],
+        [role="switch"],
+        button,
+        [role="button"] {
+            cursor: pointer;
+        }
+
+        /* ── Respect prefers-reduced-motion ────────────── */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ── Custom scrollbar (design panel) ─────────────── */
+        .design-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .design-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .design-content::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 9999px;
+        }
+
+        /* ── Color inputs ─────────────────────────────────── */
+        input[type="color"] {
+            padding: 2px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* ── Section icon badges ─────────────────────────── */
+        .acc-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        /* ── Card glow on hover ──────────────────────────── */
+        .panel-card {
+            transition: box-shadow 0.2s;
+        }
+
+        /* ── Button active feedback ──────────────────────── */
+        button:active {
+            transform: scale(0.97);
+        }
+
+        /* ── Smooth focus rings ──────────────────────────── */
+        input:focus,
+        select:focus,
+        button:focus-visible {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+
+        /* ── Logo grid drag feedback ─────────────────────── */
+        #logoDrop.drag-over {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.07);
+        }
+
+        /* ── Template buttons ────────────────────────────── */
+        .template-btn {
+            transition: all 0.15s ease;
+        }
+
+        .template-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .template-btn.selected {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+
+        /* ── Gradient toggle pill ────────────────────────── */
+        .grad-toggle {
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .grad-toggle.active {
+            background: #3b82f6;
+        }
+
+        .grad-thumb {
+            transition: transform 0.2s;
+        }
+
+        .grad-toggle.active .grad-thumb {
+            transform: translateX(16px);
+        }
+
+        /* ── QR preview container — JS handles canvas scaling, this just
+               ensures the card never stretches beyond its column ── */
+        #qrCodeContainer {
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        /* ── Header animations & styling ───────────────── */
+        .logo-icon {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #10b981);
+            background-size: 200% 200%;
+            animation: gradientShift 6s ease infinite;
+            border-radius: 0.75rem;
+            z-index: -1;
+        }
+
+        @keyframes gradientShift {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .logo-icon svg {
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        .header-title {
+            background: linear-gradient(135deg, #ffffff 0%, #60a5fa 50%, #34d399 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientFlowText 6s ease infinite;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        @keyframes gradientFlowText {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .header-subtitle {
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .header-subtitle::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 12px;
+            background: linear-gradient(135deg, #3b82f6, #10b981);
+            border-radius: 1px;
+            animation: accentPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes accentPulse {
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        header {
+            position: relative;
+            padding-bottom: 2px;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+            animation: shimmer 3s ease infinite;
+        }
+
+        @keyframes shimmer {
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        /* ── Responsive Container Layout ────────────────── */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        @media (min-width: 1024px) {
+            .main-container {
+                min-height: calc(100vh - 200px);
+            }
+        }
+
+        .grid-layout {
+            display: grid;
+            gap: 1.25rem;
+            height: auto;
+            min-height: 0;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1023px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .grid-layout {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1.5rem;
+                height: auto;
+            }
+        }
+
+        .panel-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            height: auto;
+            max-height: none;
+        }
+
+        @media (min-width: 1024px) {
+            .design-panel {
+                max-height: calc(100vh - 180px);
+                height: auto;
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .design-panel {
+                max-height: none;
+                height: auto;
+            }
+        }
+
+        /* ── Content panel scrolling ────────────────────── */
+        .design-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0;
+        }
+
+        .design-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .design-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .design-content::-webkit-scrollbar-thumb {
+            background: rgba(75, 85, 99, 0.6);
+            border-radius: 3px;
+        }
+
+        .design-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(75, 85, 99, 0.8);
+        }
+
+        /* ── QR Preview responsive sizing ───────────────── */
+        @media (max-width: 640px) {
+            #qrCodeContainer {
+                min-width: 120px;
+                min-height: 120px;
+            }
+        }
+
+        @media (min-width: 641px) and (max-width: 1023px) {
+            #qrCodeContainer {
+                min-width: 140px;
+                min-height: 140px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            #qrCodeContainer {
+                min-width: 160px;
+                min-height: 160px;
+            }
+        }
+
+        /* ── Header responsive spacing ──────────────────── */
+        @media (max-width: 768px) {
+            header {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            header {
+                margin-bottom: 2.5rem;
+            }
+        }
+
+        /* ══ Mobile UX Redesign ══════════════════════════════════ */
+
+        /* Compact header on small phones */
+        @media (max-width: 480px) {
+            .header-title { font-size: 1.5rem !important; }
+            .header-subtitle { display: none !important; }
+            header { margin-bottom: 0.5rem !important; }
+        }
+
+        /* Hide mobile menu on desktop, show on mobile */
+        .hidden-desktop { display: none; }
+        @media (max-width: 767px) {
+            .hidden-desktop { display: block; }
+        }
+
+        /* Hide downloads/share section on mobile (Preview tab has its own buttons) */
+        @media (max-width: 767px) {
+            .mobile-hidden { display: none !important; }
+        }
+
+        /* Bottom padding to clear the fixed tab bar */
+        @media (max-width: 767px) {
+            .main-container {
+                padding-bottom: calc(5.5rem + max(12px, env(safe-area-inset-bottom, 0px)));
+            }
+            /* Larger touch targets for style picker grids */
+            .shape-btn, .corner-btn, .frame-btn, .logo-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            /* Easier-to-grab slider thumb */
+            input[type="range"]::-webkit-slider-thumb {
+                width: 22px;
+                height: 22px;
+            }
+            input[type="range"]::-moz-range-thumb {
+                width: 22px;
+                height: 22px;
+            }
+        }
+
+        /* Panel gating: one panel visible at a time on mobile */
+        @media (max-width: 767px) {
+            .grid-layout > .panel-card { display: none !important; }
+            .grid-layout > .panel-card.mobile-active-panel { display: flex !important; }
+        }
+
+        /* ── Bottom Tab Bar ──────────────────────────────────── */
+        .mobile-tab-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(55, 65, 81, 0.8);
+            padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+        }
+
+        .mobile-tab-bar-inner {
+            display: flex;
+            height: 60px;
+        }
+
+        .mobile-tab-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 6px 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            transition: color 0.15s;
+            position: relative;
+        }
+
+        .mobile-tab-btn svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            margin-bottom: 1px;
+        }
+
+        .mobile-tab-btn.tab-active { color: var(--primary); }
+
+        .mobile-tab-btn .tab-indicator {
+            position: absolute;
+            top: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 2px;
+            border-radius: 9999px;
+            background: var(--primary);
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .mobile-tab-btn.tab-active .tab-indicator { opacity: 1; }
+
+        /* Preview tab update badge */
+        .mobile-tab-btn.tab-badge::after {
+            content: '';
+            position: absolute;
+            top: 7px;
+            right: calc(50% - 17px);
+            width: 7px;
+            height: 7px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 1.5px solid #111827;
+            animation: badge-pop 0.25s ease;
+        }
+
+        @keyframes badge-pop {
+            from { transform: scale(0); }
+            60%  { transform: scale(1.4); }
+            to   { transform: scale(1); }
+        }
+
+        /* ── Floating Live QR Chip ───────────────────────────── */
+        .mobile-qr-chip {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 40;
+            width: 90px;
+            height: 90px;
+            background: rgba(17, 24, 39, 0.9);
+            border: 1.5px solid rgba(59, 130, 246, 0.5);
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.12s;
+        }
+
+        .mobile-qr-chip:active { transform: scale(0.9); }
+
+        .mobile-qr-chip img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+            display: block;
+        }
+
+        .mobile-qr-chip.chip-pulse { animation: chip-pulse-anim 0.4s ease; }
+
+        @keyframes chip-pulse-anim {
+            0%   { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 0   rgba(59,130,246,0.7); }
+            50%  { box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 0 8px  rgba(59,130,246,0.1); }
+            100% { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 0   rgba(59,130,246,0); }
+        }
+
+        /* ── Mobile Download Row inside Preview Panel ────────── */
+        .mobile-preview-actions {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            gap: 0;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(75, 85, 99, 0.4);
+        }
+
+        /* Activate all mobile-specific elements on phones */
+        @media (max-width: 767px) {
+            .mobile-tab-bar          { display: block; }
+            .mobile-qr-chip          { display: block; }
+            .mobile-preview-actions  { display: flex; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #advancedModal.visible {
+            opacity: 1 !important;
+        }
