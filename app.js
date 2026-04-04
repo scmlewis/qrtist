@@ -337,6 +337,8 @@ let currentInnerCorner = 'square';
 // Gradient state
 let useGradient = false;
 let gradientColor2 = '#3b82f6';
+// Monotonic token used to ignore stale async render passes.
+let activeRenderToken = 0;
 // Foreground overlay state
 let foregroundDataUrl = null;
 let foregroundOpacity = 0.15;
@@ -944,6 +946,7 @@ function drawFrame(ctx, size, frame, frameColor, frameText, textBarHeight) {
 }
 
 function updateQRCode() {
+    const renderToken = ++activeRenderToken;
     const type = qrType.value;
     const config = qrTypeConfig[type];
     const values = getInputValues();
@@ -1005,6 +1008,7 @@ function updateQRCode() {
         
         // Use requestAnimationFrame for better synchronization instead of arbitrary timeouts
         requestAnimationFrame(() => {
+            if (renderToken !== activeRenderToken) return;
             const canvas = qrCodeContainer.querySelector('canvas');
             if (canvas) {
                 // Apply rendering optimizations
@@ -1018,7 +1022,7 @@ function updateQRCode() {
                 originalCtx.drawImage(canvas, 0, 0);
                 
                 // Process frame, text, and logo together in proper order
-                processFrameAndLogo(canvas, originalCanvas, bgColor);
+                processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken);
             }
         });
         
@@ -1047,7 +1051,11 @@ function updateQRCode() {
  * Unified function to handle frame, text, and logo rendering in correct order
  * Eliminates race conditions and ensures proper layering
  */
-function processFrameAndLogo(canvas, originalCanvas, bgColor) {
+function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken = activeRenderToken) {
+    if (renderToken !== activeRenderToken) {
+        return;
+    }
+
     // Validate selectedFrame state
     if (selectedFrame === undefined || selectedFrame === null) {
         console.warn('selectedFrame is undefined, defaulting to none');
@@ -1091,10 +1099,11 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor) {
         fc.fillStyle = bgColor;
         fc.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
         
-        // Position original QR code with frame padding
+        // Position original QR code with frame padding.
+        // Always use the pre-frame snapshot to avoid wrapping a previously processed canvas.
         const qrX = hasFrame ? FRAME_PAD : 0;
         const qrY = hasFrame ? FRAME_PAD : 0;
-        fc.drawImage(canvas, qrX, qrY);
+        fc.drawImage(originalCanvas, qrX, qrY);
         
         // Replace container canvas
         qrCodeContainer.innerHTML = '';
@@ -1125,6 +1134,7 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor) {
         if (logoUrl) {
             const logoImg = new Image();
             logoImg.onload = () => {
+                if (renderToken !== activeRenderToken) return;
                 // Check for oversized logo warning
                 let logoPercent = parseInt(logoSize.value) || 20;
                 if (logoPercent > 30) {
@@ -1154,12 +1164,13 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor) {
                 
                 // Apply foreground overlay if present
                 if (foregroundDataUrl) {
-                    applyForegroundOverlay(finalCanvas);
+                    applyForegroundOverlay(finalCanvas, renderToken);
                 } else {
                     constrainPreviewCanvas();
                 }
             };
             logoImg.onerror = () => {
+                if (renderToken !== activeRenderToken) return;
                 console.error('Failed to load logo:', logoUrl);
                 showToast('Failed to load logo image', 'error');
                 constrainPreviewCanvas();
@@ -1168,7 +1179,7 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor) {
         }
     } else if (foregroundDataUrl) {
         // No logo, but apply foreground overlay
-        applyForegroundOverlay(finalCanvas);
+        applyForegroundOverlay(finalCanvas, renderToken);
     } else {
         constrainPreviewCanvas();
     }
@@ -1177,13 +1188,15 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor) {
 /**
  * Apply foreground overlay with proper masking to dark QR modules only
  */
-function applyForegroundOverlay(canvas) {
+function applyForegroundOverlay(canvas, renderToken) {
     const fgImg = new Image();
     fgImg.onload = () => {
+        if (renderToken !== undefined && renderToken !== activeRenderToken) return;
         applyForegroundMask(canvas, fgImg, foregroundOpacity);
         constrainPreviewCanvas();
     };
     fgImg.onerror = () => {
+        if (renderToken !== undefined && renderToken !== activeRenderToken) return;
         console.error('Failed to load foreground overlay');
         constrainPreviewCanvas();
     };

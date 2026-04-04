@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -18,6 +18,9 @@
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%233b82f6;stop-opacity:1' /><stop offset='100%' style='stop-color:%2310b981;stop-opacity:1' /></linearGradient></defs><rect fill='url(%23grad)' width='180' height='180' rx='30'/><g transform='translate(45,45)'><rect fill='%23fff' x='0' y='0' width='15' height='15' rx='2'/><rect fill='%23fff' x='30' y='0' width='15' height='15' rx='2'/><rect fill='%23fff' x='60' y='0' width='15' height='15' rx='2'/><rect fill='%23fff' x='0' y='30' width='15' height='15' rx='2'/><rect fill='%23fff' x='60' y='30' width='15' height='15' rx='2'/><rect fill='%23fff' x='0' y='60' width='15' height='15' rx='2'/><rect fill='%23fff' x='30' y='60' width='15' height='15' rx='2'/><rect fill='%23fff' x='60' y='60' width='15' height='15' rx='2'/></g></svg>">
     <title>QRtist - Stylish QR Code Generator</title>
     <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         // Force dark mode only
@@ -30,7 +33,7 @@
 
 <body class="bg-gray-900 transition-colors duration-200">
     <!-- Shared SVG defs for frame thumbnails -->
-    <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+    <svg aria-hidden="true" focusable="false" class="svg-defs">
         <defs>
             <pattern id="qr-data-fill" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
                 <rect x="0" y="0" width="3" height="3" fill="#d0d0d0" />
@@ -54,14 +57,12 @@
             </symbol>
         </defs>
     </svg>
-    <div class="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 p-4 md:p-6 lg:p-8 transition-colors duration-200 flex flex-col"
-        style="background: linear-gradient(135deg, #0f172a 0%, #111827 50%, #1f2937 100%);">
+    <div class="app-shell min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-900 p-4 md:p-6 lg:p-8 transition-colors duration-200 flex flex-col">
         <div class="max-w-7xl mx-auto w-full main-container">
 
             <!-- ── Header ─────────────────────────────────── -->
             <header class="flex items-center gap-4 py-2 relative">
-                <div class="logo-icon w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg flex-shrink-0"
-                    style="box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);">
+                <div class="logo-icon logo-shadow w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg flex-shrink-0">
                     <svg width="26" height="26" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="1" y="1" width="8" height="8" rx="1.5" fill="white" />
                         <rect x="13" y="1" width="8" height="8" rx="1.5" fill="white" />
@@ -81,17 +82,17 @@
                         Create beautiful, stylish QR codes</p>
                 </div>
                 <!-- Header action buttons — wrapped so z-index beats the floating QR chip -->
-                <div class="flex items-center gap-2" style="position:relative;z-index:45;flex-shrink:0">
+                <div class="header-actions flex items-center gap-2">
                 <!-- Help button -->
-                <button id="helpBtn" class="help-btn" aria-label="How to use QRtist" title="How to use QRtist">?</button>
+                <button type="button" id="helpBtn" class="help-btn" aria-label="How to use QRtist" title="How to use QRtist">?</button>
                 <!-- History toggle button -->
-                <button id="historyToggleBtn" class="history-toggle-btn" aria-label="View saved snapshots" title="Saved snapshots">
+                <button type="button" id="historyToggleBtn" class="btn-base btn-icon btn-tertiary" aria-label="View saved snapshots" title="Saved snapshots">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <span class="history-badge" id="historyBadge" style="display:none">0</span>
+                    <span class="history-badge" id="historyBadge">0</span>
                 </button>
                 <!-- Mobile Overflow Menu Button -->
                 <div class="relative hidden-desktop" id="mobileMenuContainer">
-                    <button id="mobileMenuBtn" class="p-2.5 rounded-lg hover:bg-gray-700 text-gray-400 hover:text-white transition-colors" aria-label="More options">
+                    <button type="button" id="mobileMenuBtn" class="p-2.5 rounded-lg hover:bg-gray-700 text-gray-400 hover:text-white transition-colors" aria-label="More options">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
                             <circle cx="12" cy="5" r="2"/>
                             <circle cx="12" cy="12" r="2"/>
@@ -99,7 +100,7 @@
                         </svg>
                     </button>
                     <div id="mobileMenu" class="hidden absolute right-0 top-full mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-40">
-                        <button id="advancedOptionsBtn" class="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white flex items-center gap-3 text-sm font-medium">
+                        <button type="button" id="advancedOptionsBtn" class="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white flex items-center gap-3 text-sm font-medium">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="3"/>
                                 <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m6.08 0l4.24-4.24M1 12h6m6 0h6m-1.78 7.78l-4.24-4.24m-6.08 0l-4.24 4.24"/>
@@ -112,7 +113,7 @@
             </header>
 
             <!-- ── First-run welcome banner ──────────────────── -->
-            <div id="onboardingBanner" class="mb-5 rounded-2xl" style="display:none" role="region" aria-label="Welcome guide">
+            <section id="onboardingBanner" class="mb-5 rounded-2xl" aria-label="Welcome guide">
                 <div class="bg-gradient-to-r from-blue-900/50 via-indigo-900/40 to-purple-900/30 border border-blue-700/40 rounded-2xl p-4">
                     <div class="flex items-start gap-3">
                         <div class="flex-1 min-w-0">
@@ -132,22 +133,20 @@
                                 </span>
                             </div>
                         </div>
-                        <button id="dismissOnboarding" class="flex-shrink-0 p-1.5 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10" aria-label="Dismiss welcome message">
+                        <button type="button" id="dismissOnboarding" class="flex-shrink-0 p-1.5 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10" aria-label="Dismiss welcome message">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         </button>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <div class="grid-layout">
                 <!-- ── Left Panel: Input ─────────────────────── -->
-                <div id="panelData" class="panel-card bg-gray-800 rounded-2xl shadow-sm border border-gray-700 p-5 flex flex-col gap-5"
-                    style="background: rgba(31, 41, 55, 0.8); border-color: rgba(55, 65, 81, 0.8);">
+                <div id="panelData" class="panel-card panel-surface p-5 flex flex-col gap-5">
 
                     <!-- Panel title -->
                     <div class="flex items-center gap-2">
-                        <div
-                            class="w-7 h-7 rounded-lg bg-blue-900/40 text-blue-400 flex items-center justify-center flex-shrink-0">
+                        <div class="badge-icon bg-blue-900/40 text-blue-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="9" y1="1" x2="9" y2="23" />
@@ -156,7 +155,7 @@
                                 <path d="M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2" />
                             </svg>
                         </div>
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">QR Data</h2>
+                        <h2 class="panel-title">QR Data</h2>
                     </div>
 
                     <!-- QR Type Selector -->
@@ -193,9 +192,8 @@
                     <div>
                         <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Download</p>
                         <div class="grid grid-cols-2 gap-3">
-                            <button id="downloadPng"
-                                class="desktop-download-btn flex flex-col items-center justify-center gap-3 px-3 py-4 text-white font-bold rounded-2xl transition-all duration-200 hover:scale-110 active:scale-95 border-2 border-blue-500/30"
-                                style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);">
+                            <button type="button" id="downloadPng"
+                                class="desktop-download-btn btn-base btn-primary flex flex-col items-center justify-center gap-3 px-3 py-4 text-white font-bold rounded-2xl transition-all duration-200 border-2 border-blue-500/30">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 flex-shrink-0"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -204,9 +202,8 @@
                                 </svg>
                                 <span class="text-base leading-tight">PNG</span>
                             </button>
-                            <button id="downloadSvg"
-                                class="desktop-download-btn flex flex-col items-center justify-center gap-3 px-3 py-4 text-white font-bold rounded-2xl transition-all duration-200 hover:scale-110 active:scale-95 border-2 border-emerald-500/30"
-                                style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);">
+                            <button type="button" id="downloadSvg"
+                                class="desktop-download-btn btn-base btn-secondary flex flex-col items-center justify-center gap-3 px-3 py-4 text-white font-bold rounded-2xl transition-all duration-200 border-2 border-emerald-500/30">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 flex-shrink-0"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -220,10 +217,10 @@
 
                     <!-- Secondary actions -->
                     <div class="border-t border-gray-700 pt-4">
-                        <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Share & Config</p>
+                        <p class="section-label mb-2">Share &amp; Config</p>
                         <div class="flex flex-col gap-1.5">
-                            <button id="copyShareLink"
-                                class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
+                            <button type="button" id="copyShareLink"
+                                class="btn-base btn-tertiary btn-compact flex items-center gap-2 rounded-xl">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 flex-shrink-0"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
@@ -232,8 +229,8 @@
                                 Copy Share Link
                             </button>
                             <div class="grid grid-cols-2 gap-1.5">
-                                <button id="exportConfig"
-                                    class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
+                                <button type="button" id="exportConfig"
+                                    class="btn-base btn-ghost btn-compact flex items-center justify-center gap-1.5 rounded-xl">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 flex-shrink-0"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <polyline points="8 17 12 21 16 17" />
@@ -242,8 +239,8 @@
                                     </svg>
                                     Export
                                 </button>
-                                <button id="importConfig"
-                                    class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
+                                <button type="button" id="importConfig"
+                                    class="btn-base btn-ghost btn-compact flex items-center justify-center gap-1.5 rounded-xl">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 flex-shrink-0"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <polyline points="16 16 12 12 8 16" />
@@ -254,16 +251,16 @@
                                 </button>
                             </div>
                             <div class="grid grid-cols-2 gap-1.5">
-                                <button id="resetDesign"
-                                    class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
+                                <button type="button" id="resetDesign"
+                                    class="btn-base btn-danger btn-compact flex items-center justify-center gap-1.5 rounded-xl">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 flex-shrink-0"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
                                     </svg>
                                     Reset
                                 </button>
-                                <button id="exportCsvDesktop"
-                                    class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
+                                <button type="button" id="exportCsvDesktop"
+                                    class="btn-base btn-muted btn-compact flex items-center justify-center gap-1.5 rounded-xl">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 flex-shrink-0"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -278,14 +275,14 @@
                     </div>
                     <!-- Save Snapshot -->
                     <div class="mt-3">
-                        <button id="saveSnapshot" class="save-snapshot-btn">
+                        <button type="button" id="saveSnapshot" class="btn-base btn-tertiary flex items-center justify-center gap-2 w-full">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                             Save Snapshot
                         </button>
                     </div>
                     </div><!-- /mobile-hidden -->
                     <!-- Mobile CTA: jump to Preview tab -->
-                    <button id="mobileNextBtn" class="mobile-next-btn" aria-label="View QR code preview">
+                    <button type="button" id="mobileNextBtn" class="mobile-next-btn" aria-label="View QR code preview">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
                         Preview my QR
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -294,11 +291,9 @@
                 </div>
 
                 <!-- ── Center Panel: Preview ─────────────────── -->
-                <div id="panelPreview" class="panel-card bg-gray-800 rounded-2xl shadow-lg border border-blue-500/30 p-5 flex flex-col items-center justify-between gap-4"
-                    style="background: linear-gradient(135deg, rgba(31, 41, 55, 0.9), rgba(15, 23, 41, 0.8)); box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);">
+                <div id="panelPreview" class="panel-card panel-elevated p-5 flex flex-col items-center justify-between gap-4">
                     <div class="flex items-center gap-2 w-full">
-                        <div
-                            class="w-5 h-5 rounded-lg bg-purple-900/40 text-purple-400 flex items-center justify-center flex-shrink-0">
+                        <div class="badge-icon bg-purple-900/40 text-purple-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2.5">
                                 <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -306,13 +301,12 @@
                                 <path d="M21 15l-5-5L5 21" />
                             </svg>
                         </div>
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Preview</h2>
+                        <h2 class="panel-title">Preview</h2>
                     </div>
 
                     <!-- QR canvas wrapper -->
                     <div class="flex-1 flex items-center justify-center w-full py-2">
-                        <div id="qrCodeContainer" class="rounded-2xl ring-1 ring-gray-600 bg-gray-50 shadow-lg p-3"
-                            style="min-width:160px;min-height:160px;">
+                        <div id="qrCodeContainer" class="rounded-2xl ring-1 ring-gray-600 bg-gray-50 shadow-lg p-3">
                             <!-- QR code rendered here -->
                         </div>
                     </div>
@@ -321,8 +315,7 @@
                     <div
                         class="w-full flex items-center justify-between text-xs text-gray-500 border-t border-gray-700 pt-3">
                         <span id="previewStatus" class="flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"
-                                style="box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);"></span>
+                            <span class="status-dot w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
                             Ready
                         </span>
                         <span class="font-mono"><span id="qrSizeLabel">300</span>×<span
@@ -342,8 +335,7 @@
                         <span id="contrastWarningText">Low contrast — verify scannability.</span>
                     </div>
                     <div id="scannabilityInfo"
-                        class="hidden w-full bg-emerald-950/50 border border-emerald-800 rounded-xl px-3 py-2.5 text-xs text-emerald-300 flex items-center gap-2"
-                        style="background: rgba(5, 150, 105, 0.1); border-color: rgba(16, 185, 129, 0.4);">
+                        class="scannability-info hidden w-full bg-emerald-950/50 border border-emerald-800 rounded-xl px-3 py-2.5 text-xs text-emerald-300 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="20 6 9 17 4 12" />
@@ -365,11 +357,10 @@
                     <div class="mobile-preview-actions">
                         <!-- Primary: Download Options (most prominent) -->
                         <div class="space-y-2">
-                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">Download</p>
+                            <p class="section-label px-1">Download</p>
                             <div class="grid grid-cols-2 gap-2.5">
-                                <button id="downloadPngMobile"
-                                    class="flex flex-col items-center justify-center gap-2 py-3 px-2 text-white text-xs font-semibold rounded-xl transition-all hover:shadow-lg active:scale-95"
-                                    style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">
+                                <button type="button" id="downloadPngMobile"
+                                    class="btn-base btn-primary flex flex-col items-center justify-center gap-2 py-3 px-2 text-white text-xs font-semibold rounded-xl transition-all hover:shadow-lg">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                         <polyline points="7 10 12 15 17 10"/>
@@ -377,9 +368,8 @@
                                     </svg>
                                     PNG
                                 </button>
-                                <button id="downloadSvgMobile"
-                                    class="flex flex-col items-center justify-center gap-2 py-3 px-2 text-white text-xs font-semibold rounded-xl transition-all hover:shadow-lg active:scale-95"
-                                    style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                                <button type="button" id="downloadSvgMobile"
+                                    class="btn-base btn-secondary flex flex-col items-center justify-center gap-2 py-3 px-2 text-white text-xs font-semibold rounded-xl transition-all hover:shadow-lg">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                         <polyline points="7 10 12 15 17 10"/>
@@ -395,27 +385,25 @@
 
                         <!-- Secondary: Share & Export (subtle, organized) -->
                         <div class="space-y-2">
-                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">Share & Settings</p>
+                            <p class="section-label px-1">Share &amp; Settings</p>
                             <div class="flex flex-col gap-2">
-                                <button id="shareLinkMobile"
-                                    class="flex items-center justify-center gap-2 py-2.5 px-3 text-white text-sm font-semibold rounded-lg transition-all hover:shadow-md active:scale-95"
-                                    style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(37, 99, 235, 0.9) 100%); box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);">
+                                <button type="button" id="shareLinkMobile"
+                                    class="btn-base btn-tertiary flex items-center justify-center gap-2 py-2.5 px-3 text-sm font-semibold rounded-lg transition-all hover:shadow-md">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.47 1.47"/>
                                         <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.47-1.47"/>
                                     </svg>
                                     <span>Share Design</span>
                                 </button>
-                                <button id="exportSettingsMobile"
-                                    class="flex items-center justify-center gap-2 py-2.5 px-3 text-white text-sm font-semibold rounded-lg transition-all hover:shadow-md active:scale-95"
-                                    style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.85) 0%, rgba(109, 40, 217, 0.85) 100%); box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);">
+                                <button type="button" id="exportSettingsMobile"
+                                    class="btn-base btn-ghost flex items-center justify-center gap-2 py-2.5 px-3 text-sm font-semibold rounded-lg transition-all hover:shadow-md">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                                         <polyline points="14 2 14 8 20 8"/>
                                     </svg>
                                     <span>Export Settings</span>
                                 </button>
-                                <button id="saveSnapshotMobile" class="save-snapshot-btn">
+                                <button type="button" id="saveSnapshotMobile" class="btn-base btn-tertiary flex items-center justify-center gap-2 w-full">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                                     Save Snapshot
                                 </button>
@@ -425,13 +413,11 @@
                 </div>
 
                 <!-- ── Right Panel: Design Controls ─────────── -->
-                <div id="panelDesign" class="panel-card design-panel bg-gray-800 rounded-2xl shadow-sm border border-gray-700 flex flex-col"
-                    style="background: rgba(31, 41, 55, 0.6); border-left: 3px solid rgba(59, 130, 246, 0.3);">
+                <div id="panelDesign" class="panel-card panel-surface panel-accent design-panel flex flex-col">
 
                     <!-- Pinned header -->
                     <div class="flex items-center gap-2 px-5 pt-5 pb-4 border-b border-gray-700 flex-shrink-0">
-                        <div
-                            class="w-5 h-5 rounded-lg bg-rose-900/40 text-rose-400 flex items-center justify-center flex-shrink-0">
+                        <div class="badge-icon bg-rose-900/40 text-rose-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
                                 fill="currentColor">
                                 <circle cx="6" cy="6" r="1.5" />
@@ -440,7 +426,7 @@
                                 <path d="M12 2v20M4 12h16" stroke="currentColor" stroke-width="1.5" fill="none" />
                             </svg>
                         </div>
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Design</h2>
+                        <h2 class="panel-title">Design</h2>
                     </div>
 
                     <!-- Scrollable sections -->
@@ -450,8 +436,8 @@
                         <details class="group mb-1">
                             <summary
                                 class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
-                                <div class="flex items-center gap-2">
-                                    <div
+                                <span class="flex items-center gap-2">
+                                    <span
                                         class="w-5 h-5 rounded-lg bg-orange-900/30 text-orange-400 flex items-center justify-center flex-shrink-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -459,9 +445,9 @@
                                             <path
                                                 d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m2.12 4.24l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m2.12-4.24l4.24-4.24" />
                                         </svg>
-                                    </div>
+                                    </span>
                                     <span class="text-sm font-semibold text-gray-200">Templates</span>
-                                </div>
+                                </span>
                                 <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2.5">
                                     <polyline points="6 9 12 15 18 9" />
@@ -481,8 +467,8 @@
                         <details open class="group mb-1">
                             <summary
                                 class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
-                                <div class="flex items-center gap-2">
-                                    <div
+                                <span class="flex items-center gap-2">
+                                    <span
                                         class="w-5 h-5 rounded-lg bg-yellow-900/30 text-yellow-400 flex items-center justify-center flex-shrink-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -490,9 +476,9 @@
                                             <circle cx="12" cy="12" r="6" />
                                             <circle cx="12" cy="5" r="2" />
                                         </svg>
-                                    </div>
+                                    </span>
                                     <span class="text-sm font-semibold text-gray-200">Colors</span>
-                                </div>
+                                </span>
                                 <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2.5">
                                     <polyline points="6 9 12 15 18 9" />
@@ -525,7 +511,7 @@
                                 <div class="flex items-center justify-between">
                                     <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">Gradient
                                         Dots</label>
-                                    <button id="gradientToggle" role="switch" aria-pressed="false"
+                                    <button type="button" id="gradientToggle" role="switch" aria-pressed="false" aria-label="Toggle gradient dots"
                                         class="grad-toggle relative w-9 h-5 rounded-full bg-gray-600 flex-shrink-0"
                                         title="Enable gradient">
                                         <span
@@ -553,17 +539,17 @@
                         <details class="group mb-1">
                             <summary
                                 class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
-                                <div class="flex items-center gap-2">
-                                    <div
+                                <span class="flex items-center gap-2">
+                                    <span
                                         class="w-5 h-5 rounded-lg bg-violet-900/30 text-violet-400 flex items-center justify-center flex-shrink-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                             <path d="M17 18H5V8a2 2 0 0 1 4-2h6a2 2 0 0 1 4 2v10z" />
                                             <path d="M7 16h10M7 12h10" />
                                         </svg>
-                                    </div>
+                                    </span>
                                     <span class="text-sm font-semibold text-gray-200">Foreground</span><span class="adv-badge">Advanced</span>
-                                </div>
+                                </span>
                                 <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2.5">
                                     <polyline points="6 9 12 15 18 9" />
@@ -583,7 +569,7 @@
                                         Upload Image
                                     </label>
                                     <input type="file" id="fgOverlayInput" accept="image/*" class="hidden">
-                                    <button id="fgOverlayRemove"
+                                    <button type="button" id="fgOverlayRemove"
                                         class="hidden flex items-center gap-1 text-xs text-red-400 hover:underline px-2 py-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24"
                                             fill="none" stroke="currentColor" stroke-width="2">
@@ -617,8 +603,8 @@
                         <details open class="group mb-1">
                             <summary
                                 class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
-                                <div class="flex items-center gap-2">
-                                    <div
+                                <span class="flex items-center gap-2">
+                                    <span
                                         class="w-5 h-5 rounded-lg bg-blue-900/30 text-blue-400 flex items-center justify-center flex-shrink-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
                                             viewBox="0 0 24 24" fill="currentColor">
@@ -628,9 +614,9 @@
                                             <rect x="4" y="10" width="5" height="5" />
                                             <rect x="10" y="10" width="5" height="5" />
                                         </svg>
-                                    </div>
+                                    </span>
                                     <span class="text-sm font-semibold text-gray-200">Dot Shape</span>
-                                </div>
+                                </span>
                                 <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2.5">
                                     <polyline points="6 9 12 15 18 9" />
@@ -638,7 +624,7 @@
                             </summary>
                             <div class="acc-body px-1 pt-3 pb-2">
                                 <div id="shapeGrid" class="grid grid-cols-4 gap-1.5">
-                                    <button data-pattern="square"
+                                    <button type="button" data-pattern="square"
                                         class="shape-btn selected flex flex-col items-center gap-1 p-2 border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36">
                                             <rect x="2" y="2" width="9" height="9" fill="currentColor" />
@@ -654,7 +640,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Square</span>
                                     </button>
-                                    <button data-pattern="dots"
+                                    <button type="button" data-pattern="dots"
                                         class="shape-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36">
                                             <circle cx="6.5" cy="6.5" r="4.5" fill="currentColor" />
@@ -670,7 +656,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Dots</span>
                                     </button>
-                                    <button data-pattern="rounded"
+                                    <button type="button" data-pattern="rounded"
                                         class="shape-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36">
                                             <rect x="2" y="2" width="9" height="9" rx="2.5" fill="currentColor" />
@@ -686,7 +672,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Rounded</span>
                                     </button>
-                                    <button data-pattern="extra-rounded"
+                                    <button type="button" data-pattern="extra-rounded"
                                         class="shape-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36">
                                             <circle cx="6.5" cy="6.5" r="6" fill="currentColor" />
@@ -702,7 +688,7 @@
                                         <span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">XL
                                             Round</span>
                                     </button>
-                                    <button data-pattern="classy"
+                                    <button type="button" data-pattern="classy"
                                         class="shape-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36">
                                             <rect x="3.5" y="3.5" width="6" height="6" fill="currentColor" />
@@ -718,7 +704,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Classy</span>
                                     </button>
-                                    <button data-pattern="classy-rounded"
+                                    <button type="button" data-pattern="classy-rounded"
                                         class="shape-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36">
                                             <rect x="3.5" y="3.5" width="6" height="6" rx="2" fill="currentColor" />
@@ -734,7 +720,7 @@
                                         <span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Cl.
                                             Round</span>
                                     </button>
-                                    <button data-pattern="classy-dots"
+                                    <button type="button" data-pattern="classy-dots"
                                         class="shape-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36">
                                             <circle cx="6.5" cy="6.5" r="3" fill="currentColor" />
@@ -760,8 +746,8 @@
                         <details open class="group mb-1">
                             <summary
                                 class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
-                                <div class="flex items-center gap-2">
-                                    <div
+                                <span class="flex items-center gap-2">
+                                    <span
                                         class="w-5 h-5 rounded-lg bg-indigo-900/30 text-indigo-400 flex items-center justify-center flex-shrink-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -773,9 +759,9 @@
                                             <rect x="10" y="16" width="2" height="2" />
                                             <rect x="16" y="16" width="2" height="2" />
                                         </svg>
-                                    </div>
+                                    </span>
                                     <span class="text-sm font-semibold text-gray-200">Corner Style</span><span class="adv-badge">Advanced</span>
-                                </div>
+                                </span>
                                 <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2.5">
                                     <polyline points="6 9 12 15 18 9" />
@@ -787,7 +773,7 @@
                                         class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                                         Eye Frame</p>
                                     <div id="outerCornerGrid" class="grid grid-cols-4 gap-1.5">
-                                        <button data-outer="square"
+                                        <button type="button" data-outer="square"
                                             class="corner-btn selected flex flex-col items-center gap-1 p-2 border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <rect x="1" y="1" width="34" height="34" fill="none"
@@ -797,7 +783,7 @@
                                             <span
                                                 class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Square</span>
                                         </button>
-                                        <button data-outer="rounded"
+                                        <button type="button" data-outer="rounded"
                                             class="corner-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <rect x="1" y="1" width="34" height="34" rx="8" fill="none"
@@ -807,7 +793,7 @@
                                             <span
                                                 class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Rounded</span>
                                         </button>
-                                        <button data-outer="circle"
+                                        <button type="button" data-outer="circle"
                                             class="corner-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor"
@@ -817,7 +803,7 @@
                                             <span
                                                 class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Circle</span>
                                         </button>
-                                        <button data-outer="diamond"
+                                        <button type="button" data-outer="diamond"
                                             class="corner-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <polygon points="18,2 34,18 18,34 2,18" fill="none"
@@ -827,7 +813,7 @@
                                             <span
                                                 class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Diamond</span>
                                         </button>
-                                        <button data-outer="octagon"
+                                        <button type="button" data-outer="octagon"
                                             class="corner-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <polygon points="10,2 26,2 34,10 34,26 26,34 10,34 2,26 2,10"
@@ -837,7 +823,7 @@
                                             <span
                                                 class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Octagon</span>
                                         </button>
-                                        <button data-outer="squircle"
+                                        <button type="button" data-outer="squircle"
                                             class="corner-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <rect x="1" y="1" width="34" height="34" rx="12" fill="none"
@@ -854,7 +840,7 @@
                                         class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                                         Eye Center</p>
                                     <div id="innerCornerGrid" class="grid grid-cols-4 gap-1.5">
-                                        <button data-inner="square"
+                                        <button type="button" data-inner="square"
                                             class="corner-btn selected flex flex-col items-center gap-1 p-2 border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <rect x="4" y="4" width="28" height="28" fill="none"
@@ -864,7 +850,7 @@
                                             <span
                                                 class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Square</span>
                                         </button>
-                                        <button data-inner="dot"
+                                        <button type="button" data-inner="dot"
                                             class="corner-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <rect x="4" y="4" width="28" height="28" fill="none"
@@ -874,7 +860,7 @@
                                             <span
                                                 class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Dot</span>
                                         </button>
-                                        <button data-inner="rounded"
+                                        <button type="button" data-inner="rounded"
                                             class="corner-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <rect x="4" y="4" width="28" height="28" fill="none"
@@ -884,7 +870,7 @@
                                             <span
                                                 class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Rounded</span>
                                         </button>
-                                        <button data-inner="star"
+                                        <button type="button" data-inner="star"
                                             class="corner-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <rect x="4" y="4" width="28" height="28" fill="none"
@@ -896,7 +882,7 @@
                                             <span
                                                 class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Star</span>
                                         </button>
-                                        <button data-inner="diamond"
+                                        <button type="button" data-inner="diamond"
                                             class="corner-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <rect x="4" y="4" width="28" height="28" fill="none"
@@ -906,7 +892,7 @@
                                             <span
                                                 class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Diamond</span>
                                         </button>
-                                        <button data-inner="cross"
+                                        <button type="button" data-inner="cross"
                                             class="corner-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                             <svg width="32" height="32" viewBox="0 0 36 36">
                                                 <rect x="4" y="4" width="28" height="28" fill="none"
@@ -928,17 +914,17 @@
                         <details class="group mb-1">
                             <summary
                                 class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors">
-                                <div class="flex items-center gap-2">
-                                    <div
+                                <span class="flex items-center gap-2">
+                                    <span
                                         class="w-5 h-5 rounded-lg bg-green-900/30 text-green-400 flex items-center justify-center flex-shrink-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                             <path
                                                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 9h5v2h-5z" />
                                         </svg>
-                                    </div>
+                                    </span>
                                     <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">Logo</span>
-                                </div>
+                                </span>
                                 <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2.5">
                                     <polyline points="6 9 12 15 18 9" />
@@ -961,16 +947,16 @@
                                     <input type="file" id="logoInput" accept="image/*" class="hidden">
                                 </div>
                                 <div id="logoGrid" class="grid grid-cols-4 gap-1.5">
-                                    <button data-logo="none"
-                                        class="logo-btn selected flex items-center justify-center p-1 border-2 border-blue-500 bg-blue-50 dark:bg-gray-700 dark:border-blue-400 rounded-xl aspect-square transition">
+                                    <button type="button" data-logo="none"
+                                        class="logo-btn selected flex items-center justify-center p-1 border-2 border-blue-500 bg-blue-50 dark:bg-gray-700 dark:border-blue-400 rounded-xl aspect-square transition" aria-label="Logo option: none">
                                         <svg class="w-7 h-7 text-gray-400" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="1.5">
                                             <circle cx="12" cy="12" r="10" />
                                             <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
                                         </svg>
                                     </button>
-                                    <button data-logo="globe"
-                                        class="logo-btn flex items-center justify-center p-2 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-gray-50 dark:bg-gray-800">
+                                    <button type="button" data-logo="globe"
+                                        class="logo-btn flex items-center justify-center p-2 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-gray-50 dark:bg-gray-800" aria-label="Logo option: globe">
                                         <svg class="w-7 h-7 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24"
                                             fill="none" stroke="currentColor" stroke-width="1.3">
                                             <circle cx="12" cy="12" r="10" />
@@ -979,8 +965,8 @@
                                                 d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                                         </svg>
                                     </button>
-                                    <button data-logo="scan-brackets"
-                                        class="logo-btn flex items-center justify-center p-1.5 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-gray-50 dark:bg-gray-800">
+                                    <button type="button" data-logo="scan-brackets"
+                                        class="logo-btn flex items-center justify-center p-1.5 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-gray-50 dark:bg-gray-800" aria-label="Logo option: scan brackets">
                                         <svg viewBox="0 0 60 56" class="w-7 h-7 text-gray-800 dark:text-gray-100"
                                             fill="none">
                                             <g stroke="currentColor" stroke-width="5">
@@ -995,14 +981,14 @@
                                                 fill="currentColor" stroke="none">ME</text>
                                         </svg>
                                     </button>
-                                    <button data-logo="scan-text"
-                                        class="logo-btn flex items-center justify-center p-2 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-gray-50 dark:bg-gray-800">
+                                    <button type="button" data-logo="scan-text"
+                                        class="logo-btn flex items-center justify-center p-2 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-gray-50 dark:bg-gray-800" aria-label="Logo option: scan text">
                                         <span
                                             class="font-black text-[11px] leading-tight text-gray-800 dark:text-gray-100 text-center select-none">SCAN<br>ME</span>
                                     </button>
                                     <!-- Social -->
-                                    <button data-logo="x-twitter"
-                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-black rounded-xl overflow-hidden">
+                                    <button type="button" data-logo="x-twitter"
+                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-black overflow-hidden" aria-label="Logo option: x twitter">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" class="w-7 h-7">
                                             <path
@@ -1010,8 +996,8 @@
                                                 fill="#fff" />
                                         </svg>
                                     </button>
-                                    <button data-logo="facebook"
-                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden">
+                                    <button type="button" data-logo="facebook"
+                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden" aria-label="Logo option: facebook">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" class="w-7 h-7">
                                             <path
@@ -1019,8 +1005,8 @@
                                                 fill="#1877f2" />
                                         </svg>
                                     </button>
-                                    <button data-logo="instagram"
-                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden">
+                                    <button type="button" data-logo="instagram"
+                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden" aria-label="Logo option: instagram">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" class="w-7 h-7">
                                             <path
@@ -1028,8 +1014,8 @@
                                                 fill="#bc1888" />
                                         </svg>
                                     </button>
-                                    <button data-logo="linkedin"
-                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden">
+                                    <button type="button" data-logo="linkedin"
+                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden" aria-label="Logo option: linkedin">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" class="w-7 h-7">
                                             <path
@@ -1037,8 +1023,8 @@
                                                 fill="#0a66c2" />
                                         </svg>
                                     </button>
-                                    <button data-logo="pinterest"
-                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden">
+                                    <button type="button" data-logo="pinterest"
+                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden" aria-label="Logo option: pinterest">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" class="w-7 h-7">
                                             <path
@@ -1047,8 +1033,8 @@
                                         </svg>
                                     </button>
                                     <!-- Messaging -->
-                                    <button data-logo="telegram"
-                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden">
+                                    <button type="button" data-logo="telegram"
+                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden" aria-label="Logo option: telegram">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" class="w-7 h-7">
                                             <path
@@ -1056,8 +1042,8 @@
                                                 fill="#2AABEE" />
                                         </svg>
                                     </button>
-                                    <button data-logo="discord"
-                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden">
+                                    <button type="button" data-logo="discord"
+                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden" aria-label="Logo option: discord">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" class="w-7 h-7">
                                             <path
@@ -1066,8 +1052,8 @@
                                         </svg>
                                     </button>
                                     <!-- Music -->
-                                    <button data-logo="spotify"
-                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden">
+                                    <button type="button" data-logo="spotify"
+                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden" aria-label="Logo option: spotify">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" class="w-7 h-7">
                                             <path
@@ -1075,8 +1061,8 @@
                                                 fill="#1db954" />
                                         </svg>
                                     </button>
-                                    <button data-logo="youtube"
-                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden">
+                                    <button type="button" data-logo="youtube"
+                                        class="logo-btn flex items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition overflow-hidden" aria-label="Logo option: youtube">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" class="w-7 h-7">
                                             <path
@@ -1085,14 +1071,14 @@
                                         </svg>
                                     </button>
                                     <!-- Finance -->
-                                    <button id="customLogoBtn" data-logo="custom"
-                                        class="logo-btn hidden items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-white dark:bg-gray-800">
-                                        <img id="logoImg" src="" alt="Custom logo"
+                                    <button type="button" id="customLogoBtn" data-logo="custom"
+                                        class="logo-btn hidden items-center justify-center p-1 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-white dark:bg-gray-800" aria-label="Logo option: custom">
+                                        <img id="logoImg" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Custom logo"
                                             class="w-full h-full object-contain rounded-xl">
                                     </button>
                                 </div>
                                 <div id="logoPreview" class="hidden mt-2 flex justify-end">
-                                    <button id="logoRemove"
+                                    <button type="button" id="logoRemove"
                                         class="text-xs text-red-500 dark:text-red-400 hover:underline flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24"
                                             fill="none" stroke="currentColor" stroke-width="2">
@@ -1149,17 +1135,17 @@
                         <details class="group mb-1">
                             <summary
                                 class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors">
-                                <div class="flex items-center gap-2">
-                                    <div
+                                <span class="flex items-center gap-2">
+                                    <span
                                         class="w-5 h-5 rounded-lg bg-pink-900/30 text-pink-400 flex items-center justify-center flex-shrink-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                             <rect x="3" y="3" width="18" height="18" rx="2" />
                                             <rect x="8" y="8" width="8" height="8" />
                                         </svg>
-                                    </div>
+                                    </span>
                                     <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">Frame</span>
-                                </div>
+                                </span>
                                 <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2.5">
                                     <polyline points="6 9 12 15 18 9" />
@@ -1167,7 +1153,7 @@
                             </summary>
                             <div class="acc-body px-1 pt-3 pb-2 space-y-3">
                                 <div class="grid grid-cols-4 gap-1.5">
-                                    <button data-frame="none"
+                                    <button type="button" data-frame="none"
                                         class="frame-btn selected flex flex-col items-center gap-1 p-2 border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <circle cx="18" cy="18" r="14" stroke="currentColor" stroke-width="2"
@@ -1178,7 +1164,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">None</span>
                                     </button>
-                                    <button data-frame="simple"
+                                    <button type="button" data-frame="simple"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <rect x="2" y="2" width="32" height="32" stroke="currentColor"
@@ -1187,7 +1173,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Simple</span>
                                     </button>
-                                    <button data-frame="rounded-rect"
+                                    <button type="button" data-frame="rounded-rect"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <rect x="2" y="2" width="32" height="32" rx="7" stroke="currentColor"
@@ -1196,7 +1182,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Rounded</span>
                                     </button>
-                                    <button data-frame="thick-border"
+                                    <button type="button" data-frame="thick-border"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <rect x="2" y="2" width="32" height="32" stroke="currentColor"
@@ -1205,7 +1191,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Thick</span>
                                     </button>
-                                    <button data-frame="thick-rounded"
+                                    <button type="button" data-frame="thick-rounded"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <rect x="2" y="2" width="32" height="32" rx="8" stroke="currentColor"
@@ -1214,7 +1200,7 @@
                                         <span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Thick
                                             Rnd</span>
                                     </button>
-                                    <button data-frame="corners"
+                                    <button type="button" data-frame="corners"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <g stroke="currentColor" stroke-width="2.5">
@@ -1227,7 +1213,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Corners</span>
                                     </button>
-                                    <button data-frame="corner-circles"
+                                    <button type="button" data-frame="corner-circles"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="2" />
@@ -1238,7 +1224,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Circles</span>
                                     </button>
-                                    <button data-frame="double"
+                                    <button type="button" data-frame="double"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <rect x="1" y="1" width="34" height="34" stroke="currentColor"
@@ -1249,7 +1235,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Double</span>
                                     </button>
-                                    <button data-frame="double-rounded"
+                                    <button type="button" data-frame="double-rounded"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <rect x="1" y="1" width="34" height="34" rx="6" stroke="currentColor"
@@ -1260,7 +1246,7 @@
                                         <span class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Dbl
                                             Round</span>
                                     </button>
-                                    <button data-frame="shadow"
+                                    <button type="button" data-frame="shadow"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <rect x="5" y="5" width="29" height="29" fill="currentColor"
@@ -1271,7 +1257,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Shadow</span>
                                     </button>
-                                    <button data-frame="dashed"
+                                    <button type="button" data-frame="dashed"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <rect x="2" y="2" width="32" height="32" stroke="currentColor"
@@ -1280,7 +1266,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Dashed</span>
                                     </button>
-                                    <button data-frame="dotted"
+                                    <button type="button" data-frame="dotted"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <rect x="2" y="2" width="32" height="32" stroke="currentColor"
@@ -1289,7 +1275,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Dotted</span>
                                     </button>
-                                    <button data-frame="neon-glow"
+                                    <button type="button" data-frame="neon-glow"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <rect x="4" y="4" width="28" height="28" stroke="#818cf8" stroke-width="4"
@@ -1302,7 +1288,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Neon</span>
                                     </button>
-                                    <button data-frame="gradient"
+                                    <button type="button" data-frame="gradient"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <defs>
@@ -1317,7 +1303,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Gradient</span>
                                     </button>
-                                    <button data-frame="polaroid"
+                                    <button type="button" data-frame="polaroid"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
                                             <rect x="2" y="2" width="32" height="32" fill="none" stroke="currentColor"
@@ -1330,7 +1316,7 @@
                                         <span
                                             class="text-[10px] font-medium text-gray-600 dark:text-gray-300">Polaroid</span>
                                     </button>
-                                    <button data-frame="speech-bubble"
+                                    <button type="button" data-frame="speech-bubble"
                                         class="frame-btn flex flex-col items-center gap-1 p-2 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-400 transition">
                                         <svg width="32" height="32" viewBox="0 0 36 40" fill="none">
                                             <rect x="2" y="2" width="32" height="28" rx="6" stroke="currentColor"
@@ -1382,7 +1368,7 @@
             <!-- ── Mobile Bottom Tab Bar ──────────────────── -->
             <nav id="mobileTabBar" class="mobile-tab-bar" aria-label="Section navigation">
                 <div class="mobile-tab-bar-inner">
-                    <button class="mobile-tab-btn tab-active" data-tab="0" aria-label="Data">
+                    <button type="button" class="mobile-tab-btn tab-active" data-tab="0" aria-label="Data">
                         <span class="tab-indicator" aria-hidden="true"></span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <line x1="9" y1="1" x2="9" y2="23"/><line x1="15" y1="1" x2="15" y2="23"/>
@@ -1391,7 +1377,7 @@
                         </svg>
                         <span>Data</span>
                     </button>
-                    <button class="mobile-tab-btn" data-tab="1" aria-label="Preview">
+                    <button type="button" class="mobile-tab-btn" data-tab="1" aria-label="Preview">
                         <span class="tab-indicator" aria-hidden="true"></span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                             <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -1400,7 +1386,7 @@
                         </svg>
                         <span>Preview</span>
                     </button>
-                    <button class="mobile-tab-btn" data-tab="2" aria-label="Design">
+                    <button type="button" class="mobile-tab-btn" data-tab="2" aria-label="Design">
                         <span class="tab-indicator" aria-hidden="true"></span>
                         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                             <circle cx="6" cy="6" r="1.5"/><circle cx="12" cy="4" r="1.5"/><circle cx="18" cy="6" r="1.5"/>
@@ -1413,9 +1399,9 @@
         </div>
 
         <!-- ── Mobile Floating QR Chip ─────────────────────── -->
-        <div id="mobileQrChip" class="mobile-qr-chip" role="button" aria-label="Tap to view QR preview" tabindex="0">
-            <img id="mobileQrThumb" src="" alt="Live QR preview" aria-hidden="true">
-        </div>
+        <button type="button" id="mobileQrChip" class="mobile-qr-chip" aria-label="Tap to view QR preview">
+            <img id="mobileQrThumb" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Live QR preview" aria-hidden="true">
+        </button>
 
         <!-- ── Export Settings Modal ─────────────────────── -->
         <div id="exportSettingsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-200">
@@ -1432,7 +1418,7 @@
                         </h2>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Save your design configuration</p>
                     </div>
-                    <button id="closeExportSettingsModal" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    <button type="button" id="closeExportSettingsModal" aria-label="Close export settings" class="btn-base btn-icon btn-ghost">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <line x1="18" y1="6" x2="6" y2="18"/>
                             <line x1="6" y1="6" x2="18" y2="18"/>
@@ -1442,18 +1428,18 @@
                 <div class="p-6 space-y-4">
                     <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Your QR code design settings as JSON—copy, download, or share with others:</p>
                     <div class="bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 max-h-48 overflow-y-auto">
-                        <div class="text-xs font-mono text-gray-700 dark:text-gray-300 leading-relaxed" id="exportSettingsJson" style="word-break: break-word; white-space: pre-wrap;"></div>
+                    <div class="json-output text-xs font-mono text-gray-700 dark:text-gray-300 leading-relaxed" id="exportSettingsJson"></div>
                     </div>
                 </div>
                 <div class="flex gap-2 p-6 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
-                    <button id="copyExportSettingsBtn" class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md">
+                    <button type="button" id="copyExportSettingsBtn" class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                         </svg>
                         <span id="copyExportSettingsLabel">Copy JSON</span>
                     </button>
-                    <button id="downloadExportSettingsBtn" class="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-500 text-gray-900 dark:text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2">
+                    <button type="button" id="downloadExportSettingsBtn" class="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-500 text-gray-900 dark:text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                             <polyline points="7 10 12 15 17 10"/>
@@ -1480,7 +1466,7 @@
                         </h2>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Generate a shareable link</p>
                     </div>
-                    <button id="closeShareLinkModal" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    <button type="button" id="closeShareLinkModal" aria-label="Close share link" class="btn-base btn-icon btn-ghost">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <line x1="18" y1="6" x2="6" y2="18"/>
                             <line x1="6" y1="6" x2="18" y2="18"/>
@@ -1496,8 +1482,8 @@
                     <p class="text-sm text-gray-600 dark:text-gray-400 text-center leading-relaxed">Share this link so others can view and import your design:</p>
                     <!-- Link Input -->
                     <div class="bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 flex items-center gap-2">
-                        <input type="text" id="shareLinkInput" readonly class="flex-1 text-sm bg-transparent border-0 text-gray-700 dark:text-gray-300 font-mono truncate" style="outline: none;">
-                        <button id="copyShareLinkBtn" class="p-2 text-blue-600 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition-colors flex-shrink-0" title="Copy link">
+                        <input type="text" id="shareLinkInput" readonly class="share-link-input flex-1 text-sm bg-transparent border-0 text-gray-700 dark:text-gray-300 font-mono truncate">
+                        <button type="button" id="copyShareLinkBtn" aria-label="Copy share link" class="btn-base btn-icon btn-tertiary flex-shrink-0" title="Copy link">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -1506,18 +1492,18 @@
                     </div>
                 </div>
                 <div class="flex gap-2 p-6 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
-                    <button id="openShareLinkBtn" class="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-semibold rounded-xl transition-all shadow-sm hover:shadow-md">Open in Browser</button>
-                    <button id="closeShareLinkModal2" class="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-500 text-gray-900 dark:text-white font-semibold rounded-xl transition-all">Done</button>
+                    <button type="button" id="openShareLinkBtn" class="btn-base btn-primary flex-1">Open in Browser</button>
+                    <button type="button" id="closeShareLinkModal2" class="btn-base btn-ghost flex-1">Done</button>
                 </div>
             </div>
         </div>
 
         <!-- ── Advanced Options Mobile Modal ─────────────────────── -->
-        <div id="advancedModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center transition-all duration-300" style="opacity: 0; transition-property: opacity;">
-            <div class="bg-white dark:bg-gray-800 w-full rounded-t-3xl shadow-2xl max-h-[80vh] overflow-y-auto" style="animation: slideUp 0.3s ease-out;">
+        <div id="advancedModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center transition-all duration-300">
+            <div class="modal-sheet bg-white dark:bg-gray-800 w-full rounded-t-3xl shadow-2xl max-h-[80vh] overflow-y-auto">
                 <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800">
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white">Advanced Options</h2>
-                    <button id="closeAdvancedModal" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors">
+                    <button type="button" id="closeAdvancedModal" aria-label="Close advanced options" class="btn-base btn-icon btn-ghost">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"/>
                             <line x1="6" y1="6" x2="18" y2="18"/>
@@ -1530,7 +1516,7 @@
                         <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Import Settings</h3>
                         <p class="text-xs text-gray-600 dark:text-gray-400 mb-4">Load a previously exported JSON settings file.</p>
                         <input type="file" id="importSettingsInput" accept=".json" class="hidden">
-                        <button id="importSettingsChooseFile" class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <button type="button" id="importSettingsChooseFile" class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                 <polyline points="17 8 12 3 7 8"/>
@@ -1543,7 +1529,7 @@
                     <div class="pb-4 border-b border-gray-200 dark:border-gray-700">
                         <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Reset Design</h3>
                         <p class="text-xs text-gray-600 dark:text-gray-400 mb-4">Restore all settings to default values.</p>
-                        <button id="resetDesignBtn" class="w-full px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors">
+                        <button type="button" id="resetDesignBtn" class="btn-base btn-danger w-full">
                             Reset to Defaults
                         </button>
                     </div>
@@ -1551,29 +1537,13 @@
                     <div>
                         <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Export Data</h3>
                         <p class="text-xs text-gray-600 dark:text-gray-400 mb-4">Export current text/data as CSV.</p>
-                        <button id="exportCsvBtn" class="w-full px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+                        <button type="button" id="exportCsvBtn" class="btn-base btn-secondary w-full">
                             Export as CSV
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <style>
-            @keyframes slideUp {
-                from {
-                    transform: translateY(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateY(0);
-                    opacity: 1;
-                }
-            }
-            #advancedModal.visible {
-                opacity: 1 !important;
-            }
-        </style>
 
         <script>
             // Register service worker for offline support using Blob URL (more robust)
@@ -1590,10 +1560,10 @@
         <div id="historyOverlay" aria-hidden="true"></div>
 
         <!-- History drawer -->
-        <aside id="historyDrawer" aria-label="Saved snapshots" role="complementary">
+        <aside id="historyDrawer" aria-label="Saved snapshots">
             <div class="history-header">
                 <h2>Snapshots</h2>
-                <button id="historyCloseBtn" class="history-close-btn" aria-label="Close history">
+                <button type="button" id="historyCloseBtn" class="btn-base btn-icon btn-ghost" aria-label="Close history">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
@@ -1606,6 +1576,8 @@
         <div id="toastContainer" aria-live="polite" aria-atomic="false"></div>
         <script src="./qr-bundle.js"></script>
         <script src="./app.js"></script>
+    </div>
     </body>
 
 </html>
+
