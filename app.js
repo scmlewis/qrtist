@@ -419,12 +419,15 @@ function renderTemplates() {
         </div>
         <span class="font-medium truncate w-full text-center">${t.name}</span>
     </button>`).join('');
-    grid.addEventListener('click', (e) => {
-        const btn = e.target.closest('.template-btn');
-        if (!btn) return;
-        const t = TEMPLATES.find(x => x.id === btn.getAttribute('data-template'));
-        if (t) applyTemplate(t);
-    });
+    if (!grid.__qrtistTemplateClickHandler) {
+        grid.__qrtistTemplateClickHandler = (e) => {
+            const btn = e.target.closest('.template-btn');
+            if (!btn) return;
+            const t = TEMPLATES.find(x => x.id === btn.getAttribute('data-template'));
+            if (t) applyTemplate(t);
+        };
+        grid.addEventListener('click', grid.__qrtistTemplateClickHandler);
+    }
 }
 
 function applyTemplate(t) {
@@ -517,6 +520,8 @@ const logoMarginValue = document.getElementById('logoMarginValue');
 const framesDivider = document.getElementById('framesDivider');
 const framesSection = document.getElementById('framesSection');
 const frameBtns = document.querySelectorAll('.frame-btn');
+let renderGeneration = 0;
+let activeRenderGeneration = 0;
 
 function renderInputFields() {
     const type = qrType.value;
@@ -944,6 +949,8 @@ function drawFrame(ctx, size, frame, frameColor, frameText, textBarHeight) {
 }
 
 function updateQRCode() {
+    const renderToken = ++renderGeneration;
+    activeRenderGeneration = renderToken;
     const type = qrType.value;
     const config = qrTypeConfig[type];
     const values = getInputValues();
@@ -1002,24 +1009,27 @@ function updateQRCode() {
     try {
         qrCode = new QRCodeStyling(qrOptions);
         qrCode.append(qrCodeContainer);
+        const baseCanvas = qrCode.canvas;
         
         // Use requestAnimationFrame for better synchronization instead of arbitrary timeouts
         requestAnimationFrame(() => {
-            const canvas = qrCodeContainer.querySelector('canvas');
-            if (canvas) {
-                // Apply rendering optimizations
-                const ctx = canvas.getContext('2d');
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                
-                // Save original canvas state before any modifications
-                const originalCanvas = canvas.cloneNode(true);
-                const originalCtx = originalCanvas.getContext('2d');
-                originalCtx.drawImage(canvas, 0, 0);
-                
-                // Process frame, text, and logo together in proper order
-                processFrameAndLogo(canvas, originalCanvas, bgColor);
-            }
+            if (renderToken !== activeRenderGeneration) return;
+            if (!baseCanvas || baseCanvas.width === 0) return;
+
+            // Apply rendering optimizations
+            const ctx = baseCanvas.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+
+            // Save original canvas state before any modifications
+            const originalCanvas = document.createElement('canvas');
+            originalCanvas.width = baseCanvas.width;
+            originalCanvas.height = baseCanvas.height;
+            const originalCtx = originalCanvas.getContext('2d');
+            originalCtx.drawImage(baseCanvas, 0, 0);
+
+            // Process frame, text, and logo together in proper order
+            processFrameAndLogo(baseCanvas, originalCanvas, bgColor, renderToken);
         });
         
         constrainPreviewCanvas();
@@ -1047,7 +1057,8 @@ function updateQRCode() {
  * Unified function to handle frame, text, and logo rendering in correct order
  * Eliminates race conditions and ensures proper layering
  */
-function processFrameAndLogo(canvas, originalCanvas, bgColor) {
+function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken) {
+    if (renderToken !== activeRenderGeneration) return;
     // Validate selectedFrame state
     if (selectedFrame === undefined || selectedFrame === null) {
         console.warn('selectedFrame is undefined, defaulting to none');
@@ -1125,6 +1136,8 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor) {
         if (logoUrl) {
             const logoImg = new Image();
             logoImg.onload = () => {
+                if (renderToken !== activeRenderGeneration) return;
+
                 // Check for oversized logo warning
                 let logoPercent = parseInt(logoSize.value) || 20;
                 if (logoPercent > 30) {
@@ -1154,12 +1167,13 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor) {
                 
                 // Apply foreground overlay if present
                 if (foregroundDataUrl) {
-                    applyForegroundOverlay(finalCanvas);
+                    applyForegroundOverlay(finalCanvas, renderToken);
                 } else {
                     constrainPreviewCanvas();
                 }
             };
             logoImg.onerror = () => {
+                if (renderToken !== activeRenderGeneration) return;
                 console.error('Failed to load logo:', logoUrl);
                 showToast('Failed to load logo image', 'error');
                 constrainPreviewCanvas();
@@ -1168,7 +1182,7 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor) {
         }
     } else if (foregroundDataUrl) {
         // No logo, but apply foreground overlay
-        applyForegroundOverlay(finalCanvas);
+        applyForegroundOverlay(finalCanvas, renderToken);
     } else {
         constrainPreviewCanvas();
     }
@@ -1177,18 +1191,21 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor) {
 /**
  * Apply foreground overlay with proper masking to dark QR modules only
  */
-function applyForegroundOverlay(canvas) {
+function applyForegroundOverlay(canvas, renderToken) {
     const fgImg = new Image();
     fgImg.onload = () => {
+        if (renderToken !== activeRenderGeneration) return;
         applyForegroundMask(canvas, fgImg, foregroundOpacity);
         constrainPreviewCanvas();
     };
     fgImg.onerror = () => {
+        if (renderToken !== activeRenderGeneration) return;
         console.error('Failed to load foreground overlay');
         constrainPreviewCanvas();
     };
     fgImg.src = foregroundDataUrl;
 }
+
 
 // Scales the preview canvas display size to fit inside the panel
 // without affecting the canvas pixel resolution used for downloads.
@@ -2205,12 +2222,15 @@ renderTemplates();
                 </div>
                 <span class="font-medium truncate w-full text-center">${t.name}</span>
             </button>`).join('');
-        grid.addEventListener('click', (e) => {
-            const btn = e.target.closest('.template-btn');
-            if (!btn) return;
-            const t = TEMPLATES.find(x => x.id === btn.getAttribute('data-template'));
-            if (t) applyTemplate(t);
-        });
+        if (!grid.__qrtistTemplateClickHandler) {
+            grid.__qrtistTemplateClickHandler = (e) => {
+                const btn = e.target.closest('.template-btn');
+                if (!btn) return;
+                const t = TEMPLATES.find(x => x.id === btn.getAttribute('data-template'));
+                if (t) applyTemplate(t);
+            };
+            grid.addEventListener('click', grid.__qrtistTemplateClickHandler);
+        }
     }
 
     function applyTemplate(t) {
