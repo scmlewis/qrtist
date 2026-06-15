@@ -278,7 +278,7 @@ window.QRCodeStyling = (function () {
         // This ensures proper z-order: QR modules → frame → logo
         
         container.appendChild(this.canvas);
-        console.log('✓ QR rendered — pattern:', pattern, ' outer:', outerType, ' inner:', innerType, ' modules:', numModules);
+        // QR rendered successfully
     };
 
     QRCodeStyling.prototype.download = function (options) {
@@ -1033,7 +1033,6 @@ function updateQRCode() {
         });
         
         constrainPreviewCanvas();
-        console.log('✓ QR code generated successfully');
     } catch (err) {
         console.error('Failed to create QRCodeStyling instance:', err);
     }
@@ -1482,12 +1481,14 @@ function getConfigHash() {
         frameText: frameTextInput.value,
         fgOpacity: Math.round(foregroundOpacity * 100)
     };
-    return btoa(JSON.stringify(configObj));
+    return btoa(encodeURIComponent(JSON.stringify(configObj)));
 }
 
 function setConfigFromHash(hash) {
     try {
-        const configObj = JSON.parse(atob(hash));
+        // Strip optional prefix (e.g. "settings=" from share link modal)
+        const rawHash = hash.startsWith('settings=') ? hash.slice('settings='.length) : hash;
+        const configObj = JSON.parse(decodeURIComponent(atob(rawHash)));
         qrType.value = configObj.type;
         renderInputFields();
 
@@ -1717,7 +1718,11 @@ if (fullscreenPreviewBtn) {
             return;
         }
         const canvas = qrContainer.querySelector('canvas');
-        const clone = canvas.cloneNode(true);
+        // cloneNode doesn't copy pixel data, so create a new canvas and draw the original
+        const clone = document.createElement('canvas');
+        clone.width = canvas.width;
+        clone.height = canvas.height;
+        clone.getContext('2d').drawImage(canvas, 0, 0);
         clone.style.maxWidth = '80vh';
         clone.style.maxHeight = '80vh';
         clone.style.width = 'auto';
@@ -1772,32 +1777,10 @@ renderTemplates();
     const copyShareBtn = document.getElementById('copyShareLinkBtn');
     const openShareBtn = document.getElementById('openShareLinkBtn');
 
-    // Gather current settings for export
+    // Gather current settings for export — reuse getConfigHash for consistent format
     function gatherSettings() {
-        return {
-            text: (typeof inputText !== 'undefined') ? inputText.value : '',
-            errorCorrection: (typeof errorCorrectionSelect !== 'undefined') ? errorCorrectionSelect.value : 'M',
-            width: (typeof inputWidthField !== 'undefined') ? parseInt(inputWidthField.value) : 300,
-            height: (typeof inputHeightField !== 'undefined') ? parseInt(inputHeightField.value) : 300,
-            type: (typeof errorCorrectionSelect !== 'undefined') ? errorCorrectionSelect.value : 'M',
-            dataPattern: typeof currentPattern !== 'undefined' ? currentPattern : 'square',
-            dataColor: (typeof fgColorInput !== 'undefined') ? fgColorInput.value : '#000000',
-            cornerSquareType: typeof currentOuterCorner !== 'undefined' ? currentOuterCorner : 'square',
-            cornerSquareColor: (typeof fgColorInput !== 'undefined') ? fgColorInput.value : '#000000',
-            cornerDotType: typeof currentInnerCorner !== 'undefined' ? currentInnerCorner : 'square',
-            cornerDotColor: (typeof fgColorInput !== 'undefined') ? fgColorInput.value : '#000000',
-            backgroundColor: (typeof bgColorInput !== 'undefined') ? bgColorInput.value : '#ffffff',
-            logoEnabled: (document.getElementById('showLogo') && document.getElementById('showLogo').checked) || false,
-            logoUrl: typeof logoDataUrl !== 'undefined' ? logoDataUrl : '',
-            logoSize: (typeof logoSize !== 'undefined') ? parseInt(logoSize.value || 20) : 20,
-            logoMargin: (typeof logoMargin !== 'undefined') ? parseInt(logoMargin.value || 10) : 10,
-            frameLabel: (document.getElementById('frameLabel') && document.getElementById('frameLabel').checked) || false,
-            frameText: (typeof frameTextInput !== 'undefined') ? frameTextInput.value : '',
-            frameColor: (typeof frameColorInput !== 'undefined') ? frameColorInput.value : '#000000',
-            selectedFrame: typeof selectedFrame !== 'undefined' ? selectedFrame : 'none',
-            useGradient: typeof useGradient !== 'undefined' ? useGradient : false,
-            gradientColor2: typeof gradientColor2 !== 'undefined' ? gradientColor2 : '#3b82f6'
-        };
+        const raw = decodeURIComponent(atob(getConfigHash()));
+        return JSON.parse(raw);
     }
 
     // Export Settings Modal
@@ -1846,7 +1829,7 @@ renderTemplates();
     if (shareBtn) {
         shareBtn.addEventListener('click', () => {
             const settings = gatherSettings();
-            const encoded = btoa(JSON.stringify(settings));
+            const encoded = btoa(encodeURIComponent(JSON.stringify(settings)));
             const baseUrl = window.location.origin + window.location.pathname;
             const fullUrl = baseUrl + '#settings=' + encoded;
             
@@ -1888,218 +1871,6 @@ renderTemplates();
         });
     }
 })();
-
-// ── [DEPRECATED - Duplicate functionality disabled] Old Mobile Menu & Advanced Options ───────────
-/*
-(function  mobileMenuAndAdvanced() {
-    const menuBtn = document.getElementById('mobileMenuBtn');
-    const menu = document.getElementById('mobileMenu');
-    const advancedBtn = document.getElementById('advancedOptionsBtn');
-    const advancedModal = document.getElementById('advancedModal');
-    const closeAdvancedBtn = document.getElementById('closeAdvancedModal');
-    const importSettingsInput = document.getElementById('importSettingsInput');
-    const importChooseFileBtn = document.getElementById('importSettingsChooseFile');
-    const resetBtn = document.getElementById('resetDesignBtn');
-    const csvBtn = document.getElementById('exportCsvBtn');
-
-    // Mobile menu toggle
-    if (menuBtn) {
-        menuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            menu.classList.toggle('hidden');
-        });
-    }
-
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!menu.contains(e.target) && menuBtn && !menuBtn.contains(e.target)) {
-            menu.classList.add('hidden');
-        }
-    });
-
-    // Advanced Options
-    if (advancedBtn) {
-        advancedBtn.addEventListener('click', () => {
-            menu.classList.add('hidden');
-            advancedModal.classList.remove('hidden');
-            advancedModal.classList.add('visible');
-        });
-    }
-
-    // Close advanced modal
-    if (closeAdvancedBtn) {
-        closeAdvancedBtn.addEventListener('click', () => {
-            advancedModal.classList.add('hidden');
-            advancedModal.classList.remove('visible');
-        });
-    }
-
-    advancedModal.addEventListener('click', (e) => {
-        if (e.target === advancedModal) {
-            advancedModal.classList.add('hidden');
-            advancedModal.classList.remove('visible');
-        }
-    });
-
-    // Import Settings File
-    if (importChooseFileBtn) {
-        importChooseFileBtn.addEventListener('click', () => {
-            importSettingsInput.click();
-        });
-    }
-
-    if (importSettingsInput) {
-        importSettingsInput.addEventListener('change', (e) => {
-            if (!e.target.files[0]) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const settings = JSON.parse(event.target.result);
-                    // Apply settings
-                    inputText.value = settings.text || '';
-                    errorCorrectionSelect.value = settings.errorCorrection || 'M';
-                    inputWidthField.value = settings.width || 300;
-                    inputHeightField.value = settings.height || 300;
-                    fgColorInput.value = settings.dataColor || '#000000';
-                    fgColorText.value = settings.dataColor || '#000000';
-                    bgColorInput.value = settings.backgroundColor || '#ffffff';
-                    bgColorText.value = settings.backgroundColor || '#ffffff';
-                    currentPattern = settings.dataPattern || 'square';
-                    currentOuterCorner = settings.cornerSquareType || 'square';
-                    currentInnerCorner = settings.cornerDotType || 'square';
-                    useGradient = settings.useGradient || false;
-                    gradientColor2 = settings.gradientColor2 || '#3b82f6';
-                    if (gradColor2Input) gradColor2Input.value = gradientColor2;
-                    if (gradientToggleBtn) {
-                        gradientToggleBtn.setAttribute('aria-pressed', useGradient);
-                        gradientToggleBtn.classList.toggle('active', useGradient);
-                    }
-                    if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !useGradient);
-                    logoSize.value = settings.logoSize || 20;
-                    logoSizeValue.textContent = settings.logoSize || 20;
-                    logoMargin.value = settings.logoMargin || 10;
-                    logoMarginValue.textContent = settings.logoMargin || 10;
-                    frameColorInput.value = settings.frameColor || '#000000';
-                    frameColorTextInput.value = settings.frameColor || '#000000';
-                    frameTextInput.value = settings.frameText || '';
-                    selectedFrame = settings.selectedFrame || 'none';
-                    if (document.getElementById('showLogo')) {
-                        document.getElementById('showLogo').checked = settings.logoEnabled || false;
-                    }
-                    if (document.getElementById('frameLabel')) {
-                        document.getElementById('frameLabel').checked = settings.frameLabel || false;
-                    }
-                    updateQRCode();
-                    advancedModal.classList.add('hidden');
-                    advancedModal.classList.remove('visible');
-                    showToast('Settings imported', 'success');
-                } catch (err) {
-                    showToast('Error importing settings: ' + err.message, 'error');
-                }
-            };
-            reader.readAsText(e.target.files[0]);
-        });
-    }
-
-    // Reset Design to Defaults
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            if (!confirm('Are you sure? This will reset all settings to defaults.')) return;
-            inputText.value = '';
-            errorCorrectionSelect.value = 'M';
-            inputWidthField.value = 300;
-            inputHeightField.value = 300;
-            fgColorInput.value = '#000000';
-            fgColorText.value = '#000000';
-            bgColorInput.value = '#ffffff';
-            bgColorText.value = '#ffffff';
-            currentPattern = 'square';
-            currentOuterCorner = 'square';
-            currentInnerCorner = 'square';
-            useGradient = false;
-            gradientColor2 = '#3b82f6';
-            if (gradColor2Input) gradColor2Input.value = gradientColor2;
-            if (gradientToggleBtn) {
-                gradientToggleBtn.setAttribute('aria-pressed', 'false');
-                gradientToggleBtn.classList.remove('active');
-            }
-            if (gradColor2Row) gradColor2Row.classList.add('hidden');
-            if (document.getElementById('showLogo')) document.getElementById('showLogo').checked = false;
-            if (document.getElementById('frameLabel')) document.getElementById('frameLabel').checked = false;
-            logoDataUrl = null;
-            currentLogoPreset = 'none';
-            updateQRCode();
-            advancedModal.classList.add('hidden');
-            advancedModal.classList.remove('visible');
-        });
-    }
-
-    // Export as CSV
-    if (csvBtn) {
-        csvBtn.addEventListener('click', () => {
-            const text = inputText.value || 'Empty QR Code';
-            const csv = 'Text,Value\
-\"QR Data\",\"' + text.replace(/\"/g, '\"\"') + '\"';
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `qrtist-data-${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-    }
-
-    // Desktop: Reset Design button
-    const desktopResetBtn = document.getElementById('resetDesign');
-    if (desktopResetBtn) {
-        desktopResetBtn.addEventListener('click', () => {
-            if (!confirm('Are you sure? This will reset all settings to defaults.')) return;
-            inputText.value = '';
-            errorCorrectionSelect.value = 'M';
-            inputWidthField.value = 300;
-            inputHeightField.value = 300;
-            fgColorInput.value = '#000000';
-            fgColorText.value = '#000000';
-            bgColorInput.value = '#ffffff';
-            bgColorText.value = '#ffffff';
-            currentPattern = 'square';
-            currentOuterCorner = 'square';
-            currentInnerCorner = 'square';
-            useGradient = false;
-            gradientColor2 = '#3b82f6';
-            if (gradColor2Input) gradColor2Input.value = gradientColor2;
-            if (gradientToggleBtn) {
-                gradientToggleBtn.setAttribute('aria-pressed', 'false');
-                gradientToggleBtn.classList.remove('active');
-            }
-            if (gradColor2Row) gradColor2Row.classList.add('hidden');
-            if (document.getElementById('showLogo')) document.getElementById('showLogo').checked = false;
-            if (document.getElementById('frameLabel')) document.getElementById('frameLabel').checked = false;
-            logoDataUrl = null;
-            currentLogoPreset = 'none';
-            updateQRCode();
-        });
-    }
-
-    // Desktop: Export as CSV button
-    const desktopCsvBtn = document.getElementById('exportCsvDesktop');
-    if (desktopCsvBtn) {
-        desktopCsvBtn.addEventListener('click', () => {
-            const text = inputText.value || 'Empty QR Code';
-            const csv = 'Text,Value\
-\"QR Data\",\"' + text.replace(/\"/g, '\"\"') + '\"';
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `qrtist-data-${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-    }
-})();
-*/
 
 // ── Mobile Tab Navigation ───────────────────────────────────────────────
 (function () {
@@ -2170,251 +1941,7 @@ renderTemplates();
         if (qrCode) qrCode.download({ name: generateQRFilename(), extension: 'svg' });
     });
 
-    // ── Logo Presets ──────────────────────────────────────────────────
-    const LOGO_PRESETS = {
-        'globe': `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.3'><circle cx='12' cy='12' r='10'/><line x1='2' y1='12' x2='22' y2='12'/><path d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'/></svg>`,
-        'scan-brackets': `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 56' fill='none'><g stroke='currentColor' stroke-width='5'><polyline points='4,16 4,4 16,4'/><polyline points='44,4 56,4 56,16'/><polyline points='4,40 4,52 16,52'/><polyline points='44,52 56,52 56,40'/></g><text x='30' y='24' font-size='12' text-anchor='middle' font-weight='900' font-family='Arial,sans-serif' fill='currentColor'>SCAN</text><text x='30' y='40' font-size='12' text-anchor='middle' font-weight='900' font-family='Arial,sans-serif' fill='currentColor'>ME</text></svg>`,
-        'scan-text': `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='46' font-size='22' text-anchor='middle' font-weight='900' font-family='Arial,sans-serif' fill='currentColor'>SCAN</text><text x='50' y='74' font-size='22' text-anchor='middle' font-weight='900' font-family='Arial,sans-serif' fill='currentColor'>ME</text></svg>`,
-        'x-twitter': `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.045 4.126H5.078z' fill='currentColor'/></svg>`,
-        'facebook': `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' fill='currentColor'/></svg>`,
-        'instagram': `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M12 2.163c3.204 0 3.584.012 4.85.07 1.17.054 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.054 1.17-.249 1.805-.415 2.227-.217.562-.477.96-.896 1.382-.42.419-.819.679-1.381.896-.422.164-1.057.36-2.227.413-1.266.057-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.17-.054-1.805-.249-2.227-.415-.562-.217-.96-.477-1.382-.896-.419-.42-.679-.819-.896-1.381-.164-.422-.36-1.057-.413-2.227-.057-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.054-1.17.249-1.805.415-2.227.217-.562.477-.96.896-1.382.42-.419.819-.679 1.381-.896.422-.164 1.057-.36 2.227-.413 1.266-.057 1.646-.07 4.85-.07zM12 0C8.741 0 8.333.014 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.776.072 7.054.014 8.333 0 8.741 0 12s.014 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.986 8.74 24 12 24s3.667-.014 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0z' fill='currentColor'/><path d='M12 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a3.838 3.838 0 1 1 0-7.676A3.838 3.838 0 0 1 12 16zM18.405 4.155a1.44 1.44 0 1 0 0 2.879 1.44 1.44 0 0 0 0-2.879z' fill='currentColor'/></svg>`,
-        'linkedin': `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.454C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z' fill='currentColor'/></svg>`,
-        'pinterest': `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.411-5.996 1.411-5.996s-.36-.72-.36-1.781c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.1.12.115.225.085.345-.094.393-.304 1.239-.345 1.411-.055.231-.184.28-.423.169-1.573-.732-2.556-3.031-2.556-4.872 0-3.966 2.883-7.608 8.308-7.608 4.363 0 7.752 3.109 7.752 7.261 0 4.333-2.731 7.82-6.522 7.82-1.272 0-2.47-.661-2.879-1.442 0 0-.629 2.393-.781 2.977-.282 1.083-1.042 2.441-1.554 3.271 1.127.348 2.319.537 3.557.537 6.622 0 11.988-5.366 11.988-11.987C24.005 5.367 18.639 0 12.017 0z' fill='currentColor'/></svg>`,
-        'telegram': `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M11.944 0C5.346 0 0 5.345 0 11.944c0 6.598 5.346 11.943 11.944 11.943s11.944-5.345 11.944-11.943C23.888 5.345 18.542 0 11.944 0zm5.83 8.324c-.161 1.698-.865 5.86-1.226 7.794-.153.818-.454 1.092-.746 1.12-.634.06-1.115-.417-1.728-.82-.96-.63-1.502-1.022-2.433-1.635-1.077-.708-.379-1.097.235-1.737.161-.167 2.956-2.71 3.01-2.937.006-.029.012-.138-.053-.195-.065-.057-.16-.038-.228-.023-.098.022-1.657 1.054-4.68 3.097-.442.304-.843.454-1.202.446-.394-.008-1.154-.223-1.719-.406-.692-.224-1.242-.343-1.194-.725.025-.199.3-.404.825-.615 3.235-1.408 5.392-2.339 6.472-2.793 3.08-1.29 3.72-1.514 4.136-1.52.091-.001.297.021.43.128.112.09.143.211.15.3l-.001.073z' fill='currentColor'/></svg>`,
-        'discord': `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01 10.175 10.175 0 0 0 .372.292.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.419-2.157 2.419z' fill='currentColor'/></svg>`,
-        'spotify': `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.49 17.306c-.215.353-.674.464-1.026.25-2.863-1.748-6.466-2.143-10.707-1.176-.403.093-.81-.157-.903-.56s.157-.81.56-.903c4.646-1.062 8.636-.597 11.827 1.35.352.214.463.674.249 1.026s-.353.464-.674.249zm1.468-3.264c-.272.443-.848.583-1.291.311-3.277-2.015-8.272-2.599-12.146-1.424-.495.15-1.233-.162-1.415-.762-.182-.6.162-1.233.762-1.415 4.341-1.318 11.52-1.066 16.03 1.61.54.32.716 1.02.396 1.56s-1.02.716-1.56.396zm.127-3.41c-3.929-2.333-10.435-2.55-14.218-1.4c-.6.182-1.233-.162-1.415-.762-.182-.6.162-1.233.762-1.415 4.341-1.318 11.52-1.066 16.03 1.61.54.32.716 1.02.396 1.56s-1.02.716-1.56.396z' fill='currentColor'/></svg>`,
-        'youtube': `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z' fill='currentColor'/></svg>`,
-    };
-
-    function getLogoPresetDataUrl(preset, color) {
-        const svg = LOGO_PRESETS[preset];
-        if (!svg) return null;
-        let modifiedSvg = svg;
-        if (color && color !== '' && preset !== 'custom') {
-            modifiedSvg = svg.replace(/fill="currentColor"/g, `fill="${color}"`)
-                              .replace(/stroke="currentColor"/g, `stroke="${color}"`);
-        }
-        return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(modifiedSvg);
-    }
-
-    // ── Design Templates ──────────────────────────────────────────────────
-    const TEMPLATES = [
-        { id: 'classic-black', name: 'Classic', fg: '#000000', bg: '#ffffff', dots: 'square', outer: 'square', inner: 'square', frame: 'none', frameColor: '#000000' },
-        { id: 'corporate-blue', name: 'Corporate', fg: '#1a56db', bg: '#ffffff', dots: 'rounded', outer: 'rounded', inner: 'dot', frame: 'none', frameColor: '#1a56db' },
-        { id: 'instagram-pink', name: 'Instagram', fg: '#c13584', bg: '#fdf2f8', dots: 'dots', outer: 'circle', inner: 'dot', frame: 'none', frameColor: '#c13584' },
-        { id: 'discord-purple', name: 'Discord', fg: '#5865f2', bg: '#ffffff', dots: 'rounded', outer: 'rounded', inner: 'dot', frame: 'none', frameColor: '#5865f2' },
-        { id: 'youtube-red', name: 'YouTube', fg: '#ff0000', bg: '#ffffff', dots: 'square', outer: 'square', inner: 'square', frame: 'simple', frameColor: '#ff0000' },
-        { id: 'ocean-breeze', name: 'Ocean', fg: '#0ea5e9', bg: '#f0f9ff', dots: 'dots', outer: 'circle', inner: 'dot', frame: 'rounded-rect', frameColor: '#0ea5e9' },
-        { id: 'neon-night', name: 'Neon', fg: '#00ff88', bg: '#0a0a1a', dots: 'extra-rounded', outer: 'circle', inner: 'dot', frame: 'neon-glow', frameColor: '#00ff88' },
-        { id: 'elegant-gold', name: 'Gold', fg: '#b8860b', bg: '#fffbeb', dots: 'classy', outer: 'rounded', inner: 'square', frame: 'double', frameColor: '#b8860b' },
-        { id: 'minimal-gray', name: 'Minimal', fg: '#374151', bg: '#f9fafb', dots: 'rounded', outer: 'rounded', inner: 'rounded', frame: 'none', frameColor: '#374151' },
-        { id: 'linkedin-navy', name: 'LinkedIn', fg: '#0a66c2', bg: '#ffffff', dots: 'square', outer: 'square', inner: 'square', frame: 'simple', frameColor: '#0a66c2' },
-    ];
-
-    function renderTemplates() {
-        const grid = document.getElementById('templateGrid');
-        if (!grid) return;
-        grid.innerHTML = TEMPLATES.map(t => `
-            <button class="template-btn flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-blue-400 text-xs text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 transition-all" data-template="${t.id}" title="Preview: ${t.name}">
-                <div class="flex items-center gap-1.5">
-                    <span class="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-500 flex-shrink-0" style="background:${t.fg}" title="Dots"></span>
-                    <span class="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-500 flex-shrink-0" style="background:${t.bg}" title="Background"></span>
-                </div>
-                <span class="font-medium truncate w-full text-center">${t.name}</span>
-            </button>`).join('');
-        if (!grid.__qrtistTemplateClickHandler) {
-            grid.__qrtistTemplateClickHandler = (e) => {
-                const btn = e.target.closest('.template-btn');
-                if (!btn) return;
-                const t = TEMPLATES.find(x => x.id === btn.getAttribute('data-template'));
-                if (t) applyTemplate(t);
-            };
-            grid.addEventListener('click', grid.__qrtistTemplateClickHandler);
-        }
-    }
-
-    function applyTemplate(t) {
-        document.getElementById('fgColor').value = t.fg;
-        document.getElementById('fgColorText').value = t.fg;
-        document.getElementById('bgColor').value = t.bg;
-        document.getElementById('bgColorText').value = t.bg;
-        document.getElementById('frameColor').value = t.frameColor;
-        document.getElementById('frameColorText').value = t.frameColor;
-        document.querySelectorAll('.shape-btn').forEach(btn => btn.classList.remove('selected'));
-        document.querySelector(`.shape-btn[data-pattern="${t.dots}"]`)?.classList.add('selected');
-        document.querySelectorAll('.corner-btn[data-outer]').forEach(btn => btn.classList.remove('selected'));
-        document.querySelector(`.corner-btn[data-outer="${t.outer}"]`)?.classList.add('selected');
-        document.querySelectorAll('.corner-btn[data-inner]').forEach(btn => btn.classList.remove('selected'));
-        document.querySelector(`.corner-btn[data-inner="${t.inner}"]`)?.classList.add('selected');
-        document.querySelectorAll('.frame-btn').forEach(btn => btn.classList.remove('selected'));
-        document.querySelector(`.frame-btn[data-frame="${t.frame}"]`)?.classList.add('selected');
-        qrType.value = 'url';
-        renderInputFields();
-        updateQRCode();
-    }
-
-    renderTemplates();
-
-    // Reset design handler
-    const resetBtn = document.getElementById('resetDesign') || document.getElementById('resetDesignBtn');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            if (confirm('Reset all settings to defaults?')) {
-                localStorage.removeItem('qrConfig');
-                location.reload();
-            }
-        });
-    }
-
-    // Export settings modal handler
-    const exportSettingsModalBtn = document.getElementById('exportConfig');
-    if (exportSettingsModalBtn) {
-        exportSettingsModalBtn.addEventListener('click', () => {
-            document.getElementById('exportSettingsModal').classList.remove('hidden');
-            const config = getConfig();
-            document.getElementById('exportSettingsJson').textContent = JSON.stringify(config, null, 2);
-        });
-    }
-
-    // Export settings mobile handler
-    const exportSettingsMobileBtn = document.getElementById('exportSettingsMobile');
-    if (exportSettingsMobileBtn) {
-        exportSettingsMobileBtn.addEventListener('click', () => {
-            document.getElementById('exportSettingsModal').classList.remove('hidden');
-            const type = qrType.value;
-            const values = getInputValues();
-            const config = {
-                type: type,
-                values: values,
-                fg: fgColorInput.value,
-                bg: bgColorInput.value,
-                pattern: currentPattern,
-                outerCorner: currentOuterCorner,
-                innerCorner: currentInnerCorner,
-                useGradient: useGradient,
-                gradientColor2: gradientColor2,
-                size: currentQRSize,
-                logoSize: logoSize.value,
-                logoMargin: logoMargin.value,
-                logoPreset: currentLogoPreset,
-                logoColors: { ...logoColorOverrides },
-                frame: selectedFrame,
-                frameColor: frameColorInput.value,
-                frameText: frameTextInput.value,
-                logo: logoDataUrl
-            };
-            document.getElementById('exportSettingsJson').textContent = JSON.stringify(config, null, 2);
-        });
-    }
-
-    // Import settings handler
-    const importConfigBtn = document.getElementById('importConfig');
-    if (importConfigBtn) {
-        importConfigBtn.addEventListener('click', () => {
-            document.getElementById('importConfigInput').click();
-        });
-    }
-
-    // Wire file input for import
-    const importInput = document.getElementById('importConfigInput');
-    if (importInput) {
-        importInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    try {
-                        const imported = JSON.parse(evt.target.result);
-                        setConfigFromImport(imported);
-                        updateQRCode();
-                    } catch (err) {
-                        showToast('Invalid JSON file', 'error');
-                    }
-                };
-                reader.readAsText(file);
-            }
-        });
-    }
-
-    // Close export settings modal
-    const closeExportBtn = document.getElementById('closeExportSettingsModal');
-    if (closeExportBtn) {
-        closeExportBtn.addEventListener('click', () => {
-            document.getElementById('exportSettingsModal').classList.add('hidden');
-        });
-    }
-
-    // Copy export settings button
-    const copyExportBtn = document.getElementById('copyExportSettingsBtn');
-    if (copyExportBtn) {
-        copyExportBtn.addEventListener('click', () => {
-            const text = document.getElementById('exportSettingsJson').textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                copyExportBtn.textContent = 'Copied!';
-                setTimeout(() => {
-                    copyExportBtn.textContent = 'Copy JSON';
-                }, 2000);
-            });
-        });
-    }
-
-    // Download export settings button
-    const downloadExportBtn = document.getElementById('downloadExportSettingsBtn');
-    if (downloadExportBtn) {
-        downloadExportBtn.addEventListener('click', () => {
-            const type = qrType.value;
-            const values = getInputValues();
-            const config = {
-                type: type,
-                values: values,
-                fg: fgColorInput.value,
-                bg: bgColorInput.value,
-                pattern: currentPattern,
-                outerCorner: currentOuterCorner,
-                innerCorner: currentInnerCorner,
-                useGradient: useGradient,
-                gradientColor2: gradientColor2,
-                size: currentQRSize,
-                logoSize: logoSize.value,
-                logoMargin: logoMargin.value,
-                logoPreset: currentLogoPreset,
-                logoColors: { ...logoColorOverrides },
-                frame: selectedFrame,
-                frameColor: frameColorInput.value,
-                frameText: frameTextInput.value,
-                logo: logoDataUrl
-            };
-            const dataStr = JSON.stringify(config, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'qrtist-config.json';
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-    }
-
-    // Close advanced modal
-    const closeAdvancedBtn = document.getElementById('closeAdvancedModal');
-    if (closeAdvancedBtn) {
-        closeAdvancedBtn.addEventListener('click', () => {
-            document.getElementById('advancedModal').classList.remove('visible');
-            document.getElementById('advancedModal').classList.add('hidden');
-        });
-    }
-
-    // Open advanced modal from hamburger menu
-    const advancedMenuBtn = document.getElementById('advancedOptionsBtn');
-    if (advancedMenuBtn) {
-        advancedMenuBtn.addEventListener('click', () => {
-            const modal = document.getElementById('advancedModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('visible');
-        });
-    }
-
-    // Mobile 3-dot menu toggle (re-enabled)
+    // Mobile 3-dot menu toggle
     const menuBtn = document.getElementById('mobileMenuBtn');
     const menu = document.getElementById('mobileMenu');
     if (menuBtn && menu) {
@@ -2422,37 +1949,30 @@ renderTemplates();
             e.stopPropagation();
             menu.classList.toggle('hidden');
         });
-
-        // Prevent clicks inside the menu from closing it
         menu.addEventListener('click', (e) => e.stopPropagation());
-
-        // Close menu when clicking outside
         document.addEventListener('click', () => {
             if (!menu.classList.contains('hidden')) menu.classList.add('hidden');
         });
     }
 
-    // Reset design handler (all variants)
-    const resetDesignInModal = document.getElementById('resetDesignBtn');
-    const resetDesignMain = document.getElementById('resetDesign');
-    const resetHandler = () => {
-        if (confirm('Reset all settings to defaults?')) {
-            localStorage.removeItem('qrConfig');
-            location.reload();
-        }
-    };
-    if (resetDesignInModal) {
-        resetDesignInModal.addEventListener('click', resetHandler);
+    // Advanced modal open/close
+    const advancedMenuBtn = document.getElementById('advancedOptionsBtn');
+    const advancedModal = document.getElementById('advancedModal');
+    const closeAdvancedBtn = document.getElementById('closeAdvancedModal');
+    if (advancedMenuBtn && advancedModal) {
+        advancedMenuBtn.addEventListener('click', () => {
+            advancedModal.classList.remove('hidden');
+            advancedModal.classList.add('visible');
+        });
     }
-    if (resetDesignMain) {
-        resetDesignMain.addEventListener('click', resetHandler);
+    if (closeAdvancedBtn && advancedModal) {
+        closeAdvancedBtn.addEventListener('click', () => {
+            advancedModal.classList.add('hidden');
+            advancedModal.classList.remove('visible');
+        });
     }
 
-    // Note: Import settings handled by existing importConfig() function (lines 1470-1533)
-
-    // Export as CSV button (desktop and mobile variants)
-    const exportCsvBtn = document.getElementById('exportCsvBtn');
-    const exportCsvDesktop = document.getElementById('exportCsvDesktop');
+    // CSV export (mobile + desktop variants)
     const csvExportHandler = () => {
         const type = qrType.value;
         const values = getInputValues();
@@ -2462,95 +1982,10 @@ renderTemplates();
         link.setAttribute('download', 'qrtist-export.csv');
         link.click();
     };
-    if (exportCsvBtn) {
-        exportCsvBtn.addEventListener('click', csvExportHandler);
-    }
-    if (exportCsvDesktop) {
-        exportCsvDesktop.addEventListener('click', csvExportHandler);
-    }
-
-    // Wire modal import button
-    const importSettingsChooseFileBtn = document.getElementById('importSettingsChooseFile');
-    if (importSettingsChooseFileBtn) {
-        importSettingsChooseFileBtn.addEventListener('click', () => {
-            document.getElementById('importSettingsInput').click();
-        });
-    }
-
-    // Handle modal import file selection
-    const importSettingsInput = document.getElementById('importSettingsInput');
-    if (importSettingsInput) {
-        importSettingsInput.addEventListener('change', (e) => {
-            if (!e.target.files[0]) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const configObj = JSON.parse(event.target.result);
-                    qrType.value = configObj.type;
-                    renderInputFields();
-
-                    Object.keys(configObj.values || {}).forEach(key => {
-                        const element = document.getElementById(key);
-                        if (element) element.value = configObj.values[key];
-                    });
-
-                    fgColorInput.value = configObj.fg || '#000000';
-                    fgColorText.value = configObj.fg || '#000000';
-                    bgColorInput.value = configObj.bg || '#ffffff';
-                    bgColorText.value = configObj.bg || '#ffffff';
-                    currentPattern = configObj.pattern || 'square';
-                    currentOuterCorner = configObj.outerCorner || 'square';
-                    currentInnerCorner = configObj.innerCorner || 'square';
-                    useGradient = configObj.useGradient || false;
-                    gradientColor2 = configObj.gradientColor2 || '#3b82f6';
-                    currentQRSize = configObj.size || 300;
-                    qrSize.value = currentQRSize;
-                    qrSizeValue.textContent = currentQRSize;
-                    currentLogoPreset = configObj.logoPreset || 'none';
-                    logoSize.value = configObj.logoSize || 20;
-                    logoSizeValue.textContent = configObj.logoSize || 20;
-                    logoMargin.value = configObj.logoMargin || 10;
-                    logoMarginValue.textContent = configObj.logoMargin || 10;
-                    selectedFrame = configObj.frame || 'none';
-                    frameColorInput.value = configObj.frameColor || '#000000';
-                    frameColorTextInput.value = configObj.frameColor || '#000000';
-                    frameTextInput.value = configObj.frameText || '';
-                    
-                    Object.assign(logoColorOverrides, configObj.logoColors || {});
-                    if (configObj.logo) {
-                        logoDataUrl = configObj.logo;
-                        logoImg.src = logoDataUrl;
-                        customLogoBtn.style.display = 'flex';
-                        customLogoBtn.classList.remove('hidden');
-                        logoPreview.classList.remove('hidden');
-                    }
-                    
-                    updateShapeSelection();
-                    updateCornerSelection();
-                    updateFrameSelection();
-                    updateLogoSelection();
-                    updateLogoColorUI();
-                    updateQRCode();
-                    document.getElementById('advancedModal').classList.add('hidden');
-                    showToast('Settings imported', 'success');
-                } catch (err) {
-                    showToast('Error importing settings: ' + err.message, 'error');
-                }
-            };
-            reader.readAsText(e.target.files[0]);
-        });
-    }
-
-    // Initialize with default sample URL
-    qrType.value = 'url';
-    renderInputFields();
-    setTimeout(() => {
-        const urlInput = document.getElementById('urlInput');
-        if (urlInput) {
-            urlInput.value = 'https://google.com';
-            updateQRCode();
-        }
-    }, 10);
+    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    const exportCsvDesktop = document.getElementById('exportCsvDesktop');
+    if (exportCsvBtn) exportCsvBtn.addEventListener('click', csvExportHandler);
+    if (exportCsvDesktop) exportCsvDesktop.addEventListener('click', csvExportHandler);
 })();
 
 // ── Onboarding banner ──────────────────────────────────────────────────
@@ -2622,7 +2057,7 @@ const historyManager = {
         } catch { return ''; }
     },
     save() {
-        const configObj = JSON.parse(atob(getConfigHash()));
+        const configObj = JSON.parse(decodeURIComponent(atob(getConfigHash())));
         if (logoDataUrl) configObj.logo = logoDataUrl;
         if (foregroundDataUrl) configObj.fgOverlay = foregroundDataUrl;
         const entry = {
