@@ -1288,47 +1288,6 @@ function doReset() {
     const mobileBtn = document.getElementById('resetDesignMobile');
     if (btn) btn.addEventListener('click', doReset);
     if (mobileBtn) mobileBtn.addEventListener('click', doReset);
-        qrType.value = 'url';
-        renderInputFields();
-        fgColorInput.value = '#000000';
-        fgColorText.value = '#000000';
-        bgColorInput.value = '#ffffff';
-        bgColorText.value = '#ffffff';
-        currentPattern = 'square';
-        currentOuterCorner = 'square';
-        currentInnerCorner = 'square';
-        useGradient = false;
-        gradientColor2 = '#3b82f6';
-        if (gradColor2Input) gradColor2Input.value = gradientColor2;
-        if (gradColor2Text) gradColor2Text.value = gradientColor2;
-        if (gradientToggleBtn) { gradientToggleBtn.setAttribute('aria-pressed', false); gradientToggleBtn.classList.remove('active'); }
-        if (gradColor2Row) gradColor2Row.classList.add('hidden');
-        currentQRSize = 300;
-        qrSize.value = 300;
-        qrSizeValue.textContent = '300';
-        logoSize.value = 20;
-        logoSizeValue.textContent = '20';
-        logoMargin.value = 10;
-        logoMarginValue.textContent = '10';
-        selectedFrame = 'none';
-        frameColorInput.value = '#000000';
-        frameColorTextInput.value = '#000000';
-        frameTextInput.value = '';
-        currentLogoPreset = 'none';
-        logoDataUrl = null;
-        logoImg.src = '';
-        customLogoBtn.style.display = '';
-        customLogoBtn.classList.add('hidden');
-        logoPreview.classList.add('hidden');
-        logoInput.value = '';
-        logoControls.classList.add('hidden');
-        updateShapeSelection();
-        updateCornerSelection();
-        updateFrameSelection();
-        updateLogoSelection();
-        updateQRCode();
-        showToast('Design reset to defaults', 'info');
-    });
 })();
 
 // ── Mobile Tab Navigation ───────────────────────────────────────────────
