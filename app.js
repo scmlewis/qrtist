@@ -1384,11 +1384,16 @@ function doReset() {
     if (aboutBtn && aboutPopover) {
         aboutBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            const isOpen = !aboutPopover.classList.contains('hidden');
             aboutPopover.classList.toggle('hidden');
-        });
-        document.addEventListener('click', (e) => {
-            if (!aboutPopover.contains(e.target) && e.target !== aboutBtn) {
-                aboutPopover.classList.add('hidden');
+            if (!isOpen) {
+                const close = (ev) => {
+                    if (!aboutPopover.contains(ev.target) && ev.target !== aboutBtn) {
+                        aboutPopover.classList.add('hidden');
+                        document.removeEventListener('click', close);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', close), 0);
             }
         });
     }
