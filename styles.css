@@ -14,8 +14,13 @@
     --text-muted: #9ca3af;
 }
 
-html, body {
+html {
     overflow-x: hidden;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+    display: none;
 }
 
 body {
