@@ -1378,6 +1378,20 @@ function doReset() {
             if (!visible) banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
     }
+
+    const aboutBtn = document.getElementById('aboutBtn');
+    const aboutPopover = document.getElementById('aboutPopover');
+    if (aboutBtn && aboutPopover) {
+        aboutBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            aboutPopover.classList.toggle('hidden');
+        });
+        document.addEventListener('click', (e) => {
+            if (!aboutPopover.contains(e.target) && e.target !== aboutBtn) {
+                aboutPopover.classList.add('hidden');
+            }
+        });
+    }
 })();
 
 // ── Mobile "Preview my QR" CTA ─────────────────────────────────────────
