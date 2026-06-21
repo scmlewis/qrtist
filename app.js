@@ -1285,9 +1285,7 @@ function doReset() {
 }
 (function initResetDesign() {
     const btn = document.getElementById('resetDesign');
-    const mobileBtn = document.getElementById('resetDesignMobile');
     if (btn) btn.addEventListener('click', doReset);
-    if (mobileBtn) mobileBtn.addEventListener('click', doReset);
 })();
 
 // ── Mobile Tab Navigation ───────────────────────────────────────────────
@@ -1341,19 +1339,6 @@ function doReset() {
     if (dlSvgM) dlSvgM.addEventListener('click', () => {
         if (qrCode) qrCode.download({ name: generateQRFilename(), extension: 'svg' });
     });
-
-    const menuBtn = document.getElementById('mobileMenuBtn');
-    const menu = document.getElementById('mobileMenu');
-    if (menuBtn && menu) {
-        menuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            menu.classList.toggle('hidden');
-        });
-        menu.addEventListener('click', (e) => e.stopPropagation());
-        document.addEventListener('click', () => {
-            if (!menu.classList.contains('hidden')) menu.classList.add('hidden');
-        });
-    }
 })();
 
 // ── Onboarding banner ──────────────────────────────────────────────────
