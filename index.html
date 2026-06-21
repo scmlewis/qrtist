@@ -78,22 +78,22 @@
                 <button id="helpBtn" class="help-btn" aria-label="How to use QRtist" title="How to use QRtist">?</button>
                 <div class="relative">
                     <button id="aboutBtn" class="p-2.5 rounded-lg hover:bg-gray-700 text-gray-400 hover:text-white transition-colors" aria-label="About QRtist" title="About QRtist">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <i data-lucide="info" class="w-5 h-5"></i>
                     </button>
                     <div id="aboutPopover" class="hidden absolute right-0 top-full mt-2 w-64 bg-gray-800 rounded-xl shadow-xl border border-gray-700 z-50 p-4">
                         <div class="flex items-center gap-2 mb-3">
-                            <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                            <i data-lucide="github" class="w-5 h-5 text-gray-400"></i>
                             <span class="text-sm font-bold text-white">QRtist</span>
                         </div>
                         <p class="text-xs text-gray-400 mb-3">Create beautiful, stylish QR codes</p>
                         <div class="text-xs text-gray-500 mb-3">Created by <span class="text-gray-300 font-medium">scmlewis</span></div>
                         <div class="flex items-center gap-3">
                             <a href="https://github.com/scmlewis" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-blue-400 transition-colors">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                                <i data-lucide="github" class="w-4 h-4"></i>
                                 Profile
                             </a>
                             <a href="https://github.com/scmlewis/qrtist" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-blue-400 transition-colors">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                                <i data-lucide="git-fork" class="w-4 h-4"></i>
                                 Source
                             </a>
                         </div>
@@ -101,17 +101,11 @@
                 </div>
                 <div class="relative hidden-desktop" id="mobileMenuContainer">
                     <button id="mobileMenuBtn" class="p-2.5 rounded-lg hover:bg-gray-700 text-gray-400 hover:text-white transition-colors" aria-label="More options">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                            <circle cx="12" cy="5" r="2"/>
-                            <circle cx="12" cy="12" r="2"/>
-                            <circle cx="12" cy="19" r="2"/>
-                        </svg>
+                        <i data-lucide="more-vertical" class="w-6 h-6"></i>
                     </button>
                     <div id="mobileMenu" class="hidden absolute right-0 top-full mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-40">
                         <button id="resetDesignMobile" class="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white flex items-center gap-3 text-sm font-medium">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-                            </svg>
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                             Reset Design
                         </button>
                     </div>
@@ -141,7 +135,7 @@
                             </div>
                         </div>
                         <button id="dismissOnboarding" class="flex-shrink-0 p-1.5 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10" aria-label="Dismiss welcome message">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
@@ -152,10 +146,7 @@
                 <div id="panelData" class="panel-card bg-gray-800 rounded-xl shadow-sm border border-gray-700 p-5 flex flex-col gap-5">
                     <div class="flex items-center gap-2">
                         <div class="w-7 h-7 rounded-lg bg-blue-900/40 text-blue-400 flex items-center justify-center flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="9" y1="1" x2="9" y2="23" /><line x1="15" y1="1" x2="15" y2="23" />
-                                <path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2" /><path d="M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2" />
-                            </svg>
+                            <i data-lucide="scan-line" class="w-4 h-4"></i>
                         </div>
                         <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">QR Data</h2>
                     </div>
@@ -183,11 +174,11 @@
                         <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Download</p>
                         <div class="grid grid-cols-2 gap-3">
                             <button id="downloadPng" class="desktop-download-btn flex flex-col items-center justify-center gap-3 px-3 py-4 text-white font-bold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 border border-blue-500/20 bg-blue-600 hover:bg-blue-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                                <i data-lucide="download" class="w-7 h-7 flex-shrink-0"></i>
                                 <span class="text-base leading-tight">PNG</span>
                             </button>
                             <button id="downloadSvg" class="desktop-download-btn flex flex-col items-center justify-center gap-3 px-3 py-4 text-white font-bold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 border border-emerald-500/20 bg-emerald-600 hover:bg-emerald-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                                <i data-lucide="file-down" class="w-7 h-7 flex-shrink-0"></i>
                                 <span class="text-base leading-tight">SVG</span>
                             </button>
                         </div>
@@ -196,21 +187,21 @@
                         <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Share & Config</p>
                         <div class="flex flex-col gap-1.5">
                             <button id="copyShareLink" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+                                <i data-lucide="link" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
                                 Copy Share Link
                             </button>
                             <div class="grid grid-cols-2 gap-1.5">
                                 <button id="exportConfig" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 17 12 21 16 17" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29" /></svg>
+                                    <i data-lucide="cloud-upload" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
                                     Export
                                 </button>
                                 <button id="importConfig" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
+                                    <i data-lucide="cloud-download" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
                                     Import
                                 </button>
                             </div>
                             <button id="resetDesign" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" /></svg>
+                                <i data-lucide="rotate-ccw" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
                                 Reset
                             </button>
                         </div>
@@ -226,7 +217,7 @@
                 <div id="panelPreview" class="panel-card bg-gray-800 rounded-xl shadow-sm border border-gray-700 p-5 flex flex-col items-center justify-between gap-4">
                     <div class="flex items-center gap-2 w-full">
                         <div class="w-5 h-5 rounded-lg bg-purple-900/40 text-purple-400 flex items-center justify-center flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" /></svg>
+                            <i data-lucide="image" class="w-3 h-3"></i>
                         </div>
                         <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Preview</h2>
                     </div>
@@ -241,15 +232,15 @@
                         <span class="font-mono"><span id="qrSizeLabel">300</span>&times;<span id="qrSizeLabel2">300</span>px</span>
                     </div>
                     <div id="contrastWarning" class="hidden w-full bg-amber-950/50 border border-amber-800 rounded-xl px-3 py-2.5 text-xs text-amber-300 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+                        <i data-lucide="triangle-alert" class="w-4 h-4 flex-shrink-0"></i>
                         <span id="contrastWarningText">Low contrast — verify scannability.</span>
                     </div>
                     <div id="scannabilityInfo" class="hidden w-full bg-emerald-950/50 border border-emerald-800 rounded-xl px-3 py-2.5 text-xs text-emerald-300 flex items-center gap-2" style="background: rgba(5, 150, 105, 0.1); border-color: rgba(16, 185, 129, 0.4);">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12" /></svg>
+                        <i data-lucide="check" class="w-4 h-4 flex-shrink-0"></i>
                         Logo size &amp; margin within safe limits
                     </div>
                     <div id="frameLabelPreview" class="hidden w-full bg-blue-950/50 border border-blue-800 rounded-xl px-3 py-2.5 text-xs text-blue-300 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                        <i data-lucide="tag" class="w-4 h-4 flex-shrink-0"></i>
                         <span>Label: <strong id="frameLabelText"></strong></span>
                     </div>
                     <div class="mobile-preview-actions">
@@ -257,11 +248,11 @@
                             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">Download</p>
                             <div class="grid grid-cols-2 gap-2.5">
                                 <button id="downloadPngMobile" class="flex flex-col items-center justify-center gap-2 py-3 px-2 text-white text-xs font-semibold rounded-xl transition-all hover:shadow-md active:scale-95 bg-blue-600 hover:bg-blue-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    <i data-lucide="download" class="w-5 h-5"></i>
                                     PNG
                                 </button>
                                 <button id="downloadSvgMobile" class="flex flex-col items-center justify-center gap-2 py-3 px-2 text-white text-xs font-semibold rounded-xl transition-all hover:shadow-md active:scale-95 bg-emerald-600 hover:bg-emerald-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    <i data-lucide="file-down" class="w-5 h-5"></i>
                                     SVG
                                 </button>
                             </div>
@@ -273,7 +264,7 @@
                 <div id="panelDesign" class="panel-card design-panel bg-gray-800 rounded-xl shadow-sm border border-gray-700 flex flex-col">
                     <div class="flex items-center gap-2 px-5 pt-5 pb-4 border-b border-gray-700 flex-shrink-0">
                         <div class="w-5 h-5 rounded-lg bg-rose-900/40 text-rose-400 flex items-center justify-center flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="6" r="1.5" /><circle cx="12" cy="4" r="1.5" /><circle cx="18" cy="6" r="1.5" /><path d="M12 2v20M4 12h16" stroke="currentColor" stroke-width="1.5" fill="none" /></svg>
+                            <i data-lucide="paintbrush-2" class="w-3 h-3"></i>
                         </div>
                         <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Design</h2>
                     </div>
@@ -283,11 +274,11 @@
                             <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
                                 <div class="flex items-center gap-2">
                                     <div class="w-5 h-5 rounded-lg bg-orange-900/30 text-orange-400 flex items-center justify-center flex-shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="1" /><path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m2.12 4.24l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m2.12-4.24l4.24-4.24" /></svg>
+                                        <i data-lucide="sparkles" class="w-3 h-3"></i>
                                     </div>
                                     <span class="text-sm font-semibold text-gray-200">Templates</span>
                                 </div>
-                                <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9" /></svg>
+                                <i data-lucide="chevron-down" class="acc-chevron w-4 h-4 text-gray-400"></i>
                             </summary>
                             <div class="acc-body px-1 pt-3 pb-2">
                                 <div id="templateGrid" class="grid grid-cols-2 gap-2"></div>
@@ -299,11 +290,11 @@
                             <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
                                 <div class="flex items-center gap-2">
                                     <div class="w-5 h-5 rounded-lg bg-yellow-900/30 text-yellow-400 flex items-center justify-center flex-shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="5" r="2" /></svg>
+                                        <i data-lucide="palette" class="w-3 h-3"></i>
                                     </div>
                                     <span class="text-sm font-semibold text-gray-200">Colors</span>
                                 </div>
-                                <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9" /></svg>
+                                <i data-lucide="chevron-down" class="acc-chevron w-4 h-4 text-gray-400"></i>
                             </summary>
                             <div class="acc-body px-1 pt-3 pb-2 space-y-4">
                                 <div>
@@ -341,11 +332,11 @@
                             <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
                                 <div class="flex items-center gap-2">
                                     <div class="w-5 h-5 rounded-lg bg-blue-900/30 text-blue-400 flex items-center justify-center flex-shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="5" height="5" /><rect x="10" y="4" width="5" height="5" /><rect x="16" y="4" width="4" height="5" /><rect x="4" y="10" width="5" height="5" /><rect x="10" y="10" width="5" height="5" /></svg>
+                                        <i data-lucide="grid-3x3" class="w-3 h-3"></i>
                                     </div>
                                     <span class="text-sm font-semibold text-gray-200">Dot Shape</span>
                                 </div>
-                                <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9" /></svg>
+                                <i data-lucide="chevron-down" class="acc-chevron w-4 h-4 text-gray-400"></i>
                             </summary>
                             <div class="acc-body px-1 pt-3 pb-2">
                                 <div id="shapeGrid" class="grid grid-cols-4 gap-1.5">
@@ -386,11 +377,11 @@
                             <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
                                 <div class="flex items-center gap-2">
                                     <div class="w-5 h-5 rounded-lg bg-indigo-900/30 text-indigo-400 flex items-center justify-center flex-shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="2" height="2" /><rect x="10" y="4" width="2" height="2" /><rect x="16" y="4" width="2" height="2" /><rect x="4" y="10" width="2" height="2" /><rect x="4" y="16" width="2" height="2" /><rect x="10" y="16" width="2" height="2" /><rect x="16" y="16" width="2" height="2" /></svg>
+                                        <i data-lucide="corner-up-left" class="w-3 h-3"></i>
                                     </div>
                                     <span class="text-sm font-semibold text-gray-200">Corner Style</span>
                                 </div>
-                                <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9" /></svg>
+                                <i data-lucide="chevron-down" class="acc-chevron w-4 h-4 text-gray-400"></i>
                             </summary>
                             <div class="acc-body px-1 pt-3 pb-2 space-y-3">
                                 <div>
@@ -459,30 +450,30 @@
                             <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors">
                                 <div class="flex items-center gap-2">
                                     <div class="w-5 h-5 rounded-lg bg-green-900/30 text-green-400 flex items-center justify-center flex-shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 9h5v2h-5z" /></svg>
+                                        <i data-lucide="frame" class="w-3 h-3"></i>
                                     </div>
                                     <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">Logo</span>
                                 </div>
-                                <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9" /></svg>
+                                <i data-lucide="chevron-down" class="acc-chevron w-4 h-4 text-gray-400"></i>
                             </summary>
                             <div class="acc-body px-1 pt-3 pb-2">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-xs text-gray-400 dark:text-gray-500">Preset or upload</span>
                                     <label for="logoInput" class="flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400 cursor-pointer hover:text-blue-700 transition px-2 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
+                                        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
                                         Upload
                                     </label>
                                     <input type="file" id="logoInput" accept="image/*" class="hidden">
                                 </div>
                                 <div id="logoGrid" class="grid grid-cols-4 gap-1.5">
                                     <button data-logo="none" class="logo-btn selected flex items-center justify-center p-1 border-2 border-blue-500 bg-blue-50 dark:bg-gray-700 dark:border-blue-400 rounded-xl aspect-square transition">
-                                        <svg class="w-7 h-7 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></svg>
+                                        <i data-lucide="circle-off" class="w-7 h-7 text-gray-400"></i>
                                     </button>
                                     <button data-logo="globe" class="logo-btn flex items-center justify-center p-2 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-gray-50 dark:bg-gray-800">
-                                        <svg class="w-7 h-7 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+                                        <i data-lucide="globe" class="w-7 h-7 text-gray-700 dark:text-gray-200"></i>
                                     </button>
                                     <button data-logo="scan-brackets" class="logo-btn flex items-center justify-center p-1.5 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-gray-50 dark:bg-gray-800">
-                                        <svg viewBox="0 0 60 56" class="w-7 h-7 text-gray-800 dark:text-gray-100" fill="none"><g stroke="currentColor" stroke-width="5"><polyline points="4,16 4,4 16,4" /><polyline points="44,4 56,4 56,16" /><polyline points="4,40 4,52 16,52" /><polyline points="44,52 56,52 56,40" /></g><text x="30" y="24" font-size="12" text-anchor="middle" font-weight="900" font-family="Arial,sans-serif" fill="currentColor" stroke="none">SCAN</text><text x="30" y="40" font-size="12" text-anchor="middle" font-weight="900" font-family="Arial,sans-serif" fill="currentColor" stroke="none">ME</text></svg>
+                                        <i data-lucide="scan" class="w-7 h-7 text-gray-800 dark:text-gray-100"></i>
                                     </button>
                                     <button data-logo="scan-text" class="logo-btn flex items-center justify-center p-2 border border-gray-200 dark:border-gray-600 rounded-xl aspect-square hover:border-blue-400 transition bg-gray-50 dark:bg-gray-800">
                                         <span class="font-black text-[11px] leading-tight text-gray-800 dark:text-gray-100 text-center select-none">SCAN<br>ME</span>
@@ -493,7 +484,7 @@
                                 </div>
                                 <div id="logoPreview" class="hidden mt-2 flex justify-end">
                                     <button id="logoRemove" class="text-xs text-red-500 dark:text-red-400 hover:underline flex items-center gap-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
                                         Remove logo
                                     </button>
                                 </div>
@@ -521,11 +512,11 @@
                             <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors">
                                 <div class="flex items-center gap-2">
                                     <div class="w-5 h-5 rounded-lg bg-pink-900/30 text-pink-400 flex items-center justify-center flex-shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" /><rect x="8" y="8" width="8" height="8" /></svg>
+                                        <i data-lucide="square-dashed-bottom" class="w-3 h-3"></i>
                                     </div>
                                     <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">Frame</span>
                                 </div>
-                                <svg class="acc-chevron w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9" /></svg>
+                                <i data-lucide="chevron-down" class="acc-chevron w-4 h-4 text-gray-400"></i>
                             </summary>
                             <div class="acc-body px-1 pt-3 pb-2 space-y-3">
                                 <div class="grid grid-cols-4 gap-1.5">
@@ -577,17 +568,17 @@
                 <div class="mobile-tab-bar-inner">
                     <button class="mobile-tab-btn tab-active" data-tab="0" aria-label="Data">
                         <span class="tab-indicator" aria-hidden="true"></span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="9" y1="1" x2="9" y2="23"/><line x1="15" y1="1" x2="15" y2="23"/><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2"/><path d="M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2"/></svg>
+                        <i data-lucide="scan-line" aria-hidden="true"></i>
                         <span>Data</span>
                     </button>
                     <button class="mobile-tab-btn" data-tab="1" aria-label="Preview">
                         <span class="tab-indicator" aria-hidden="true"></span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                        <i data-lucide="image" aria-hidden="true"></i>
                         <span>Preview</span>
                     </button>
                     <button class="mobile-tab-btn" data-tab="2" aria-label="Design">
                         <span class="tab-indicator" aria-hidden="true"></span>
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="6" cy="6" r="1.5"/><circle cx="12" cy="4" r="1.5"/><circle cx="18" cy="6" r="1.5"/><path d="M12 2v20M4 12h16" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+                        <i data-lucide="paintbrush-2" aria-hidden="true"></i>
                         <span>Design</span>
                     </button>
                 </div>
@@ -606,5 +597,7 @@
         <div id="toastContainer" aria-live="polite" aria-atomic="false"></div>
         <script src="./qr-bundle.js"></script>
         <script src="./app.js"></script>
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <script>lucide.createIcons();</script>
     </body>
 </html>
