@@ -87,38 +87,57 @@
                         Create beautiful, stylish QR codes</p>
                 </div>
                 <div class="flex items-center gap-1.5" style="position:relative;z-index:45;flex-shrink:0">
-                <button id="helpBtn" class="header-action-btn" aria-label="How to use QRtist" title="How to use QRtist">
-                    <i data-lucide="help-circle" class="w-5 h-5"></i>
-                </button>
-                <div class="relative">
-                    <button id="aboutBtn" class="header-action-btn" aria-label="About QRtist" title="About QRtist">
-                        <i data-lucide="info" class="w-5 h-5"></i>
-                    </button>
-                    <div id="aboutPopover" class="hidden absolute right-0 top-full mt-2 w-64 bg-gray-800 rounded-xl shadow-xl border border-gray-700 z-50 p-4">
-                        <div class="flex items-center gap-2 mb-3">
-                            <i data-lucide="github" class="w-5 h-5 text-gray-400"></i>
-                            <span class="text-sm font-bold text-white">QRtist</span>
-                        </div>
-                        <p class="text-xs text-gray-400 mb-3">Create beautiful, stylish QR codes</p>
-                        <div class="text-xs text-gray-500 mb-3">Created by <span class="text-gray-300 font-medium">scmlewis</span></div>
-                        <div class="flex items-center gap-3">
-                            <a href="https://github.com/scmlewis" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-blue-400 transition-colors">
-                                <i data-lucide="github" class="w-4 h-4"></i>
-                                Profile
-                            </a>
-                            <a href="https://github.com/scmlewis/qrtist" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-blue-400 transition-colors">
-                                <i data-lucide="git-fork" class="w-4 h-4"></i>
-                                Source
-                            </a>
+                    <div class="relative" id="headerMenuContainer">
+                        <button id="headerMenuBtn" class="header-action-btn" aria-label="Menu" aria-expanded="false" aria-haspopup="true">
+                            <i data-lucide="menu" class="w-5 h-5"></i>
+                        </button>
+                        <div id="headerMenu" class="hidden absolute right-0 top-full mt-2 w-72 rounded-xl shadow-xl z-50 p-4" style="background: var(--md-surface-container-high); border: 1px solid var(--md-outline-variant);">
+                            <!-- Help / Getting Started -->
+                            <div class="mb-4 pb-4" style="border-bottom: 1px solid var(--md-outline-variant);">
+                                <h3 class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: var(--md-on-surface-variant);">Getting Started</h3>
+                                <div class="space-y-2 text-sm" style="color: var(--md-on-surface);">
+                                    <p class="flex items-center gap-2"><span class="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-bold" style="background: var(--md-primary);">1</span> Choose type &amp; enter data</p>
+                                    <p class="flex items-center gap-2"><span class="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-bold" style="background: var(--md-tertiary);">2</span> Pick a template or customize</p>
+                                    <p class="flex items-center gap-2"><span class="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-bold" style="background: var(--md-secondary);">3</span> Download PNG or SVG — free</p>
+                                </div>
+                            </div>
+                            <!-- About -->
+                            <div class="mb-4 pb-4" style="border-bottom: 1px solid var(--md-outline-variant);">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <i data-lucide="github" class="w-5 h-5" style="color: var(--md-on-surface-variant);"></i>
+                                    <span class="text-sm font-bold" style="color: var(--md-on-surface);">QRtist</span>
+                                </div>
+                                <p class="text-xs mb-3" style="color: var(--md-on-surface-variant);">Create beautiful, stylish QR codes</p>
+                                <div class="text-xs mb-3" style="color: var(--md-outline);">Created by <span style="color: var(--md-on-surface);">scmlewis</span></div>
+                                <div class="flex flex-col gap-1">
+                                    <a href="https://github.com/scmlewis" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-xs transition-colors px-2 py-1.5 rounded-lg" style="color: var(--md-on-surface-variant);">
+                                        <i data-lucide="github" class="w-4 h-4"></i>
+                                        <span>Profile</span>
+                                    </a>
+                                    <a href="https://github.com/scmlewis/qrtist" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-xs transition-colors px-2 py-1.5 rounded-lg" style="color: var(--md-on-surface-variant);">
+                                        <i data-lucide="git-fork" class="w-4 h-4"></i>
+                                        <span>Source</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Actions -->
+                            <div class="space-y-1">
+                                <button id="resetDesignFromMenu" class="w-full text-left px-3 py-2 text-sm font-medium transition-colors flex items-center gap-2 rounded-lg" style="color: var(--md-on-surface);">
+                                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                                    Reset Design
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <a href="https://github.com/scmlewis/qrtist" target="_blank" rel="noopener noreferrer" class="header-action-btn" aria-label="View on GitHub" title="View on GitHub">
+                        <i data-lucide="github" class="w-5 h-5"></i>
+                    </a>
                 <div class="relative hidden-desktop" id="mobileMenuContainer">
-                    <button id="mobileMenuBtn" class="p-2.5 rounded-lg hover:bg-gray-700 text-gray-400 hover:text-white transition-colors" aria-label="More options">
-                        <i data-lucide="more-vertical" class="w-6 h-6"></i>
+                    <button id="mobileMenuBtn" class="header-action-btn" aria-label="More options">
+                        <i data-lucide="more-vertical" class="w-5 h-5"></i>
                     </button>
-                    <div id="mobileMenu" class="hidden absolute right-0 top-full mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-40">
-                        <button id="resetDesignMobile" class="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white flex items-center gap-3 text-sm font-medium">
+                    <div id="mobileMenu" class="hidden absolute right-0 top-full mt-2 w-48 rounded-lg shadow-xl z-40" style="background: var(--md-surface-container-high); border: 1px solid var(--md-outline-variant);">
+                        <button id="resetDesignMobile" class="w-full text-left px-4 py-3 transition-colors flex items-center gap-3 text-sm font-medium rounded-lg" style="color: var(--md-on-surface);">
                             <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                             Reset Design
                         </button>
@@ -129,26 +148,26 @@
 
             <!-- First-run welcome banner -->
             <div id="onboardingBanner" class="mb-5 rounded-xl" style="display:none" role="region" aria-label="Welcome guide">
-                <div class="bg-blue-950/40 border border-blue-800/40 rounded-xl p-4">
+                <div class="rounded-xl p-4" style="background: color-mix(in srgb, var(--md-primary) 12%, var(--md-surface-container)); border: 1px solid var(--md-outline-variant);">
                     <div class="flex items-start gap-3">
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white mb-2.5">Welcome to QRtist — free, no sign-up needed</p>
-                            <div class="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-gray-300">
+                            <p class="text-sm font-bold mb-2.5" style="color: var(--md-on-surface);">Welcome to QRtist — free, no sign-up needed</p>
+                            <div class="flex flex-wrap gap-x-5 gap-y-1.5 text-xs" style="color: var(--md-on-surface-variant);">
                                 <span class="flex items-center gap-1.5 whitespace-nowrap">
-                                    <span class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">1</span>
+                                    <span class="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0" style="background: var(--md-primary); color: var(--md-on-primary);">1</span>
                                     Choose type &amp; enter data
                                 </span>
                                 <span class="flex items-center gap-1.5 whitespace-nowrap">
-                                    <span class="w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">2</span>
+                                    <span class="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0" style="background: var(--md-tertiary); color: var(--md-on-tertiary);">2</span>
                                     Pick a template or customize
                                 </span>
                                 <span class="flex items-center gap-1.5 whitespace-nowrap">
-                                    <span class="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">3</span>
+                                    <span class="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0" style="background: var(--md-secondary); color: var(--md-on-secondary);">3</span>
                                     Download PNG or SVG — free
                                 </span>
                             </div>
                         </div>
-                        <button id="dismissOnboarding" class="flex-shrink-0 p-1.5 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10" aria-label="Dismiss welcome message">
+                        <button id="dismissOnboarding" class="flex-shrink-0 p-1.5 transition-colors rounded-lg header-action-btn" aria-label="Dismiss welcome message">
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
                     </div>
@@ -157,12 +176,12 @@
 
             <div class="grid-layout">
                 <!-- Left Panel: Input -->
-                <div id="panelData" class="panel-card bg-gray-800 rounded-xl shadow-sm border border-gray-700 p-5 flex flex-col gap-5">
+                <div id="panelData" class="panel-card p-5 flex flex-col gap-5" style="background: var(--md-surface-container-low); border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-medium);">
                     <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-lg bg-blue-900/40 text-blue-400 flex items-center justify-center flex-shrink-0">
+                        <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background: color-mix(in srgb, var(--md-primary) 12%, var(--md-surface-container)); color: var(--md-primary);">
                             <i data-lucide="scan-line" class="w-4 h-4"></i>
                         </div>
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">QR Data</h2>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider" style="color: var(--md-on-surface-variant);">QR Data</h2>
                     </div>
                     <div>
                         <label for="qrType" class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wide">Type</label>
@@ -228,44 +247,44 @@
                 </div>
 
                 <!-- Center Panel: Preview -->
-                <div id="panelPreview" class="panel-card bg-gray-800 rounded-xl shadow-sm border border-gray-700 p-5 flex flex-col items-center justify-between gap-4">
+                <div id="panelPreview" class="panel-card p-5 flex flex-col items-center justify-between gap-4" style="background: var(--md-surface-container-low); border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-medium);">
                     <div class="flex items-center gap-2 w-full">
-                        <div class="w-5 h-5 rounded-lg bg-purple-900/40 text-purple-400 flex items-center justify-center flex-shrink-0">
+                        <div class="w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0" style="background: color-mix(in srgb, var(--md-tertiary) 12%, var(--md-surface-container)); color: var(--md-tertiary);">
                             <i data-lucide="image" class="w-3 h-3"></i>
                         </div>
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Preview</h2>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider" style="color: var(--md-on-surface-variant);">Preview</h2>
                     </div>
                     <div class="flex-1 flex items-center justify-center w-full py-2">
-                        <div id="qrCodeContainer" class="rounded-xl ring-1 ring-gray-600 bg-gray-50 p-3" style="min-width:160px;min-height:160px;"></div>
+                        <div id="qrCodeContainer" class="rounded-xl p-3" style="min-width:160px;min-height:160px; background: var(--md-surface-container-highest); border: 1px solid var(--md-outline-variant);"></div>
                     </div>
-                    <div class="w-full flex items-center justify-between text-xs text-gray-500 border-t border-gray-700 pt-3">
+                    <div class="w-full flex items-center justify-between text-xs border-t pt-3" style="color: var(--md-on-surface-variant); border-color: var(--md-outline-variant);">
                         <span id="previewStatus" class="flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block" style="box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);"></span>
+                            <span class="w-2 h-2 rounded-full inline-block" style="background: var(--md-tertiary); box-shadow: 0 0 8px color-mix(in srgb, var(--md-tertiary) 60%, transparent);"></span>
                             Ready
                         </span>
                         <span class="font-mono"><span id="qrSizeLabel">300</span>&times;<span id="qrSizeLabel2">300</span>px</span>
                     </div>
-                    <div id="contrastWarning" class="hidden w-full bg-amber-950/50 border border-amber-800 rounded-xl px-3 py-2.5 text-xs text-amber-300 flex items-center gap-2">
+                    <div id="contrastWarning" class="hidden w-full rounded-xl px-3 py-2.5 text-xs flex items-center gap-2" style="background: color-mix(in srgb, var(--md-error) 12%, var(--md-surface-container)); border: 1px solid color-mix(in srgb, var(--md-error) 40%, var(--md-outline-variant)); color: var(--md-error);">
                         <i data-lucide="triangle-alert" class="w-4 h-4 flex-shrink-0"></i>
                         <span id="contrastWarningText">Low contrast — verify scannability.</span>
                     </div>
-                    <div id="scannabilityInfo" class="hidden w-full bg-emerald-950/50 border border-emerald-800 rounded-xl px-3 py-2.5 text-xs text-emerald-300 flex items-center gap-2" style="background: rgba(5, 150, 105, 0.1); border-color: rgba(16, 185, 129, 0.4);">
+                    <div id="scannabilityInfo" class="hidden w-full rounded-xl px-3 py-2.5 text-xs flex items-center gap-2" style="background: color-mix(in srgb, var(--md-tertiary) 12%, var(--md-surface-container)); border: 1px solid color-mix(in srgb, var(--md-tertiary) 40%, var(--md-outline-variant)); color: var(--md-tertiary);">
                         <i data-lucide="check" class="w-4 h-4 flex-shrink-0"></i>
                         Logo size &amp; margin within safe limits
                     </div>
-                    <div id="frameLabelPreview" class="hidden w-full bg-blue-950/50 border border-blue-800 rounded-xl px-3 py-2.5 text-xs text-blue-300 flex items-center gap-2">
+                    <div id="frameLabelPreview" class="hidden w-full rounded-xl px-3 py-2.5 text-xs flex items-center gap-2" style="background: color-mix(in srgb, var(--md-primary) 12%, var(--md-surface-container)); border: 1px solid color-mix(in srgb, var(--md-primary) 40%, var(--md-outline-variant)); color: var(--md-primary);">
                         <i data-lucide="tag" class="w-4 h-4 flex-shrink-0"></i>
                         <span>Label: <strong id="frameLabelText"></strong></span>
                     </div>
                     <div class="mobile-preview-actions">
                         <div class="space-y-2">
-                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">Download</p>
+                            <p class="text-xs font-semibold uppercase tracking-wide px-1" style="color: var(--md-on-surface-variant);">Download</p>
                             <div class="grid grid-cols-2 gap-2.5">
-                                <button id="downloadPngMobile" class="flex flex-col items-center justify-center gap-2 py-3 px-2 text-white text-xs font-semibold rounded-xl transition-all hover:shadow-md active:scale-95 bg-blue-600 hover:bg-blue-500">
+                                <button id="downloadPngMobile" class="flex flex-col items-center justify-center gap-2 py-3 px-2 text-xs font-semibold rounded-xl transition-all active:scale-95" style="background: var(--md-primary); color: var(--md-on-primary);">
                                     <i data-lucide="download" class="w-5 h-5"></i>
                                     PNG
                                 </button>
-                                <button id="downloadSvgMobile" class="flex flex-col items-center justify-center gap-2 py-3 px-2 text-white text-xs font-semibold rounded-xl transition-all hover:shadow-md active:scale-95 bg-emerald-600 hover:bg-emerald-500">
+                                <button id="downloadSvgMobile" class="flex flex-col items-center justify-center gap-2 py-3 px-2 text-xs font-semibold rounded-xl transition-all active:scale-95" style="background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);">
                                     <i data-lucide="file-down" class="w-5 h-5"></i>
                                     SVG
                                 </button>
@@ -275,19 +294,19 @@
                 </div>
 
                 <!-- Right Panel: Design Controls -->
-                <div id="panelDesign" class="panel-card design-panel bg-gray-800 rounded-xl shadow-sm border border-gray-700 flex flex-col">
-                    <div class="flex items-center gap-2 px-5 pt-5 pb-4 border-b border-gray-700 flex-shrink-0">
-                        <div class="w-5 h-5 rounded-lg bg-rose-900/40 text-rose-400 flex items-center justify-center flex-shrink-0">
+                <div id="panelDesign" class="panel-card design-panel flex flex-col" style="background: var(--md-surface-container-low); border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-medium);">
+                    <div class="flex items-center gap-2 px-5 pt-5 pb-4 flex-shrink-0" style="border-bottom: 1px solid var(--md-outline-variant);">
+                        <div class="w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0" style="background: color-mix(in srgb, var(--md-error) 12%, var(--md-surface-container)); color: var(--md-error);">
                             <i data-lucide="paintbrush-2" class="w-3 h-3"></i>
                         </div>
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Design</h2>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider" style="color: var(--md-on-surface-variant);">Design</h2>
                     </div>
                     <div class="design-content px-5 py-4 space-y-1">
                         <!-- Templates -->
                         <details class="group mb-1">
-                            <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
+                            <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl transition-colors" style="border-radius: var(--md-shape-medium);">
                                 <div class="flex items-center gap-2">
-                                    <div class="w-5 h-5 rounded-lg bg-orange-900/30 text-orange-400 flex items-center justify-center flex-shrink-0">
+                                    <div class="w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0" style="background: color-mix(in srgb, var(--md-tertiary) 12%, var(--md-surface-container)); color: var(--md-tertiary);">
                                         <i data-lucide="sparkles" class="w-3 h-3"></i>
                                     </div>
                                     <span class="text-sm font-semibold text-gray-200">Templates</span>

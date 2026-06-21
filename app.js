@@ -1360,7 +1360,6 @@ function doReset() {
 (function initOnboarding() {
     const banner = document.getElementById('onboardingBanner');
     const dismissBtn = document.getElementById('dismissOnboarding');
-    const helpBtn = document.getElementById('helpBtn');
     if (!banner) return;
     if (!localStorage.getItem('qrtist_v1_welcomed')) {
         banner.style.display = 'block';
@@ -1371,30 +1370,36 @@ function doReset() {
             localStorage.setItem('qrtist_v1_welcomed', '1');
         });
     }
-    if (helpBtn) {
-        helpBtn.addEventListener('click', () => {
-            const visible = banner.style.display !== 'none';
-            banner.style.display = visible ? 'none' : 'block';
-            if (!visible) banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        });
-    }
 
-    const aboutBtn = document.getElementById('aboutBtn');
-    const aboutPopover = document.getElementById('aboutPopover');
-    if (aboutBtn && aboutPopover) {
-        aboutBtn.addEventListener('click', (e) => {
+    // Header menu (replaces help & about)
+    const headerMenuBtn = document.getElementById('headerMenuBtn');
+    const headerMenu = document.getElementById('headerMenu');
+    const resetFromMenu = document.getElementById('resetDesignFromMenu');
+
+    if (headerMenuBtn && headerMenu) {
+        headerMenuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const isOpen = !aboutPopover.classList.contains('hidden');
-            aboutPopover.classList.toggle('hidden');
+            const isOpen = !headerMenu.classList.contains('hidden');
+            headerMenu.classList.toggle('hidden');
+            headerMenuBtn.setAttribute('aria-expanded', !isOpen);
             if (!isOpen) {
                 const close = (ev) => {
-                    if (!aboutPopover.contains(ev.target) && ev.target !== aboutBtn) {
-                        aboutPopover.classList.add('hidden');
+                    if (!headerMenu.contains(ev.target) && ev.target !== headerMenuBtn) {
+                        headerMenu.classList.add('hidden');
+                        headerMenuBtn.setAttribute('aria-expanded', 'false');
                         document.removeEventListener('click', close);
                     }
                 };
                 setTimeout(() => document.addEventListener('click', close), 0);
             }
+        });
+    }
+
+    if (resetFromMenu) {
+        resetFromMenu.addEventListener('click', () => {
+            if (typeof resetDesign === 'function') resetDesign();
+            headerMenu?.classList.add('hidden');
+            headerMenuBtn?.setAttribute('aria-expanded', 'false');
         });
     }
 })();
