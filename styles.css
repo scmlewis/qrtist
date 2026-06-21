@@ -82,7 +82,6 @@
    Reset & Base
    ══════════════════════════════════════════════════════════════════════════════ */
 html {
-    overflow-x: hidden;
     scrollbar-width: none;
 }
 html::-webkit-scrollbar { display: none; }
@@ -94,6 +93,7 @@ body {
     min-height: 100vh;
     background: var(--md-surface);
     color: var(--md-on-surface);
+    overflow-x: hidden;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
