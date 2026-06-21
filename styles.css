@@ -637,25 +637,27 @@ header {
     }
 }
 
-/* Help (?) button */
-.help-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(59,130,246,0.12);
-    border: 1px solid rgba(59,130,246,0.3);
-    color: #60a5fa;
-    font-size: 13px;
-    font-weight: 700;
+/* Header action buttons (help & about) */
+.header-action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 0.5rem;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #9ca3af;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: background 0.15s, border-color 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.help-btn:hover {
-    background: rgba(59,130,246,0.22);
-    border-color: rgba(59,130,246,0.55);
+.header-action-btn:hover {
+    background: rgba(55, 65, 81, 0.6);
+    color: #f3f4f6;
+}
+.header-action-btn:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
 }
 
 /* Desktop Download Buttons */
