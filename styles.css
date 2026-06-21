@@ -100,16 +100,12 @@ body {
    M3 Header — Top App Bar
    ══════════════════════════════════════════════════════════════════════════════ */
 header {
-    position: sticky;
-    top: 0;
-    z-index: 40;
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 8px 16px;
     background: var(--md-surface-container);
     border-bottom: 1px solid var(--md-outline-variant);
-    transition: box-shadow 0.2s ease;
 }
 
 @media (min-width: 769px) and (max-width: 1023px) {
