@@ -9,8 +9,8 @@
 }
 
 :root {
-    /* M3 Color Roles — Baseline palette (Blue primary, Teal tertiary) */
-    --md-primary:            #a8c7fa;
+    /* M3 Color Roles — Dark theme with strong contrast */
+    --md-primary:            #669df6;
     --md-on-primary:         #003061;
     --md-primary-container:  #0b4a8a;
     --md-on-primary-container: #d3e3fd;
@@ -20,7 +20,7 @@
     --md-secondary-container: #3e4759;
     --md-on-secondary-container: #d9e3f8;
 
-    --md-tertiary:           #7dd3c0;
+    --md-tertiary:           #4dd0b0;
     --md-on-tertiary:        #003730;
     --md-tertiary-container: #005046;
     --md-on-tertiary-container: #a0f0dc;
