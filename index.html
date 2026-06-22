@@ -87,6 +87,12 @@
                         Create beautiful, stylish QR codes</p>
                 </div>
                 <div class="flex items-center gap-1.5" style="position:relative;z-index:45;flex-shrink:0">
+                    <button id="undoBtn" class="header-action-btn" aria-label="Undo (Ctrl+Z)" title="Undo" disabled>
+                        <i data-lucide="undo-2" class="w-5 h-5"></i>
+                    </button>
+                    <button id="redoBtn" class="header-action-btn" aria-label="Redo (Ctrl+Shift+Z)" title="Redo" disabled>
+                        <i data-lucide="redo-2" class="w-5 h-5"></i>
+                    </button>
                     <div class="relative" id="headerMenuContainer">
                         <button id="headerMenuBtn" class="header-action-btn" aria-label="Menu" aria-expanded="false" aria-haspopup="true">
                             <i data-lucide="menu" class="w-5 h-5"></i>

@@ -221,21 +221,25 @@ window.QRCodeStyling = (function () {
 
         if (extension === 'svg') {
             try {
-                const qrData = window.QRCodeLib.create(this.options.data, {
-                    errorCorrectionLevel: this.options.errorCorrectionLevel || 'M'
+                const svgOpts = Object.assign({}, this.options, {
+                    frameStyle: options?.frameStyle || 'none',
+                    frameColor: options?.frameColor || '#000000',
+                    frameText: options?.frameText || '',
+                    logoDataUrl: options?.logoDataUrl || null,
+                    logoSize: options?.logoSize || 20,
+                    logoMargin: options?.logoMargin || 10
                 });
-                const svgString = window.QRCodeLib.toString(qrData, {
-                    width: this.options.width || 300,
-                    margin: this.options.margin || 10,
-                    color: {
-                        dark: this.options.dotsOptions?.color || '#000000',
-                        light: this.options.backgroundOptions?.color || '#ffffff'
-                    }
-                });
-                const blob = new Blob([svgString], { type: 'image/svg+xml' });
-                link.href = URL.createObjectURL(blob);
-                link.download = name + '.svg';
+                const svgString = generateStyledSVG(this.options.data, svgOpts);
+                if (svgString) {
+                    const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                    link.href = URL.createObjectURL(blob);
+                    link.download = name + '.svg';
+                } else {
+                    link.href = this.canvas.toDataURL('image/png');
+                    link.download = name + '.png';
+                }
             } catch (e) {
+                console.error('SVG export failed:', e);
                 link.href = this.canvas.toDataURL('image/png');
                 link.download = name + '.png';
             }
@@ -253,6 +257,242 @@ window.QRCodeStyling = (function () {
     return QRCodeStyling;
 })();
 
+// ── SVG Export Helpers ────────────────────────────────────────────────
+function _svgEscape(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function _svgRoundRect(x, y, w, h, r) {
+    return `M${x + r},${y} L${x + w - r},${y} Q${x + w},${y} ${x + w},${y + r} L${x + w},${y + h - r} Q${x + w},${y + h} ${x + w - r},${y + h} L${x + r},${y + h} Q${x},${y + h} ${x},${y + h - r} L${x},${y + r} Q${x},${y} ${x + r},${y} Z`;
+}
+
+function _svgOctagon(x, y, s) {
+    const cut = s * 0.22;
+    return `M${x + cut},${y} L${x + s - cut},${y} L${x + s},${y + cut} L${x + s},${y + s - cut} L${x + s - cut},${y + s} L${x + cut},${y + s} L${x},${y + s - cut} L${x},${y + cut} Z`;
+}
+
+function _svgSquircle(x, y, s) {
+    return _svgRoundRect(x, y, s, s, s * 0.38);
+}
+
+function _svgStarPoints(cx, cy, outerR, innerR, points) {
+    let pts = [];
+    for (let i = 0; i < points * 2; i++) {
+        const angle = (i * Math.PI / points) - Math.PI / 2;
+        const r = i % 2 === 0 ? outerR : innerR;
+        pts.push((cx + r * Math.cos(angle)).toFixed(2) + ',' + (cy + r * Math.sin(angle)).toFixed(2));
+    }
+    return pts.join(' ');
+}
+
+function _svgModuleShape(pattern, x, y, mSize) {
+    const r = mSize / 2;
+    switch (pattern) {
+        case 'dots':
+            return `<circle cx="${x + r}" cy="${y + r}" r="${(r * 0.65).toFixed(2)}"/>`;
+        case 'rounded':
+            return `<path d="${_svgRoundRect(x, y, mSize, mSize, r * 0.35)}"/>`;
+        case 'extra-rounded':
+            return `<circle cx="${x + r}" cy="${y + r}" r="${(r * 0.92).toFixed(2)}"/>`;
+        case 'classy':
+            return `<rect x="${(x + 1).toFixed(2)}" y="${(y + 1).toFixed(2)}" width="${(mSize - 2).toFixed(2)}" height="${(mSize - 2).toFixed(2)}"/>`;
+        case 'classy-rounded':
+            return `<path d="${_svgRoundRect(x + 1, y + 1, mSize - 2, mSize - 2, r * 0.45)}"/>`;
+        case 'classy-dots':
+            return `<circle cx="${x + r}" cy="${y + r}" r="${(r * 0.5).toFixed(2)}"/>`;
+        default:
+            return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${mSize.toFixed(2)}" height="${mSize.toFixed(2)}"/>`;
+    }
+}
+
+function _svgOuterFinder(type, x, y, s) {
+    const cx = x + s / 2, cy = y + s / 2;
+    switch (type) {
+        case 'circle':
+            return `<circle cx="${cx}" cy="${cy}" r="${s / 2}"/>`;
+        case 'rounded':
+            return `<path d="${_svgRoundRect(x, y, s, s, s * 0.22)}"/>`;
+        case 'diamond':
+            return `<polygon points="${cx},${y} ${x + s},${cy} ${cx},${y + s} ${x},${cy}"/>`;
+        case 'octagon':
+            return `<path d="${_svgOctagon(x, y, s)}"/>`;
+        case 'squircle':
+            return `<path d="${_svgSquircle(x, y, s)}"/>`;
+        default:
+            return `<rect x="${x}" y="${y}" width="${s}" height="${s}"/>`;
+    }
+}
+
+function _svgInnerFinder(type, cx, cy, s) {
+    const hs = s / 2;
+    switch (type) {
+        case 'dot':
+            return `<circle cx="${cx}" cy="${cy}" r="${hs}"/>`;
+        case 'rounded':
+            return `<path d="${_svgRoundRect(cx - hs, cy - hs, s, s, s * 0.28)}"/>`;
+        case 'star':
+            return `<polygon points="${_svgStarPoints(cx, cy, s * 0.56, s * 0.22, 5)}"/>`;
+        case 'diamond':
+            return `<polygon points="${cx},${cy - hs} ${cx + hs},${cy} ${cx},${cy + hs} ${cx - hs},${cy}"/>`;
+        case 'cross': {
+            const tw = s / 3;
+            return `<rect x="${cx - tw / 2}" y="${cy - hs}" width="${tw}" height="${s}"/><rect x="${cx - hs}" y="${cy - tw / 2}" width="${s}" height="${tw}"/>`;
+        }
+        default:
+            return `<rect x="${cx - hs}" y="${cy - hs}" width="${s}" height="${s}"/>`;
+    }
+}
+
+function generateStyledSVG(data, opts) {
+    const size = opts.width || 300;
+    const fgColor = opts.dotsOptions?.color || '#000000';
+    const fgColor2 = opts.dotsOptions?.gradient || null;
+    const bgColor = opts.backgroundOptions?.color || '#ffffff';
+    const pattern = opts.dotsOptions?.type || 'square';
+    const outerType = opts.cornersSquareOptions?.type || 'square';
+    const innerType = opts.cornersDotOptions?.type || 'square';
+    const ecLevel = opts.errorCorrectionLevel || 'M';
+    const frameStyle = opts.frameStyle || 'none';
+    const frameColor = opts.frameColor || '#000000';
+    const frameText = opts.frameText || '';
+    const logoDataUrl = opts.logoDataUrl || null;
+    const logoSizePercent = opts.logoSize || 20;
+    const logoMargin = opts.logoMargin || 10;
+
+    let qr;
+    try {
+        qr = window.QRCodeLib.create(data, { errorCorrectionLevel: ecLevel });
+    } catch (e) {
+        console.error('SVG export: QRCodeLib.create failed:', e);
+        return null;
+    }
+
+    const numModules = qr.modules.size;
+    const margin = 2;
+    const mSize = size / (numModules + margin * 2);
+    const FRAME_PAD = 20;
+    const TEXT_BAR_H = 44;
+    const hasFrame = frameStyle && frameStyle !== 'none' && frameStyle !== 'text-only';
+    const hasText = frameText && frameText.length > 0;
+    const hasLogo = logoDataUrl && logoDataUrl.length > 0;
+
+    let finalW = size;
+    let finalH = size;
+    if (hasFrame) { finalW = size + FRAME_PAD * 2; finalH = size + FRAME_PAD * 2; }
+    if (hasText) finalH += TEXT_BAR_H;
+
+    const qrX = hasFrame ? FRAME_PAD : 0;
+    const qrY = hasFrame ? FRAME_PAD : 0;
+
+    let svgParts = [];
+
+    // Root SVG
+    svgParts.push(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" shape-rendering="crispEdges" width="${finalW}" height="${finalH}" viewBox="0 0 ${finalW} ${finalH}">`);
+
+    // Defs: gradient
+    if (fgColor2) {
+        svgParts.push(`<defs><linearGradient id="qrGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${_svgEscape(fgColor)}"/><stop offset="100%" stop-color="${_svgEscape(fgColor2)}"/></linearGradient></defs>`);
+    }
+
+    // Background
+    svgParts.push(`<rect width="${finalW}" height="${finalH}" fill="${_svgEscape(bgColor)}"/>`);
+
+    const fill = fgColor2 ? 'url(#qrGrad)' : _svgEscape(fgColor);
+
+    // Data modules (skip finder regions)
+    let modulesSvg = '';
+    for (let row = 0; row < numModules; row++) {
+        for (let col = 0; col < numModules; col++) {
+            if (row < 7 && col < 7) continue;
+            if (row < 7 && col >= numModules - 7) continue;
+            if (row >= numModules - 7 && col < 7) continue;
+            if (qr.modules.data[row * numModules + col]) {
+                const x = (col + margin) * mSize + qrX;
+                const y = (row + margin) * mSize + qrY;
+                modulesSvg += _svgModuleShape(pattern, x, y, mSize);
+            }
+        }
+    }
+    svgParts.push(`<g fill="${fill}">${modulesSvg}</g>`);
+
+    // Finder patterns (3 corners)
+    const finderSize = mSize * 7;
+    const finderPositions = [
+        [(0 + margin) * mSize + qrX, (0 + margin) * mSize + qrY],
+        [(numModules - 7 + margin) * mSize + qrX, (0 + margin) * mSize + qrY],
+        [(0 + margin) * mSize + qrX, (numModules - 7 + margin) * mSize + qrY]
+    ];
+
+    for (const [fx, fy] of finderPositions) {
+        const outerS = finderSize;
+        const innerS = mSize * 3;
+        const cx = fx + outerS / 2;
+        const cy = fy + outerS / 2;
+
+        // Outer frame: draw outer shape, cut out inner+1, draw inner separately
+        // Use clip-path approach: outer shape clipped to frame ring
+        svgParts.push(`<g fill="${fill}">`);
+        svgParts.push(_svgOuterFinder(outerType, fx, fy, outerS));
+
+        // Cut out inner region using bgColor
+        svgParts.push(`<g fill="${_svgEscape(bgColor)}">`);
+        svgParts.push(_svgOuterFinder(outerType, fx + mSize, fy + mSize, outerS - mSize * 2));
+        svgParts.push(`</g>`);
+
+        // Inner center dot
+        svgParts.push(_svgInnerFinder(innerType, cx, cy, innerS));
+        svgParts.push(`</g>`);
+    }
+
+    // Frame
+    if (hasFrame) {
+        const fp = FRAME_PAD;
+        const fw = size;
+        const fh = size;
+        svgParts.push(`<g fill="none" stroke="${_svgEscape(frameColor)}" shape-rendering="auto">`);
+        switch (frameStyle) {
+            case 'simple':
+                svgParts.push(`<rect x="${fp}" y="${fp}" width="${fw}" height="${fh}" stroke-width="2"/>`);
+                break;
+            case 'rounded-rect':
+                svgParts.push(`<path d="${_svgRoundRect(fp, fp, fw, fh, 20)}" stroke-width="3"/>`);
+                break;
+            case 'thick-border':
+                svgParts.push(`<rect x="${fp}" y="${fp}" width="${fw}" height="${fh}" stroke-width="8"/>`);
+                break;
+            case 'double':
+                svgParts.push(`<rect x="${fp}" y="${fp}" width="${fw}" height="${fh}" stroke-width="2"/>`);
+                svgParts.push(`<rect x="${fp + 7}" y="${fp + 7}" width="${fw - 14}" height="${fh - 14}" stroke-width="2"/>`);
+                break;
+        }
+        svgParts.push(`</g>`);
+    }
+
+    // Text bar
+    if (hasText) {
+        const barY = finalH - TEXT_BAR_H;
+        const barPad = 8;
+        const barR = 8;
+        const fontSize = Math.min(16, Math.floor(TEXT_BAR_H * 0.5));
+        svgParts.push(`<path d="${_svgRoundRect(barPad, barY + 4, finalW - barPad * 2, TEXT_BAR_H - 8, barR)}" fill="${_svgEscape(frameColor)}" shape-rendering="auto"/>`);
+        svgParts.push(`<text x="${finalW / 2}" y="${barY + TEXT_BAR_H / 2 + 2}" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="${fontSize}" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" shape-rendering="auto">${_svgEscape(frameText)}</text>`);
+    }
+
+    // Logo
+    if (hasLogo) {
+        const logoPct = Math.min(logoSizePercent, 30);
+        const logoPx = (size * logoPct) / 100;
+        const lx = (size - logoPx) / 2 + qrX;
+        const ly = (size - logoPx) / 2 + qrY;
+        // White backing rect
+        svgParts.push(`<rect x="${lx - logoMargin}" y="${ly - logoMargin}" width="${logoPx + logoMargin * 2}" height="${logoPx + logoMargin * 2}" fill="${_svgEscape(bgColor)}" shape-rendering="auto"/>`);
+        svgParts.push(`<image x="${lx}" y="${ly}" width="${logoPx}" height="${logoPx}" href="${_svgEscape(logoDataUrl)}" shape-rendering="auto"/>`);
+    }
+
+    svgParts.push(`</svg>`);
+    return svgParts.join('\n');
+}
+
 let qrCode = null;
 let logoDataUrl = null;
 let currentLogoPreset = 'none';
@@ -263,6 +503,140 @@ let currentOuterCorner = 'square';
 let currentInnerCorner = 'square';
 let useGradient = false;
 let gradientColor2 = '#3b82f6';
+
+// ── Undo/Redo History ────────────────────────────────────────────────
+let _historyStack = [];
+let _historyIndex = -1;
+const _MAX_HISTORY = 50;
+let _historyCaptureTimer = null;
+
+function getConfig() {
+    const type = qrType.value;
+    const values = getInputValues();
+    return {
+        type: type,
+        values: JSON.parse(JSON.stringify(values)),
+        fg: fgColorInput.value,
+        bg: bgColorInput.value,
+        pattern: currentPattern,
+        outerCorner: currentOuterCorner,
+        innerCorner: currentInnerCorner,
+        useGradient: useGradient,
+        gradientColor2: gradientColor2,
+        size: currentQRSize,
+        logoSize: logoSize.value,
+        logoMargin: logoMargin.value,
+        logoPreset: currentLogoPreset,
+        frame: selectedFrame,
+        frameColor: frameColorInput.value,
+        frameText: frameTextInput.value
+    };
+}
+
+function applyConfig(cfg) {
+    if (!cfg) return;
+    qrType.value = cfg.type || 'url';
+    renderInputFields();
+    if (cfg.values) {
+        Object.keys(cfg.values).forEach(key => {
+            const el = document.getElementById(key);
+            if (el) el.value = cfg.values[key];
+        });
+    }
+    fgColorInput.value = cfg.fg || '#000000';
+    fgColorText.value = cfg.fg || '#000000';
+    bgColorInput.value = cfg.bg || '#ffffff';
+    bgColorText.value = cfg.bg || '#ffffff';
+    currentPattern = cfg.pattern || 'square';
+    currentOuterCorner = cfg.outerCorner || 'square';
+    currentInnerCorner = cfg.innerCorner || 'square';
+    useGradient = cfg.useGradient || false;
+    gradientColor2 = cfg.gradientColor2 || '#3b82f6';
+    if (gradColor2Input) gradColor2Input.value = gradientColor2;
+    if (gradColor2Text) gradColor2Text.value = gradientColor2;
+    if (gradientToggleBtn) { gradientToggleBtn.setAttribute('aria-pressed', useGradient); gradientToggleBtn.classList.toggle('active', useGradient); }
+    if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !useGradient);
+    currentQRSize = cfg.size || 300;
+    qrSize.value = currentQRSize;
+    qrSizeValue.textContent = currentQRSize;
+    logoSize.value = cfg.logoSize || 20;
+    logoSizeValue.textContent = cfg.logoSize || 20;
+    logoMargin.value = cfg.logoMargin || 10;
+    logoMarginValue.textContent = cfg.logoMargin || 10;
+    selectedFrame = cfg.frame || 'none';
+    frameColorInput.value = cfg.frameColor || '#000000';
+    frameColorTextInput.value = cfg.frameColor || '#000000';
+    frameTextInput.value = cfg.frameText || '';
+    currentLogoPreset = cfg.logoPreset || 'none';
+    logoDataUrl = null;
+    if (currentLogoPreset !== 'none' && currentLogoPreset !== 'custom') {
+        // preset logos are loaded from SVG data URLs, no need to store
+    }
+    updateShapeSelection();
+    updateCornerSelection();
+    updateFrameSelection();
+    updateLogoSelection();
+    logoControls.classList.toggle('hidden', currentLogoPreset === 'none');
+    if (currentLogoPreset === 'custom') {
+        customLogoBtn.style.display = 'flex';
+        customLogoBtn.classList.remove('hidden');
+        logoPreview.classList.remove('hidden');
+    } else {
+        customLogoBtn.style.display = '';
+        customLogoBtn.classList.add('hidden');
+        logoPreview.classList.add('hidden');
+    }
+    updateQRCode();
+}
+
+function _deepClone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
+function captureState() {
+    const state = getConfig();
+    // Truncate any future states if we're in the middle of the stack
+    if (_historyIndex < _historyStack.length - 1) {
+        _historyStack = _historyStack.slice(0, _historyIndex + 1);
+    }
+    // Avoid duplicate consecutive states
+    if (_historyStack.length > 0) {
+        const last = _historyStack[_historyStack.length - 1];
+        if (JSON.stringify(last) === JSON.stringify(state)) return;
+    }
+    _historyStack.push(_deepClone(state));
+    if (_historyStack.length > _MAX_HISTORY) {
+        _historyStack.shift();
+    }
+    _historyIndex = _historyStack.length - 1;
+    _updateUndoRedoButtons();
+}
+
+function _debounceCapture() {
+    clearTimeout(_historyCaptureTimer);
+    _historyCaptureTimer = setTimeout(() => captureState(), 600);
+}
+
+function undo() {
+    if (_historyIndex <= 0) return;
+    _historyIndex--;
+    applyConfig(_deepClone(_historyStack[_historyIndex]));
+    _updateUndoRedoButtons();
+}
+
+function redo() {
+    if (_historyIndex >= _historyStack.length - 1) return;
+    _historyIndex++;
+    applyConfig(_deepClone(_historyStack[_historyIndex]));
+    _updateUndoRedoButtons();
+}
+
+function _updateUndoRedoButtons() {
+    const undoBtn = document.getElementById('undoBtn');
+    const redoBtn = document.getElementById('redoBtn');
+    if (undoBtn) undoBtn.disabled = _historyIndex <= 0;
+    if (redoBtn) redoBtn.disabled = _historyIndex >= _historyStack.length - 1;
+}
 
 // ── Toast notifications ──────────────────────────────────────────────────
 function _esc(s) {
@@ -314,10 +688,7 @@ function renderTemplates() {
     if (!grid) return;
     grid.innerHTML = TEMPLATES.map(t => `
     <button class="template-btn flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-200 dark:border-gray-600 hover:border-blue-400 text-xs text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 transition-all" data-template="${t.id}" title="Preview: ${t.name}">
-        <div class="flex items-center gap-1.5">
-            <span class="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-500 flex-shrink-0" style="background:${t.fg}" title="Dots"></span>
-            <span class="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-500 flex-shrink-0" style="background:${t.bg}" title="Background"></span>
-        </div>
+        <canvas class="template-preview-canvas" width="56" height="56" data-template-id="${t.id}"></canvas>
         <span class="font-medium truncate w-full text-center">${t.name}</span>
     </button>`).join('');
     if (!grid.__qrtistTemplateClickHandler) {
@@ -329,6 +700,120 @@ function renderTemplates() {
         };
         grid.addEventListener('click', grid.__qrtistTemplateClickHandler);
     }
+    requestAnimationFrame(() => renderTemplatePreviews());
+}
+
+function _miniFinderMod(ctx, pattern, x, y, mSize) {
+    const r = mSize / 2;
+    switch (pattern) {
+        case 'dots':
+            ctx.beginPath(); ctx.arc(x + r, y + r, r * 0.65, 0, Math.PI * 2); ctx.fill(); break;
+        case 'rounded':
+            ctx.beginPath(); ctx.roundRect(x, y, mSize, mSize, r * 0.35); ctx.fill(); break;
+        case 'extra-rounded':
+            ctx.beginPath(); ctx.arc(x + r, y + r, r * 0.92, 0, Math.PI * 2); ctx.fill(); break;
+        case 'classy':
+            ctx.fillRect(x + 1, y + 1, mSize - 2, mSize - 2); break;
+        case 'classy-rounded':
+            ctx.beginPath(); ctx.roundRect(x + 1, y + 1, mSize - 2, mSize - 2, r * 0.45); ctx.fill(); break;
+        case 'classy-dots':
+            ctx.beginPath(); ctx.arc(x + r, y + r, r * 0.5, 0, Math.PI * 2); ctx.fill(); break;
+        default:
+            ctx.fillRect(x, y, mSize, mSize);
+    }
+}
+
+function _miniFinderPattern(ctx, px, py, mSize, outerType, innerType, fgColor) {
+    const sz = mSize * 7;
+    const cx = sz / 2, cy = sz / 2;
+    const in3s = mSize * 3;
+    ctx.fillStyle = fgColor;
+
+    function drawOuter(c, inset, type) {
+        const s = sz - inset * 2;
+        const x0 = inset, y0 = inset;
+        const lx = x0 + s / 2, ly = y0 + s / 2;
+        switch (type) {
+            case 'circle': c.beginPath(); c.arc(lx, ly, s / 2, 0, Math.PI * 2); c.fill(); break;
+            case 'rounded': c.beginPath(); c.roundRect(x0, y0, s, s, s * 0.22); c.fill(); break;
+            case 'diamond': c.beginPath(); c.moveTo(lx, y0); c.lineTo(x0 + s, ly); c.lineTo(lx, y0 + s); c.lineTo(x0, ly); c.closePath(); c.fill(); break;
+            case 'octagon': {
+                const cut = s * 0.22; c.beginPath();
+                c.moveTo(x0 + cut, y0); c.lineTo(x0 + s - cut, y0); c.lineTo(x0 + s, y0 + cut);
+                c.lineTo(x0 + s, y0 + s - cut); c.lineTo(x0 + s - cut, y0 + s); c.lineTo(x0 + cut, y0 + s);
+                c.lineTo(x0, y0 + s - cut); c.lineTo(x0, y0 + cut); c.closePath(); c.fill(); break;
+            }
+            case 'squircle': c.beginPath(); c.roundRect(x0, y0, s, s, s * 0.38); c.fill(); break;
+            default: c.fillRect(x0, y0, s, s);
+        }
+    }
+
+    drawOuter(ctx, 0, outerType);
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = 'rgba(0,0,0,1)';
+    drawOuter(ctx, mSize, outerType);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = fgColor;
+
+    switch (innerType) {
+        case 'dot': ctx.beginPath(); ctx.arc(cx, cy, in3s / 2, 0, Math.PI * 2); ctx.fill(); break;
+        case 'rounded': ctx.beginPath(); ctx.roundRect(cx - in3s / 2, cy - in3s / 2, in3s, in3s, in3s * 0.28); ctx.fill(); break;
+        case 'star': {
+            ctx.beginPath();
+            for (let i = 0; i < 10; i++) {
+                const angle = (i * Math.PI / 5) - Math.PI / 2;
+                const rad = i % 2 === 0 ? in3s * 0.56 : in3s * 0.22;
+                if (i === 0) ctx.moveTo(cx + rad * Math.cos(angle), cy + rad * Math.sin(angle));
+                else ctx.lineTo(cx + rad * Math.cos(angle), cy + rad * Math.sin(angle));
+            }
+            ctx.closePath(); ctx.fill(); break;
+        }
+        case 'diamond': ctx.beginPath(); ctx.moveTo(cx, cy - in3s / 2); ctx.lineTo(cx + in3s / 2, cy); ctx.lineTo(cx, cy + in3s / 2); ctx.lineTo(cx - in3s / 2, cy); ctx.closePath(); ctx.fill(); break;
+        case 'cross': ctx.fillRect(cx - in3s / 6, cy - in3s / 2, in3s / 3, in3s); ctx.fillRect(cx - in3s / 2, cy - in3s / 6, in3s, in3s / 3); break;
+        default: ctx.fillRect(cx - in3s / 2, cy - in3s / 2, in3s, in3s);
+    }
+}
+
+function renderTemplatePreviews() {
+    TEMPLATES.forEach(t => {
+        const canvas = document.querySelector(`canvas[data-template-id="${t.id}"]`);
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const sz = 56;
+        const qrSize = 52;
+        const qrData = 'https://example.com';
+        let qr;
+        try {
+            qr = window.QRCodeLib.create(qrData, { errorCorrectionLevel: 'L' });
+        } catch (e) { return; }
+
+        const numModules = qr.modules.size;
+        const m = 2;
+        const mSize = qrSize / (numModules + m * 2);
+
+        ctx.fillStyle = t.bg;
+        ctx.fillRect(0, 0, sz, sz);
+        ctx.fillStyle = t.fg;
+
+        for (let row = 0; row < numModules; row++) {
+            for (let col = 0; col < numModules; col++) {
+                if (row < 7 && col < 7) continue;
+                if (row < 7 && col >= numModules - 7) continue;
+                if (row >= numModules - 7 && col < 7) continue;
+                if (qr.modules.data[row * numModules + col]) {
+                    const x = (col + m) * mSize + 2;
+                    const y = (row + m) * mSize + 2;
+                    _miniFinderMod(ctx, t.dots, x, y, mSize);
+                }
+            }
+        }
+
+        const finderSz = mSize * 7;
+        const offsets = [[0, 0], [numModules - 7, 0], [0, numModules - 7]];
+        offsets.forEach(([r, c]) => {
+            _miniFinderPattern(ctx, (c + m) * mSize + 2, (r + m) * mSize + 2, mSize, t.outer, t.inner, t.fg);
+        });
+    });
 }
 
 function applyTemplate(t) {
@@ -347,6 +832,7 @@ function applyTemplate(t) {
     frameColorTextInput.value = t.frameColor || '#000000';
     updateFrameSelection();
     updateQRCode();
+    captureState();
 }
 
 // Dark mode removed - dark mode only
@@ -356,12 +842,28 @@ const qrTypeConfig = {
     email: { fields: [{ id: 'emailInput', label: 'Email', type: 'email', placeholder: 'test@example.com', value: 'test@example.com' }, { id: 'subjectInput', label: 'Subject (optional)', type: 'text', placeholder: 'Subject' }], encode: (values) => `mailto:${values.emailInput || 'test@example.com'}${values.subjectInput ? '?subject=' + encodeURIComponent(values.subjectInput) : ''}` },
     phone: { fields: [{ id: 'phoneInput', label: 'Phone Number', type: 'tel', placeholder: '+1234567890', value: '+14155552671' }], encode: (values) => `tel:${values.phoneInput || '+14155552671'}` },
     wifi: { fields: [{ id: 'wifiSsid', label: 'Network Name (SSID)', type: 'text', placeholder: 'MyWiFi', value: 'MyNetwork', help: 'The WiFi network name users will see' }, { id: 'wifiPassword', label: 'Password', type: 'password', placeholder: 'password', value: 'password123', help: 'Leave blank for open networks' }, { id: 'wifiSecurity', label: 'Security Type', type: 'select', options: [{ value: 'WPA', label: 'WPA/WPA2' }, { value: 'WEP', label: 'WEP' }, { value: 'nopass', label: 'Open' }], value: 'WPA', help: 'Select your network security type' }], encode: (values) => `WIFI:S:${values.wifiSsid || 'MyNetwork'};T:${values.wifiSecurity || 'WPA'};P:${values.wifiPassword || 'password123'};;` },
-    vcard: { fields: [{ id: 'vcardName', label: 'Full Name', type: 'text', placeholder: 'John Doe', value: 'John Doe', help: 'Person or business name' }, { id: 'vcardEmail', label: 'Email', type: 'email', placeholder: 'john@example.com', value: 'john@example.com', help: 'Contact email address' }, { id: 'vcardPhone', label: 'Phone', type: 'tel', placeholder: '+1234567890', value: '+14155552671', help: 'Phone number with country code' }], encode: (values) => `BEGIN:VCARD
-VERSION:3.0
-FN:${values.vcardName || 'John Doe'}
-EMAIL:${values.vcardEmail || 'john@example.com'}
-TEL:${values.vcardPhone || '+14155552671'}
-END:VCARD` }
+    vcard: { fields: [
+        { id: 'vcardName', label: 'Full Name', type: 'text', placeholder: 'John Doe', value: 'John Doe', help: 'Person or business name' },
+        { id: 'vcardOrg', label: 'Organization', type: 'text', placeholder: 'Acme Inc.', value: '', help: 'Company or organization name' },
+        { id: 'vcardTitle', label: 'Job Title', type: 'text', placeholder: 'Software Engineer', value: '', help: 'Role or position' },
+        { id: 'vcardEmail', label: 'Email', type: 'email', placeholder: 'john@example.com', value: 'john@example.com', help: 'Contact email address' },
+        { id: 'vcardPhone', label: 'Phone', type: 'tel', placeholder: '+1234567890', value: '+14155552671', help: 'Phone number with country code' },
+        { id: 'vcardUrl', label: 'Website', type: 'url', placeholder: 'https://example.com', value: '', help: 'Personal or business website' },
+        { id: 'vcardAddress', label: 'Address', type: 'text', placeholder: '123 Main St, City, Country', value: '', help: 'Physical address' },
+        { id: 'vcardNote', label: 'Notes', type: 'text', placeholder: 'Additional info', value: '', help: 'Free-text notes (keep short for QR scanning)' }
+    ], encode: (values) => {
+        const lines = ['BEGIN:VCARD', 'VERSION:3.0'];
+        lines.push(`FN:${values.vcardName || 'John Doe'}`);
+        if (values.vcardOrg) lines.push(`ORG:${values.vcardOrg}`);
+        if (values.vcardTitle) lines.push(`TITLE:${values.vcardTitle}`);
+        lines.push(`EMAIL:${values.vcardEmail || 'john@example.com'}`);
+        lines.push(`TEL:${values.vcardPhone || '+14155552671'}`);
+        if (values.vcardUrl) lines.push(`URL:${values.vcardUrl}`);
+        if (values.vcardAddress) lines.push(`ADR:;;${values.vcardAddress};;;;`);
+        if (values.vcardNote) lines.push(`NOTE:${values.vcardNote}`);
+        lines.push('END:VCARD');
+        return lines.join('\n');
+    } }
 };
 
 const qrType = document.getElementById('qrType');
@@ -426,7 +928,7 @@ function renderInputFields() {
                 option.textContent = opt.label;
                 select.appendChild(option);
             });
-            select.addEventListener('change', updateQRCode);
+            select.addEventListener('change', () => { updateQRCode(); captureState(); });
             wrapper.appendChild(select);
         } else {
             const input = document.createElement('input');
@@ -436,8 +938,8 @@ function renderInputFields() {
             input.value = field.value;
             if (field.help) input.title = field.help;
             input.className = 'w-full px-3 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition';
-            input.addEventListener('input', updateQRCode);
-            input.addEventListener('change', updateQRCode);
+            input.addEventListener('input', () => { updateQRCode(); _debounceCapture(); });
+            input.addEventListener('change', () => { updateQRCode(); captureState(); });
             wrapper.appendChild(input);
             if (field.type === 'url' || field.id === 'urlInput' || field.id === 'emailInput') {
                 const errEl = document.createElement('p');
@@ -558,6 +1060,7 @@ document.getElementById('logoGrid').addEventListener('click', (e) => {
     updateLogoSelection();
     logoControls.classList.toggle('hidden', preset === 'none');
     updateQRCode();
+    captureState();
 });
 
 logoInput.addEventListener('change', (e) => {
@@ -578,6 +1081,7 @@ logoRemove.addEventListener('click', () => {
         logoControls.classList.add('hidden');
     }
     updateQRCode();
+    captureState();
 });
 
 frameBtns.forEach((btn) => {
@@ -585,6 +1089,7 @@ frameBtns.forEach((btn) => {
         selectedFrame = btn.getAttribute('data-frame');
         updateFrameSelection();
         updateQRCode();
+        captureState();
     });
 });
 
@@ -860,17 +1365,31 @@ function generateQRFilename() {
     return `qr-${typeLabel}-${timestamp}`;
 }
 
+function getSvgDownloadOptions() {
+    return {
+        frameStyle: selectedFrame,
+        frameColor: frameColorInput.value,
+        frameText: frameTextInput.value.trim(),
+        logoDataUrl: currentLogoPreset === 'custom' ? logoDataUrl
+            : currentLogoPreset !== 'none' ? getLogoPresetDataUrl(currentLogoPreset)
+            : null,
+        logoSize: parseInt(logoSize.value) || 20,
+        logoMargin: parseInt(logoMargin.value) || 10
+    };
+}
+
 downloadPng.addEventListener('click', () => {
     if (qrCode) qrCode.download({ name: generateQRFilename(), extension: 'png' });
 });
 
 downloadSvg.addEventListener('click', () => {
-    if (qrCode) qrCode.download({ name: generateQRFilename(), extension: 'svg' });
+    if (qrCode) qrCode.download(Object.assign({ name: generateQRFilename(), extension: 'svg' }, getSvgDownloadOptions()));
 });
 
 qrType.addEventListener('change', () => {
     renderInputFields();
     updateQRCode();
+    captureState();
 });
 
 qrSize.addEventListener('input', (e) => {
@@ -879,29 +1398,34 @@ qrSize.addEventListener('input', (e) => {
     if (qrSizeLabel) qrSizeLabel.textContent = currentQRSize;
     if (qrSizeLabel2) qrSizeLabel2.textContent = currentQRSize;
     updateQRCode();
+    _debounceCapture();
 });
 
 fgColorInput.addEventListener('input', (e) => {
     fgColorText.value = e.target.value;
     updateQRCode();
+    _debounceCapture();
 });
 
 fgColorText.addEventListener('change', (e) => {
     if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
         fgColorInput.value = e.target.value;
         updateQRCode();
+        captureState();
     }
 });
 
 bgColorInput.addEventListener('input', (e) => {
     bgColorText.value = e.target.value;
     updateQRCode();
+    _debounceCapture();
 });
 
 bgColorText.addEventListener('change', (e) => {
     if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
         bgColorInput.value = e.target.value;
         updateQRCode();
+        captureState();
     }
 });
 
@@ -911,6 +1435,7 @@ document.getElementById('shapeGrid').addEventListener('click', (e) => {
     currentPattern = btn.getAttribute('data-pattern');
     updateShapeSelection();
     updateQRCode();
+    captureState();
 });
 
 document.getElementById('outerCornerGrid').addEventListener('click', (e) => {
@@ -919,6 +1444,7 @@ document.getElementById('outerCornerGrid').addEventListener('click', (e) => {
     currentOuterCorner = btn.getAttribute('data-outer');
     updateCornerSelection();
     updateQRCode();
+    captureState();
 });
 
 document.getElementById('innerCornerGrid').addEventListener('click', (e) => {
@@ -927,6 +1453,7 @@ document.getElementById('innerCornerGrid').addEventListener('click', (e) => {
     currentInnerCorner = btn.getAttribute('data-inner');
     updateCornerSelection();
     updateQRCode();
+    captureState();
 });
 
 const gradientToggleBtn = document.getElementById('gradientToggle');
@@ -940,6 +1467,7 @@ if (gradientToggleBtn) {
         gradientToggleBtn.classList.toggle('active', useGradient);
         if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !useGradient);
         updateQRCode();
+        captureState();
     });
 }
 if (gradColor2Input) {
@@ -947,6 +1475,7 @@ if (gradColor2Input) {
         gradientColor2 = e.target.value;
         if (gradColor2Text) gradColor2Text.value = e.target.value;
         if (useGradient) updateQRCode();
+        _debounceCapture();
     });
 }
 if (gradColor2Text) {
@@ -955,6 +1484,7 @@ if (gradColor2Text) {
             gradientColor2 = e.target.value;
             if (gradColor2Input) gradColor2Input.value = e.target.value;
             if (useGradient) updateQRCode();
+            captureState();
         }
     });
 }
@@ -962,11 +1492,13 @@ if (gradColor2Text) {
 frameColorInput.addEventListener('input', (e) => {
     frameColorTextInput.value = e.target.value;
     updateQRCode();
+    _debounceCapture();
 });
 frameColorTextInput.addEventListener('change', (e) => {
     if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
         frameColorInput.value = e.target.value;
         updateQRCode();
+        captureState();
     }
 });
 
@@ -985,17 +1517,20 @@ frameTextInput.addEventListener('input', (e) => {
         }
     }
     updateQRCode();
+    _debounceCapture();
 });
 
 logoSize.addEventListener('input', (e) => {
     logoSizeValue.textContent = e.target.value;
     updateQRCode();
     checkScannability();
+    _debounceCapture();
 });
 
 logoMargin.addEventListener('input', (e) => {
     logoMarginValue.textContent = e.target.value;
     updateQRCode();
+    _debounceCapture();
 });
 
 // URL Hash Serialization
@@ -1027,45 +1562,7 @@ function setConfigFromHash(hash) {
     try {
         const rawHash = hash.startsWith('settings=') ? hash.slice('settings='.length) : hash;
         const configObj = JSON.parse(decodeURIComponent(atob(rawHash)));
-        qrType.value = configObj.type;
-        renderInputFields();
-
-        Object.keys(configObj.values).forEach(key => {
-            const element = document.getElementById(key);
-            if (element) element.value = configObj.values[key];
-        });
-
-        fgColorInput.value = configObj.fg || '#000000';
-        fgColorText.value = configObj.fg || '#000000';
-        bgColorInput.value = configObj.bg || '#ffffff';
-        bgColorText.value = configObj.bg || '#ffffff';
-        currentPattern = configObj.pattern || 'square';
-        currentOuterCorner = configObj.outerCorner || configObj.cornerStyle || 'square';
-        currentInnerCorner = configObj.innerCorner || 'square';
-        useGradient = configObj.useGradient || false;
-        gradientColor2 = configObj.gradientColor2 || '#3b82f6';
-        if (gradColor2Input) gradColor2Input.value = gradientColor2;
-        if (gradColor2Text) gradColor2Text.value = gradientColor2;
-        if (gradientToggleBtn) { gradientToggleBtn.setAttribute('aria-pressed', useGradient); gradientToggleBtn.classList.toggle('active', useGradient); }
-        if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !useGradient);
-        currentQRSize = configObj.size || 300;
-        qrSize.value = currentQRSize;
-        qrSizeValue.textContent = currentQRSize;
-        logoSize.value = configObj.logoSize || 20;
-        logoSizeValue.textContent = configObj.logoSize || 20;
-        logoMargin.value = configObj.logoMargin || 10;
-        logoMarginValue.textContent = configObj.logoMargin || 10;
-        selectedFrame = configObj.frame || 'none';
-        frameColorInput.value = configObj.frameColor || '#000000';
-        frameColorTextInput.value = configObj.frameColor || '#000000';
-        frameTextInput.value = configObj.frameText || '';
-        currentLogoPreset = configObj.logoPreset || 'none';
-        updateShapeSelection();
-        updateCornerSelection();
-        updateFrameSelection();
-        updateLogoSelection();
-        logoControls.classList.toggle('hidden', currentLogoPreset === 'none');
-        updateQRCode();
+        applyConfig(configObj);
     } catch (e) {
         console.error('Invalid config hash', e);
     }
@@ -1172,40 +1669,8 @@ document.getElementById('importConfigInput').addEventListener('change', (e) => {
     reader.onload = (event) => {
         try {
             const configObj = JSON.parse(event.target.result);
-            qrType.value = configObj.type;
-            renderInputFields();
-
-            Object.keys(configObj.values).forEach(key => {
-                const element = document.getElementById(key);
-                if (element) element.value = configObj.values[key];
-            });
-
-            fgColorInput.value = configObj.fg || '#000000';
-            fgColorText.value = configObj.fg || '#000000';
-            bgColorInput.value = configObj.bg || '#ffffff';
-            bgColorText.value = configObj.bg || '#ffffff';
-            currentPattern = configObj.pattern || 'square';
-            currentOuterCorner = configObj.outerCorner || configObj.cornerStyle || 'square';
-            currentInnerCorner = configObj.innerCorner || 'square';
-            useGradient = configObj.useGradient || false;
-            gradientColor2 = configObj.gradientColor2 || '#3b82f6';
-            if (gradColor2Input) gradColor2Input.value = gradientColor2;
-            if (gradColor2Text) gradColor2Text.value = gradientColor2;
-            if (gradientToggleBtn) { gradientToggleBtn.setAttribute('aria-pressed', useGradient); gradientToggleBtn.classList.toggle('active', useGradient); }
-            if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !useGradient);
-            currentQRSize = configObj.size || 300;
-            qrSize.value = currentQRSize;
-            qrSizeValue.textContent = currentQRSize;
-            logoSize.value = configObj.logoSize || 20;
-            logoSizeValue.textContent = configObj.logoSize || 20;
-            logoMargin.value = configObj.logoMargin || 10;
-            logoMarginValue.textContent = configObj.logoMargin || 10;
-            selectedFrame = configObj.frame || 'none';
-            frameColorInput.value = configObj.frameColor || '#000000';
-            frameColorTextInput.value = configObj.frameColor || '#000000';
-            frameTextInput.value = configObj.frameText || '';
-
-            currentLogoPreset = configObj.logoPreset || 'none';
+            applyConfig(configObj);
+            // Handle custom logo from import
             if (configObj.logo) {
                 logoDataUrl = configObj.logo;
                 logoImg.src = logoDataUrl;
@@ -1213,13 +1678,11 @@ document.getElementById('importConfigInput').addEventListener('change', (e) => {
                 customLogoBtn.classList.remove('hidden');
                 logoPreview.classList.remove('hidden');
                 currentLogoPreset = 'custom';
+                updateLogoSelection();
+                logoControls.classList.remove('hidden');
+                updateQRCode();
             }
-            logoControls.classList.toggle('hidden', currentLogoPreset === 'none');
-            updateShapeSelection();
-            updateCornerSelection();
-            updateFrameSelection();
-            updateLogoSelection();
-            updateQRCode();
+            captureState();
         } catch (e) {
             showToast('Import failed: ' + e.message, 'error');
         }
@@ -1281,6 +1744,7 @@ function doReset() {
     updateFrameSelection();
     updateLogoSelection();
     updateQRCode();
+    captureState();
     showToast('Design reset to defaults', 'info');
 }
 (function initResetDesign() {
@@ -1337,7 +1801,7 @@ function doReset() {
         if (qrCode) qrCode.download({ name: generateQRFilename(), extension: 'png' });
     });
     if (dlSvgM) dlSvgM.addEventListener('click', () => {
-        if (qrCode) qrCode.download({ name: generateQRFilename(), extension: 'svg' });
+        if (qrCode) qrCode.download(Object.assign({ name: generateQRFilename(), extension: 'svg' }, getSvgDownloadOptions()));
     });
 })();
 
@@ -1382,7 +1846,7 @@ function doReset() {
 
     if (resetFromMenu) {
         resetFromMenu.addEventListener('click', () => {
-            if (typeof resetDesign === 'function') resetDesign();
+            doReset();
             headerMenu?.classList.add('hidden');
             headerMenuBtn?.setAttribute('aria-expanded', 'false');
         });
@@ -1397,4 +1861,33 @@ function doReset() {
         const previewTab = document.querySelector('.mobile-tab-btn[data-tab="1"]');
         if (previewTab) previewTab.click();
     });
+})();
+
+// ── Keyboard Shortcuts (Undo/Redo) ───────────────────────────────────
+document.addEventListener('keydown', (e) => {
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const mod = isMac ? e.metaKey : e.ctrlKey;
+    if (!mod) return;
+    if (e.key === 'z' || e.key === 'Z') {
+        if (e.shiftKey) {
+            e.preventDefault();
+            redo();
+        } else {
+            e.preventDefault();
+            undo();
+        }
+    } else if (e.key === 'y') {
+        e.preventDefault();
+        redo();
+    }
+});
+
+// ── Undo/Redo Button Init ────────────────────────────────────────────
+(function initUndoRedoButtons() {
+    const undoBtn = document.getElementById('undoBtn');
+    const redoBtn = document.getElementById('redoBtn');
+    if (undoBtn) undoBtn.addEventListener('click', undo);
+    if (redoBtn) redoBtn.addEventListener('click', redo);
+    // Capture initial state after first render
+    setTimeout(() => captureState(), 100);
 })();

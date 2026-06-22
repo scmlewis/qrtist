@@ -198,6 +198,11 @@ header {
     outline: 2px solid var(--md-primary);
     outline-offset: 2px;
 }
+.header-action-btn:disabled {
+    opacity: 0.38;
+    cursor: default;
+    pointer-events: none;
+}
 
 /* ══════════════════════════════════════════════════════════════════════════════
    M3 Panels — Card (Filled variant)
@@ -476,6 +481,15 @@ input[type="color"] {
     border: 1px solid var(--md-outline-variant);
     background: var(--md-surface-container-highest);
     cursor: pointer;
+}
+
+/* Template preview canvases */
+.template-preview-canvas {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    border: 1px solid var(--md-outline-variant);
+    image-rendering: pixelated;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
