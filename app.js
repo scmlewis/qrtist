@@ -683,66 +683,6 @@ const TEMPLATES = [
     { id: 'linkedin-navy', name: 'LinkedIn', fg: '#0a66c2', bg: '#ffffff', dots: 'square', outer: 'square', inner: 'square', frame: 'simple', frameColor: '#0a66c2' },
 ];
 
-// ── Quick Presets ──────────────────────────────────────────────────────
-const PRESETS = [
-    { id: 'minimal', name: 'Minimal', icon: '○', fg: '#1f2937', bg: '#ffffff', dots: 'rounded', outer: 'rounded', inner: 'rounded', frame: 'none', frameColor: '#1f2937', gradient: false },
-    { id: 'bold', name: 'Bold', icon: '■', fg: '#000000', bg: '#ffffff', dots: 'square', outer: 'square', inner: 'square', frame: 'thick-border', frameColor: '#000000', gradient: false },
-    { id: 'neon', name: 'Neon', icon: '◈', fg: '#00ff88', bg: '#0a0a0a', dots: 'dots', outer: 'circle', inner: 'dot', frame: 'none', frameColor: '#00ff88', gradient: false },
-    { id: 'corporate', name: 'Corporate', icon: '◆', fg: '#1e40af', bg: '#ffffff', dots: 'rounded', outer: 'rounded', inner: 'dot', frame: 'simple', frameColor: '#1e40af', gradient: false },
-    { id: 'sunset', name: 'Sunset', icon: '◐', fg: '#f97316', bg: '#fff7ed', dots: 'classy-rounded', outer: 'squircle', inner: 'rounded', frame: 'rounded-rect', frameColor: '#f97316', gradient: true, gradientTo: '#ef4444' },
-    { id: 'ocean', name: 'Ocean', icon: '◑', fg: '#0ea5e9', bg: '#f0f9ff', dots: 'dots', outer: 'circle', inner: 'dot', frame: 'rounded-rect', frameColor: '#0ea5e9', gradient: true, gradientTo: '#6366f1' },
-    { id: 'mono', name: 'Mono', icon: '◎', fg: '#6b7280', bg: '#f3f4f6', dots: 'square', outer: 'octagon', inner: 'diamond', frame: 'double', frameColor: '#6b7280', gradient: false },
-    { id: 'playful', name: 'Playful', icon: '●', fg: '#8b5cf6', bg: '#faf5ff', dots: 'extra-rounded', outer: 'circle', inner: 'star', frame: 'rounded-rect', frameColor: '#8b5cf6', gradient: false },
-];
-
-function renderPresets() {
-    const strip = document.getElementById('presetStrip');
-    if (!strip) return;
-    strip.innerHTML = PRESETS.map(p => `
-        <button class="preset-btn flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl border border-gray-600 hover:border-blue-400 transition-all" data-preset="${p.id}" title="${p.name}">
-            <span class="text-base leading-none" style="color:${p.fg}">${p.icon}</span>
-            <span class="text-[10px] font-medium text-gray-300">${p.name}</span>
-        </button>`).join('');
-    strip.addEventListener('click', (e) => {
-        const btn = e.target.closest('.preset-btn');
-        if (!btn) return;
-        const p = PRESETS.find(x => x.id === btn.getAttribute('data-preset'));
-        if (p) applyPreset(p);
-    });
-}
-
-function applyPreset(p) {
-    fgColorInput.value = p.fg;
-    fgColorText.value = p.fg;
-    bgColorInput.value = p.bg;
-    bgColorText.value = p.bg;
-    currentPattern = p.dots;
-    currentOuterCorner = p.outer;
-    currentInnerCorner = p.inner;
-    selectedFrame = p.frame || 'none';
-    frameColorInput.value = p.frameColor || '#000000';
-    frameColorTextInput.value = p.frameColor || '#000000';
-    if (p.gradient) {
-        useGradient = true;
-        gradientColor2 = p.gradientTo || '#3b82f6';
-        gradientToggleBtn.setAttribute('aria-pressed', 'true');
-        gradientToggleBtn.classList.add('active');
-        gradColor2Row.classList.remove('hidden');
-        document.getElementById('gradColor2').value = p.gradientTo;
-        document.getElementById('gradColor2Text').value = p.gradientTo;
-    } else {
-        useGradient = false;
-        gradientToggleBtn.setAttribute('aria-pressed', 'false');
-        gradientToggleBtn.classList.remove('active');
-        gradColor2Row.classList.add('hidden');
-    }
-    updateShapeSelection();
-    updateCornerSelection();
-    updateFrameSelection();
-    updateQRCode();
-    captureState();
-}
-
 function renderTemplates() {
     const grid = document.getElementById('templateGrid');
     if (!grid) return;
@@ -923,63 +863,6 @@ const qrTypeConfig = {
         if (values.vcardNote) lines.push(`NOTE:${values.vcardNote}`);
         lines.push('END:VCARD');
         return lines.join('\n');
-    } },
-    'wifi-direct': { fields: [
-        { id: 'wdSsid', label: 'Network Name (SSID)', type: 'text', placeholder: 'DirectHotspot', value: 'MyHotspot', help: 'The hotspot name devices will see' },
-        { id: 'wdPassword', label: 'Password', type: 'password', placeholder: 'password', value: 'password123', help: 'Minimum 8 characters for WPA' },
-        { id: 'wdSecurity', label: 'Security Type', type: 'select', options: [{ value: 'WPA', label: 'WPA/WPA2' }, { value: 'nopass', label: 'Open' }], value: 'WPA' }
-    ], encode: (values) => `WIFI:S:${values.wdSsid || 'MyHotspot'};T:${values.wdSecurity || 'WPA'};P:${values.wdPassword || 'password123'};H:true;;` },
-    calendar: { fields: [
-        { id: 'calSummary', label: 'Event Title', type: 'text', placeholder: 'Team Meeting', value: 'Meeting', help: 'What the event is about' },
-        { id: 'calLocation', label: 'Location', type: 'text', placeholder: 'Room 42, Building A', value: '', help: 'Physical or virtual location' },
-        { id: 'calStart', label: 'Start', type: 'text', placeholder: '2026-07-15T10:00:00', value: '', help: 'Format: YYYY-MM-DDTHH:MM:SS' },
-        { id: 'calEnd', label: 'End', type: 'text', placeholder: '2026-07-15T11:00:00', value: '', help: 'Format: YYYY-MM-DDTHH:MM:SS' },
-        { id: 'calDescription', label: 'Description', type: 'text', placeholder: 'Agenda, notes...', value: '', help: 'Optional event details' }
-    ], encode: (values) => {
-        const pad = (s) => (s || '').replace(/[-:]/g, '');
-        const lines = ['BEGIN:VEVENT'];
-        if (values.calSummary) lines.push(`SUMMARY:${values.calSummary}`);
-        if (values.calLocation) lines.push(`LOCATION:${values.calLocation}`);
-        if (values.calStart) lines.push(`DTSTART:${pad(values.calStart)}`);
-        if (values.calEnd) lines.push(`DTEND:${pad(values.calEnd)}`);
-        if (values.calDescription) lines.push(`DESCRIPTION:${values.calDescription}`);
-        lines.push('END:VEVENT');
-        return lines.join('\n');
-    } },
-    geo: { fields: [
-        { id: 'geoLat', label: 'Latitude', type: 'text', placeholder: '37.7749', value: '37.7749', help: 'Decimal degrees (-90 to 90)' },
-        { id: 'geoLng', label: 'Longitude', type: 'text', placeholder: '-122.4194', value: '-122.4194', help: 'Decimal degrees (-180 to 180)' },
-        { id: 'geoZoom', label: 'Zoom Level', type: 'select', options: [{ value: '18', label: 'Street' }, { value: '15', label: 'Neighborhood' }, { value: '12', label: 'City' }, { value: '8', label: 'Region' }], value: '15', help: 'Map zoom when opened' }
-    ], encode: (values) => `geo:${values.geoLat || '37.7749'},${values.geoLng || '-122.4194'}?z=${values.geoZoom || '15'}` },
-    deeplink: { fields: [
-        { id: 'dlUri', label: 'Link URI', type: 'text', placeholder: 'myapp://item/123 or https://example.com/path', value: 'https://example.com', help: 'Universal link (https://) or custom scheme (myapp://)' },
-        { id: 'dlFallback', label: 'Fallback URL (optional)', type: 'text', placeholder: 'https://example.com/fallback', value: '', help: 'Web fallback if app is not installed' }
-    ], encode: (values) => values.dlUri || 'https://example.com' },
-    social: { fields: [
-        { id: 'socialPlatform', label: 'Platform', type: 'select', options: [
-            { value: 'twitter', label: 'Twitter / X' },
-            { value: 'linkedin', label: 'LinkedIn' },
-            { value: 'facebook', label: 'Facebook' },
-            { value: 'whatsapp', label: 'WhatsApp' },
-            { value: 'telegram', label: 'Telegram' },
-            { value: 'reddit', label: 'Reddit' },
-            { value: 'email', label: 'Email Share' }
-        ], value: 'twitter' },
-        { id: 'socialText', label: 'Message / URL', type: 'text', placeholder: 'Check this out!', value: 'Check out QRtist!', help: 'Text to share or a URL' },
-        { id: 'socialUrl', label: 'URL (optional)', type: 'text', placeholder: 'https://example.com', value: '', help: 'Link to include with the message' }
-    ], encode: (values) => {
-        const text = encodeURIComponent(values.socialText || '');
-        const url = values.socialUrl ? encodeURIComponent(values.socialUrl) : '';
-        switch (values.socialPlatform) {
-            case 'twitter': return `https://twitter.com/intent/tweet?text=${text}${url ? '&url=' + url : ''}`;
-            case 'linkedin': return `https://www.linkedin.com/sharing/share-offsite/?url=${url || text}`;
-            case 'facebook': return `https://www.facebook.com/sharer/sharer.php?u=${url || text}`;
-            case 'whatsapp': return `https://wa.me/?text=${text}${url ? '%20' + url : ''}`;
-            case 'telegram': return `https://t.me/share/url?url=${url || ''}&text=${text}`;
-            case 'reddit': return `https://reddit.com/submit?url=${url || text}&title=${text}`;
-            case 'email': return `mailto:?subject=${text}&body=${url || text}`;
-            default: return text;
-        }
     } }
 };
 
@@ -1262,7 +1145,6 @@ function drawFrame(ctx, size, frame, frameColor, frameText, textBarHeight) {
 function updateQRCode() {
     const renderToken = ++renderGeneration;
     activeRenderGeneration = renderToken;
-    qrCodeContainer.classList.add('updating');
     const type = qrType.value;
     const config = qrTypeConfig[type];
     const values = getInputValues();
@@ -1339,7 +1221,6 @@ function updateQRCode() {
 
     checkContrast();
     checkScannability();
-    requestAnimationFrame(() => qrCodeContainer.classList.remove('updating'));
     if (window.__isMobilePreviewTab && !window.__isMobilePreviewTab()) {
         const previewTabBtn = document.querySelector('.mobile-tab-btn[data-tab="1"]');
         if (previewTabBtn) {
@@ -1480,7 +1361,7 @@ function constrainPreviewCanvas(retries) {
 function generateQRFilename() {
     const type = qrType.value;
     const timestamp = new Date().toISOString().slice(0, 10);
-    const typeLabel = { url: 'url', text: 'text', email: 'email', phone: 'phone', wifi: 'wifi', 'wifi-direct': 'wifi-direct', calendar: 'event', geo: 'location', deeplink: 'deeplink', social: 'social', vcard: 'contact' }[type] || 'qr';
+    const typeLabel = { url: 'url', text: 'text', email: 'email', phone: 'phone', wifi: 'wifi', vcard: 'contact' }[type] || 'qr';
     return `qr-${typeLabel}-${timestamp}`;
 }
 
@@ -1820,155 +1701,7 @@ if (window.location.hash) {
     renderInputFields();
     updateQRCode();
 }
-renderPresets();
 renderTemplates();
-
-// ── Saved Designs (localStorage) ──────────────────────────────────────
-const SAVED_KEY = 'qrtist_v1_designs';
-const MAX_SAVED = 20;
-
-function getSavedDesigns() {
-    try { return JSON.parse(localStorage.getItem(SAVED_KEY)) || []; }
-    catch { return []; }
-}
-
-function saveDesign(design) {
-    const all = getSavedDesigns();
-    all.unshift(design);
-    if (all.length > MAX_SAVED) all.length = MAX_SAVED;
-    localStorage.setItem(SAVED_KEY, JSON.stringify(all));
-    renderSavedDesigns();
-}
-
-function deleteSavedDesign(id) {
-    const all = getSavedDesigns().filter(d => d.id !== id);
-    localStorage.setItem(SAVED_KEY, JSON.stringify(all));
-    renderSavedDesigns();
-}
-
-function captureThumbnail() {
-    const canvas = qrCodeContainer.querySelector('canvas');
-    if (!canvas) return null;
-    try {
-        const tmp = document.createElement('canvas');
-        tmp.width = 72; tmp.height = 72;
-        const ctx = tmp.getContext('2d');
-        const s = Math.min(canvas.width, canvas.height);
-        const sx = (canvas.width - s) / 2, sy = (canvas.height - s) / 2;
-        ctx.drawImage(canvas, sx, sy, s, s, 0, 0, 72, 72);
-        return tmp.toDataURL('image/png', 0.6);
-    } catch { return null; }
-}
-
-function getCurrentDesignConfig() {
-    return {
-        type: qrType.value,
-        values: getInputValues(),
-        fg: fgColorInput.value,
-        bg: bgColorInput.value,
-        dots: currentPattern,
-        outer: currentOuterCorner,
-        inner: currentInnerCorner,
-        frame: selectedFrame,
-        frameColor: frameColorInput.value,
-        size: currentQRSize,
-        gradient: useGradient,
-        gradientTo: useGradient ? gradientColor2 : null,
-        logoPreset: currentLogoPreset,
-        logoSize: parseInt(logoSize.value),
-        logoMargin: parseInt(logoMargin.value),
-        frameText: frameTextInput.value.trim()
-    };
-}
-
-function restoreDesign(cfg) {
-    qrType.value = cfg.type;
-    renderInputFields();
-    Object.entries(cfg.values || {}).forEach(([id, val]) => {
-        const el = document.getElementById(id);
-        if (el) el.value = val;
-    });
-    fgColorInput.value = cfg.fg || '#000000';
-    fgColorText.value = cfg.fg || '#000000';
-    bgColorInput.value = cfg.bg || '#ffffff';
-    bgColorText.value = cfg.bg || '#ffffff';
-    currentPattern = cfg.dots || 'square';
-    currentOuterCorner = cfg.outer || 'square';
-    currentInnerCorner = cfg.inner || 'square';
-    selectedFrame = cfg.frame || 'none';
-    frameColorInput.value = cfg.frameColor || '#000000';
-    frameColorTextInput.value = cfg.frameColor || '#000000';
-    if (cfg.size) { currentQRSize = cfg.size; qrSize.value = cfg.size; qrSizeValue.textContent = cfg.size; }
-    if (cfg.gradient) {
-        useGradient = true;
-        gradientColor2 = cfg.gradientTo || '#3b82f6';
-        gradientToggleBtn.setAttribute('aria-pressed', 'true');
-        gradientToggleBtn.classList.add('active');
-        gradColor2Row.classList.remove('hidden');
-        document.getElementById('gradColor2').value = cfg.gradientTo;
-        document.getElementById('gradColor2Text').value = cfg.gradientTo;
-    } else {
-        useGradient = false;
-        gradientToggleBtn.setAttribute('aria-pressed', 'false');
-        gradientToggleBtn.classList.remove('active');
-        gradColor2Row.classList.add('hidden');
-    }
-    if (cfg.logoPreset && cfg.logoPreset !== 'none') {
-        currentLogoPreset = cfg.logoPreset;
-        logoSize.value = cfg.logoSize || 20;
-        logoSizeValue.textContent = cfg.logoSize || 20;
-        logoMargin.value = cfg.logoMargin || 10;
-        logoMarginValue.textContent = cfg.logoMargin || 10;
-    }
-    if (cfg.frameText) frameTextInput.value = cfg.frameText;
-    updateShapeSelection();
-    updateCornerSelection();
-    updateFrameSelection();
-    updateLogoSelection();
-    updateQRCode();
-}
-
-function renderSavedDesigns() {
-    const section = document.getElementById('savedDesignsSection');
-    const strip = document.getElementById('savedDesignsStrip');
-    if (!section || !strip) return;
-    const designs = getSavedDesigns();
-    if (designs.length === 0) { section.style.display = 'none'; return; }
-    section.style.display = 'block';
-    strip.innerHTML = designs.map(d => `
-        <button class="saved-design-card flex-shrink-0 flex flex-col items-center gap-1.5 p-2 rounded-xl border border-gray-600 hover:border-blue-400 transition-all" data-id="${d.id}" title="${d.label || d.type}">
-            <img src="${d.thumbnail}" alt="${d.type} QR" class="w-14 h-14 rounded-lg object-cover" style="background:var(--md-surface-container-highest);">
-            <span class="text-[10px] font-medium text-gray-300 truncate max-w-[72px]">${d.label || d.type}</span>
-        </button>`).join('');
-}
-
-document.getElementById('savedDesignsStrip')?.addEventListener('click', (e) => {
-    const btn = e.target.closest('.saved-design-card');
-    if (!btn) return;
-    const id = btn.getAttribute('data-id');
-    const d = getSavedDesigns().find(x => x.id === id);
-    if (d && d.config) restoreDesign(d.config);
-});
-
-document.getElementById('clearSavedDesigns')?.addEventListener('click', () => {
-    localStorage.removeItem(SAVED_KEY);
-    renderSavedDesigns();
-});
-
-// Auto-save after QR generation completes
-let _saveTimer = null;
-const _origUpdateQR = updateQRCode;
-updateQRCode = function() {
-    _origUpdateQR();
-    clearTimeout(_saveTimer);
-    _saveTimer = setTimeout(() => {
-        const thumb = captureThumbnail();
-        if (!thumb) return;
-        const cfg = getCurrentDesignConfig();
-        const label = { url: 'URL', text: 'Text', email: 'Email', phone: 'Phone', wifi: 'WiFi', 'wifi-direct': 'WiFi Direct', calendar: 'Event', geo: 'Location', deeplink: 'Link', social: 'Social', vcard: 'vCard' }[cfg.type] || 'QR';
-        saveDesign({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), timestamp: Date.now(), thumbnail: thumb, config: cfg, type: cfg.type, label: label });
-    }, 800);
-};
 
 // ── Reset Design ─────────────────────────────────────────────────────
 function doReset() {
@@ -2130,29 +1863,6 @@ function doReset() {
     });
 })();
 
-// ── Mobile Floating Download FAB ──────────────────────────────────────
-(function initMobileFAB() {
-    const fab = document.getElementById('mobileDownloadFAB');
-    if (!fab) return;
-    fab.addEventListener('click', () => {
-        if (qrCode) qrCode.download({ name: generateQRFilename(), extension: 'png' });
-    });
-})();
-
-// ── Auto-advance to Preview on mobile after preset/template ───────────
-(function initMobileAutoAdvance() {
-    function advanceToPreview() {
-        if (window.innerWidth < 768) {
-            setTimeout(() => {
-                const previewTab = document.querySelector('.mobile-tab-btn[data-tab="1"]');
-                if (previewTab) previewTab.click();
-            }, 150);
-        }
-    }
-    document.getElementById('presetStrip')?.addEventListener('click', advanceToPreview);
-    document.getElementById('templateGrid')?.addEventListener('click', advanceToPreview);
-})();
-
 // ── Keyboard Shortcuts (Undo/Redo) ───────────────────────────────────
 document.addEventListener('keydown', (e) => {
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -2180,153 +1890,4 @@ document.addEventListener('keydown', (e) => {
     if (redoBtn) redoBtn.addEventListener('click', redo);
     // Capture initial state after first render
     setTimeout(() => captureState(), 100);
-})();
-
-// ── Batch Generation ──────────────────────────────────────────────────
-(function initBatch() {
-    const modal = document.getElementById('batchModal');
-    const batchBtn = document.getElementById('batchBtn');
-    const closeBtn = document.getElementById('batchClose');
-    const input = document.getElementById('batchInput');
-    const countEl = document.getElementById('batchCount');
-    const fileInput = document.getElementById('batchFileInput');
-    const previewGrid = document.getElementById('batchPreviewGrid');
-    const generateBtn = document.getElementById('batchGenerate');
-    const downloadBtn = document.getElementById('batchDownloadZip');
-    if (!modal || !batchBtn) return;
-
-    let batchResults = [];
-
-    function getLines() {
-        return (input.value || '').split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    }
-
-    function updateCount() {
-        const n = getLines().length;
-        countEl.textContent = `${n} item${n !== 1 ? 's' : ''}`;
-    }
-
-    batchBtn.addEventListener('click', () => {
-        modal.classList.remove('hidden');
-        input.focus();
-        updateCount();
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    });
-
-    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
-
-    input.addEventListener('input', updateCount);
-
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-            input.value = reader.result;
-            updateCount();
-        };
-        reader.readAsText(file);
-        fileInput.value = '';
-    });
-
-    generateBtn.addEventListener('click', async () => {
-        const lines = getLines();
-        if (lines.length === 0) return;
-        generateBtn.disabled = true;
-        generateBtn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Generating...';
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-
-        batchResults = [];
-        previewGrid.innerHTML = '';
-        previewGrid.style.display = 'grid';
-
-        const fgColor = fgColorInput.value;
-        const bgColor = bgColorInput.value;
-        const dotsOpts = { color: fgColor, type: currentPattern };
-        if (useGradient) dotsOpts.gradient = gradientColor2;
-
-        for (let i = 0; i < lines.length; i++) {
-            const data = lines[i];
-            try {
-                const opts = {
-                    width: currentQRSize,
-                    height: currentQRSize,
-                    data: data,
-                    dotsOptions: dotsOpts,
-                    backgroundOptions: { color: bgColor },
-                    cornersSquareOptions: { type: currentOuterCorner },
-                    cornersDotOptions: { type: currentInnerCorner },
-                    margin: 10,
-                    errorCorrectionLevel: 'M'
-                };
-                const qr = new QRCodeStyling(opts);
-                const canvas = document.createElement('canvas');
-                canvas.width = currentQRSize;
-                canvas.height = currentQRSize;
-                await qr.getRawData('canvas').then(blob => {
-                    return new Promise((resolve) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0);
-                            resolve();
-                        };
-                        img.src = URL.createObjectURL(blob);
-                    });
-                });
-                const thumb = canvas.toDataURL('image/png', 0.5);
-                batchResults.push({ data, canvas, thumb });
-                const item = document.createElement('div');
-                item.className = 'batch-preview-item rounded-lg overflow-hidden border border-gray-600';
-                item.innerHTML = `<img src="${thumb}" alt="QR ${i + 1}" class="w-full aspect-square object-cover"><p class="text-[9px] text-gray-400 truncate px-1 py-0.5" title="${data}">${data}</p>`;
-                previewGrid.appendChild(item);
-            } catch (err) {
-                console.warn('Batch item failed:', data, err);
-            }
-        }
-
-        generateBtn.disabled = false;
-        generateBtn.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> Generate All';
-        if (batchResults.length > 0) downloadBtn.classList.remove('hidden');
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    });
-
-    downloadBtn.addEventListener('click', async () => {
-        if (batchResults.length === 0) return;
-        downloadBtn.disabled = true;
-        downloadBtn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Packing...';
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-
-        // Lazy-load JSZip
-        if (!window.JSZip) {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js';
-            document.head.appendChild(script);
-            await new Promise((resolve, reject) => {
-                script.onload = resolve;
-                script.onerror = reject;
-            });
-        }
-
-        const zip = new JSZip();
-        const folder = zip.folder('qrtist-batch');
-        for (let i = 0; i < batchResults.length; i++) {
-            const r = batchResults[i];
-            const blob = await new Promise(resolve => r.canvas.toBlob(resolve, 'image/png'));
-            const safeName = r.data.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 40);
-            folder.file(`qr-${i + 1}-${safeName}.png`, blob);
-        }
-        const zipBlob = await zip.generateAsync({ type: 'blob' });
-        const url = URL.createObjectURL(zipBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `qrtist-batch-${new Date().toISOString().slice(0, 10)}.zip`;
-        a.click();
-        URL.revokeObjectURL(url);
-
-        downloadBtn.disabled = false;
-        downloadBtn.innerHTML = '<i data-lucide="download" class="w-4 h-4"></i> Download ZIP';
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    });
 })();
