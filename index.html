@@ -169,6 +169,15 @@
                 </div>
             </div>
 
+            <!-- Saved Designs Gallery -->
+            <div id="savedDesignsSection" class="mb-5" style="display:none;">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide" style="color: var(--md-on-surface-variant);">Recent Designs</p>
+                    <button id="clearSavedDesigns" class="text-xs font-medium px-2 py-1 rounded-lg transition-colors" style="color: var(--md-on-surface-variant);">Clear all</button>
+                </div>
+                <div id="savedDesignsStrip" class="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1" style="scrollbar-width:none;"></div>
+            </div>
+
             <div class="grid-layout">
                 <!-- Left Panel: Input -->
                 <div id="panelData" class="panel-card p-5 flex flex-col gap-5" style="background: var(--md-surface-container-low); border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-medium);">
@@ -186,6 +195,11 @@
                             <option value="email">Email</option>
                             <option value="phone">Phone</option>
                             <option value="wifi">WiFi</option>
+                            <option value="wifi-direct">WiFi Direct</option>
+                            <option value="calendar">Calendar Event</option>
+                            <option value="geo">Geolocation</option>
+                            <option value="deeplink">App Deep Link</option>
+                            <option value="social">Social Share</option>
                             <option value="vcard">vCard</option>
                         </select>
                     </div>
@@ -231,6 +245,10 @@
                             <button id="resetDesign" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
                                 <i data-lucide="rotate-ccw" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
                                 Reset
+                            </button>
+                            <button id="batchBtn" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
+                                <i data-lucide="layers" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
+                                Batch Generate
                             </button>
                         </div>
                     </div>
@@ -286,6 +304,10 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Mobile Floating Download FAB -->
+                    <button id="mobileDownloadFAB" class="mobile-fab" aria-label="Download QR code">
+                        <i data-lucide="download" class="w-5 h-5"></i>
+                    </button>
                 </div>
 
                 <!-- Right Panel: Design Controls -->
@@ -297,6 +319,12 @@
                         <h2 class="text-sm font-semibold uppercase tracking-wider" style="color: var(--md-on-surface-variant);">Design</h2>
                     </div>
                     <div class="design-content px-5 py-4 space-y-1">
+                        <!-- Quick Presets -->
+                        <div class="mb-3">
+                            <p class="text-xs font-semibold uppercase tracking-wide px-1 mb-2" style="color: var(--md-on-surface-variant);">Quick Presets</p>
+                            <div id="presetStrip" class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" style="scrollbar-width:none;"></div>
+                        </div>
+                        <div class="h-px bg-gray-700 my-1"></div>
                         <!-- Templates -->
                         <details class="group mb-1">
                             <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl transition-colors" style="border-radius: var(--md-shape-medium);">
@@ -612,6 +640,7 @@
                 </div>
             </nav>
         </div>
+        </div>
 
         <script>
             if ('serviceWorker' in navigator) {
@@ -627,5 +656,35 @@
         <script src="./app.js"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <script>lucide.createIcons();</script>
+
+        <!-- Batch Generation Modal -->
+        <div id="batchModal" class="batch-overlay hidden" role="dialog" aria-modal="true" aria-label="Batch generate QR codes">
+            <div class="batch-panel">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold uppercase tracking-wide" style="color:var(--md-on-surface);">Batch Generate</h3>
+                    <button id="batchClose" class="p-1.5 rounded-lg transition-colors" style="color:var(--md-on-surface-variant);" aria-label="Close batch dialog">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <p class="text-xs mb-3" style="color:var(--md-on-surface-variant);">Enter one URL, text, or value per line. Each line becomes a separate QR code using your current style.</p>
+                <textarea id="batchInput" rows="8" class="w-full px-3 py-2.5 rounded-xl text-sm font-mono resize-none" style="background:var(--md-surface-container-highest);border:1px solid var(--md-outline-variant);color:var(--md-on-surface);" placeholder="https://example.com&#10;https://example.org&#10;https://example.net"></textarea>
+                <div class="flex items-center gap-2 mt-3">
+                    <label for="batchFileInput" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium cursor-pointer transition-colors" style="background:var(--md-surface-container);border:1px solid var(--md-outline-variant);color:var(--md-on-surface-variant);">
+                        <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload CSV
+                    </label>
+                    <input type="file" id="batchFileInput" accept=".csv,.txt" class="hidden">
+                    <span id="batchCount" class="text-xs ml-auto" style="color:var(--md-on-surface-variant);">0 items</span>
+                </div>
+                <div id="batchPreviewGrid" class="grid grid-cols-3 gap-2 mt-4 max-h-48 overflow-y-auto" style="display:none;"></div>
+                <div class="flex gap-2 mt-4">
+                    <button id="batchGenerate" class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95" style="background:var(--md-primary);color:var(--md-on-primary);">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i> Generate All
+                    </button>
+                    <button id="batchDownloadZip" class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 hidden" style="background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);">
+                        <i data-lucide="download" class="w-4 h-4"></i> Download ZIP
+                    </button>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

@@ -580,6 +580,87 @@ hr {
     background: color-mix(in srgb, var(--md-primary) 12%, var(--md-surface-container));
 }
 
+.preset-btn {
+    transition: all 0.2s ease;
+    min-width: 60px;
+}
+.preset-btn:hover {
+    border-color: var(--md-primary) !important;
+    background: color-mix(in srgb, var(--md-primary) 8%, var(--md-surface-container));
+}
+.preset-btn:active {
+    transform: scale(0.95);
+}
+#presetStrip::-webkit-scrollbar { display: none; }
+
+.saved-design-card {
+    min-width: 80px;
+}
+.saved-design-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+#savedDesignsStrip::-webkit-scrollbar { display: none; }
+
+/* Mobile Floating Download FAB */
+.mobile-fab {
+    display: none;
+    position: fixed;
+    bottom: calc(5rem + max(12px, env(safe-area-inset-bottom, 0px)));
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--md-shape-large);
+    background: var(--md-primary);
+    color: var(--md-on-primary);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    z-index: 40;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.mobile-fab:active {
+    transform: scale(0.92);
+}
+@media (max-width: 767px) {
+    .mobile-fab { display: flex; }
+}
+
+/* Batch Generation Modal */
+.batch-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: overlayFadeIn 0.2s ease;
+}
+.batch-overlay.hidden { display: none; }
+.batch-panel {
+    width: 100%;
+    max-width: 480px;
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: var(--md-shape-large);
+    padding: 20px;
+    background: var(--md-surface-container);
+    border: 1px solid var(--md-outline-variant);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    animation: panelSlideUp 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes panelSlideUp {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* ══════════════════════════════════════════════════════════════════════════════
    M3 Focus Rings
    ══════════════════════════════════════════════════════════════════════════════ */
@@ -815,6 +896,36 @@ input[type="range"],
 button,
 [role="button"] {
     cursor: pointer;
+}
+
+/* Panel transitions (mobile) */
+.grid-layout > .panel-card {
+    transition: opacity 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+@media (max-width: 767px) {
+    .grid-layout > .panel-card.mobile-active-panel {
+        animation: panelFadeIn 0.25s cubic-bezier(0.2, 0, 0, 1);
+    }
+}
+@keyframes panelFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Preview crossfade on QR update */
+#qrCodeContainer {
+    transition: opacity 0.15s ease;
+}
+#qrCodeContainer.updating {
+    opacity: 0.6;
+}
+
+/* Smooth color picker & input transitions */
+input[type="color"] {
+    transition: transform 0.15s ease;
+}
+input[type="color"]:hover {
+    transform: scale(1.1);
 }
 
 @media (prefers-reduced-motion: reduce) {
