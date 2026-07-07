@@ -863,6 +863,63 @@ const qrTypeConfig = {
         if (values.vcardNote) lines.push(`NOTE:${values.vcardNote}`);
         lines.push('END:VCARD');
         return lines.join('\n');
+    } },
+    'wifi-direct': { fields: [
+        { id: 'wdSsid', label: 'Network Name (SSID)', type: 'text', placeholder: 'DirectHotspot', value: 'MyHotspot', help: 'The hotspot name devices will see' },
+        { id: 'wdPassword', label: 'Password', type: 'password', placeholder: 'password', value: 'password123', help: 'Minimum 8 characters for WPA' },
+        { id: 'wdSecurity', label: 'Security Type', type: 'select', options: [{ value: 'WPA', label: 'WPA/WPA2' }, { value: 'nopass', label: 'Open' }], value: 'WPA' }
+    ], encode: (values) => `WIFI:S:${values.wdSsid || 'MyHotspot'};T:${values.wdSecurity || 'WPA'};P:${values.wdPassword || 'password123'};H:true;;` },
+    calendar: { fields: [
+        { id: 'calSummary', label: 'Event Title', type: 'text', placeholder: 'Team Meeting', value: 'Meeting', help: 'What the event is about' },
+        { id: 'calLocation', label: 'Location', type: 'text', placeholder: 'Room 42, Building A', value: '', help: 'Physical or virtual location' },
+        { id: 'calStart', label: 'Start', type: 'text', placeholder: '2026-07-15T10:00:00', value: '', help: 'Format: YYYY-MM-DDTHH:MM:SS' },
+        { id: 'calEnd', label: 'End', type: 'text', placeholder: '2026-07-15T11:00:00', value: '', help: 'Format: YYYY-MM-DDTHH:MM:SS' },
+        { id: 'calDescription', label: 'Description', type: 'text', placeholder: 'Agenda, notes...', value: '', help: 'Optional event details' }
+    ], encode: (values) => {
+        const pad = (s) => (s || '').replace(/[-:]/g, '');
+        const lines = ['BEGIN:VEVENT'];
+        if (values.calSummary) lines.push(`SUMMARY:${values.calSummary}`);
+        if (values.calLocation) lines.push(`LOCATION:${values.calLocation}`);
+        if (values.calStart) lines.push(`DTSTART:${pad(values.calStart)}`);
+        if (values.calEnd) lines.push(`DTEND:${pad(values.calEnd)}`);
+        if (values.calDescription) lines.push(`DESCRIPTION:${values.calDescription}`);
+        lines.push('END:VEVENT');
+        return lines.join('\n');
+    } },
+    geo: { fields: [
+        { id: 'geoLat', label: 'Latitude', type: 'text', placeholder: '37.7749', value: '37.7749', help: 'Decimal degrees (-90 to 90)' },
+        { id: 'geoLng', label: 'Longitude', type: 'text', placeholder: '-122.4194', value: '-122.4194', help: 'Decimal degrees (-180 to 180)' },
+        { id: 'geoZoom', label: 'Zoom Level', type: 'select', options: [{ value: '18', label: 'Street' }, { value: '15', label: 'Neighborhood' }, { value: '12', label: 'City' }, { value: '8', label: 'Region' }], value: '15', help: 'Map zoom when opened' }
+    ], encode: (values) => `geo:${values.geoLat || '37.7749'},${values.geoLng || '-122.4194'}?z=${values.geoZoom || '15'}` },
+    deeplink: { fields: [
+        { id: 'dlUri', label: 'Link URI', type: 'text', placeholder: 'myapp://item/123 or https://example.com/path', value: 'https://example.com', help: 'Universal link (https://) or custom scheme (myapp://)' },
+        { id: 'dlFallback', label: 'Fallback URL (optional)', type: 'text', placeholder: 'https://example.com/fallback', value: '', help: 'Web fallback if app is not installed' }
+    ], encode: (values) => values.dlUri || 'https://example.com' },
+    social: { fields: [
+        { id: 'socialPlatform', label: 'Platform', type: 'select', options: [
+            { value: 'twitter', label: 'Twitter / X' },
+            { value: 'linkedin', label: 'LinkedIn' },
+            { value: 'facebook', label: 'Facebook' },
+            { value: 'whatsapp', label: 'WhatsApp' },
+            { value: 'telegram', label: 'Telegram' },
+            { value: 'reddit', label: 'Reddit' },
+            { value: 'email', label: 'Email Share' }
+        ], value: 'twitter' },
+        { id: 'socialText', label: 'Message / URL', type: 'text', placeholder: 'Check this out!', value: 'Check out QRtist!', help: 'Text to share or a URL' },
+        { id: 'socialUrl', label: 'URL (optional)', type: 'text', placeholder: 'https://example.com', value: '', help: 'Link to include with the message' }
+    ], encode: (values) => {
+        const text = encodeURIComponent(values.socialText || '');
+        const url = values.socialUrl ? encodeURIComponent(values.socialUrl) : '';
+        switch (values.socialPlatform) {
+            case 'twitter': return `https://twitter.com/intent/tweet?text=${text}${url ? '&url=' + url : ''}`;
+            case 'linkedin': return `https://www.linkedin.com/sharing/share-offsite/?url=${url || text}`;
+            case 'facebook': return `https://www.facebook.com/sharer/sharer.php?u=${url || text}`;
+            case 'whatsapp': return `https://wa.me/?text=${text}${url ? '%20' + url : ''}`;
+            case 'telegram': return `https://t.me/share/url?url=${url || ''}&text=${text}`;
+            case 'reddit': return `https://reddit.com/submit?url=${url || text}&title=${text}`;
+            case 'email': return `mailto:?subject=${text}&body=${url || text}`;
+            default: return text;
+        }
     } }
 };
 
@@ -1361,7 +1418,7 @@ function constrainPreviewCanvas(retries) {
 function generateQRFilename() {
     const type = qrType.value;
     const timestamp = new Date().toISOString().slice(0, 10);
-    const typeLabel = { url: 'url', text: 'text', email: 'email', phone: 'phone', wifi: 'wifi', vcard: 'contact' }[type] || 'qr';
+    const typeLabel = { url: 'url', text: 'text', email: 'email', phone: 'phone', wifi: 'wifi', 'wifi-direct': 'wifi-direct', calendar: 'event', geo: 'location', deeplink: 'deeplink', social: 'social', vcard: 'contact' }[type] || 'qr';
     return `qr-${typeLabel}-${timestamp}`;
 }
 
