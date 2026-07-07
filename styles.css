@@ -230,9 +230,19 @@ header {
     }
 }
 @media (max-width: 768px) {
+    .grid-layout > .panel-card.mobile-active-panel {
+        height: 100%;
+        max-height: calc(100vh - 140px);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
     .design-panel {
-        max-height: none;
-        height: auto;
+        height: 100%;
+        max-height: calc(100vh - 140px);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 }
 
