@@ -365,6 +365,7 @@ function generateStyledSVG(data, opts) {
     const logoDataUrl = opts.logoDataUrl || null;
     const logoSizePercent = opts.logoSize || 20;
     const logoMargin = opts.logoMargin || 10;
+    const logoColor = opts.logoColor || null;
 
     let qr;
     try {
@@ -494,6 +495,9 @@ function generateStyledSVG(data, opts) {
         // White backing rect
         svgParts.push(`<rect x="${lx - logoMargin}" y="${ly - logoMargin}" width="${logoPx + logoMargin * 2}" height="${logoPx + logoMargin * 2}" fill="${_svgEscape(bgColor)}" shape-rendering="auto"/>`);
         svgParts.push(`<image x="${lx}" y="${ly}" width="${logoPx}" height="${logoPx}" href="${_svgEscape(logoDataUrl)}" shape-rendering="auto"/>`);
+        if (logoColor && logoColor !== '#000000') {
+            svgParts.push(`<rect x="${lx}" y="${ly}" width="${logoPx}" height="${logoPx}" fill="${_svgEscape(logoColor)}" opacity="0.5" style="mix-blend-mode:multiply" shape-rendering="auto"/>`);
+        }
     }
 
     svgParts.push(`</svg>`);
@@ -503,6 +507,7 @@ function generateStyledSVG(data, opts) {
 let qrCode = null;
 let logoDataUrl = null;
 let currentLogoPreset = 'none';
+let logoColor = '#000000';
 let selectedFrame = 'none';
 let currentQRSize = 300;
 let currentPattern = 'square';
@@ -534,6 +539,7 @@ function getConfig() {
         logoSize: logoSize.value,
         logoMargin: logoMargin.value,
         logoPreset: currentLogoPreset,
+        logoColor: logoColor,
         logoDataUrl: currentLogoPreset === 'custom' ? logoDataUrl : null,
         frame: selectedFrame,
         frameColor: frameColorInput.value,
@@ -576,7 +582,10 @@ function applyConfig(cfg) {
     frameColorTextInput.value = cfg.frameColor || '#000000';
     frameTextInput.value = cfg.frameText || '';
     currentLogoPreset = cfg.logoPreset || 'none';
+    logoColor = cfg.logoColor || '#000000';
     logoDataUrl = cfg.logoDataUrl || null;
+    if (logoColorInput) logoColorInput.value = logoColor;
+    if (logoColorText) logoColorText.value = logoColor;
     updateShapeSelection();
     updateCornerSelection();
     updateFrameSelection();
@@ -668,10 +677,11 @@ const LOGO_PRESETS = {
     'scan-text': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="46" font-size="22" text-anchor="middle" font-weight="900" font-family="Arial,sans-serif" fill="currentColor">SCAN</text><text x="50" y="74" font-size="22" text-anchor="middle" font-weight="900" font-family="Arial,sans-serif" fill="currentColor">ME</text></svg>`,
 };
 
-function getLogoPresetDataUrl(preset) {
+function getLogoPresetDataUrl(preset, color) {
     const svg = LOGO_PRESETS[preset];
     if (!svg) return null;
-    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    const colored = svg.replace(/currentColor/g, color || '#000000');
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(colored);
 }
 
 // ── Design Templates ──────────────────────────────────────────────────
@@ -882,6 +892,8 @@ const logoSize = document.getElementById('logoSize');
 const logoSizeValue = document.getElementById('logoSizeValue');
 const logoMargin = document.getElementById('logoMargin');
 const logoMarginValue = document.getElementById('logoMarginValue');
+const logoColorInput = document.getElementById('logoColor');
+const logoColorText = document.getElementById('logoColorText');
 
 const frameBtns = document.querySelectorAll('.frame-btn');
 let renderGeneration = 0;
@@ -1161,7 +1173,7 @@ function updateQRCode() {
     const fgColor = fgColorInput.value;
     const bgColor = bgColorInput.value;
     const activeLogoUrl = currentLogoPreset === 'custom' ? logoDataUrl
-        : currentLogoPreset !== 'none' ? getLogoPresetDataUrl(currentLogoPreset)
+        : currentLogoPreset !== 'none' ? getLogoPresetDataUrl(currentLogoPreset, logoColor)
             : null;
     const logoPercent = activeLogoUrl ? parseInt(logoSize.value) : undefined;
     const frameText = frameTextInput.value.trim();
@@ -1289,7 +1301,7 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken) {
 
     if (hasLogo) {
         const logoUrl = currentLogoPreset === 'custom' ? logoDataUrl
-            : getLogoPresetDataUrl(currentLogoPreset);
+            : getLogoPresetDataUrl(currentLogoPreset, logoColor);
 
         if (logoUrl) {
             const logoImg = new Image();
@@ -1318,6 +1330,14 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken) {
                     logoSize_px + logoMarginVal * 2, logoSize_px + logoMarginVal * 2);
 
                 ctx.drawImage(logoImg, logoX, logoY, logoSize_px, logoSize_px);
+
+                if (currentLogoPreset === 'custom' && logoColor && logoColor !== '#000000') {
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'source-atop';
+                    ctx.fillStyle = logoColor;
+                    ctx.fillRect(logoX, logoY, logoSize_px, logoSize_px);
+                    ctx.restore();
+                }
 
                 constrainPreviewCanvas();
             };
@@ -1365,10 +1385,11 @@ function getSvgDownloadOptions() {
         frameColor: frameColorInput.value,
         frameText: frameTextInput.value.trim(),
         logoDataUrl: currentLogoPreset === 'custom' ? logoDataUrl
-            : currentLogoPreset !== 'none' ? getLogoPresetDataUrl(currentLogoPreset)
+            : currentLogoPreset !== 'none' ? getLogoPresetDataUrl(currentLogoPreset, logoColor)
             : null,
         logoSize: parseInt(logoSize.value) || 20,
-        logoMargin: parseInt(logoMargin.value) || 10
+        logoMargin: parseInt(logoMargin.value) || 10,
+        logoColor: currentLogoPreset === 'custom' ? logoColor : null
     };
 }
 
@@ -1527,6 +1548,25 @@ logoMargin.addEventListener('input', (e) => {
     _debounceCapture();
 });
 
+if (logoColorInput) {
+    logoColorInput.addEventListener('input', (e) => {
+        logoColor = e.target.value;
+        if (logoColorText) logoColorText.value = e.target.value;
+        _debouncedUpdateQRCode();
+        _debounceCapture();
+    });
+}
+if (logoColorText) {
+    logoColorText.addEventListener('change', (e) => {
+        if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+            logoColor = e.target.value;
+            if (logoColorInput) logoColorInput.value = e.target.value;
+            updateQRCode();
+            captureState();
+        }
+    });
+}
+
 // URL Hash Serialization
 function getConfigHash() {
     const type = qrType.value;
@@ -1545,6 +1585,7 @@ function getConfigHash() {
         logoSize: logoSize.value,
         logoMargin: logoMargin.value,
         logoPreset: currentLogoPreset,
+        logoColor: logoColor,
         frame: selectedFrame,
         frameColor: frameColorInput.value,
         frameText: frameTextInput.value,
@@ -1638,6 +1679,7 @@ function exportConfig() {
         logoSize: logoSize.value,
         logoMargin: logoMargin.value,
         logoPreset: currentLogoPreset,
+        logoColor: logoColor,
         frame: selectedFrame,
         frameColor: frameColorInput.value,
         frameText: frameTextInput.value,
@@ -1721,6 +1763,9 @@ function doReset() {
     logoSizeValue.textContent = '20';
     logoMargin.value = 10;
     logoMarginValue.textContent = '10';
+    logoColor = '#000000';
+    if (logoColorInput) logoColorInput.value = '#000000';
+    if (logoColorText) logoColorText.value = '#000000';
     selectedFrame = 'none';
     frameColorInput.value = '#000000';
     frameColorTextInput.value = '#000000';
