@@ -12,8 +12,7 @@ const FILES_TO_CACHE = [
     './',
     './index.html',
     './manifest.json',
-    './qr-bundle.js',
-    './qrcode-styling.js'
+    './qr-bundle.js'
 ];
 
 // Install event: cache essential files on first load

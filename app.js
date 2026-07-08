@@ -107,10 +107,15 @@ window.QRCodeStyling = (function () {
             }
         }
 
-        const tc = document.createElement('canvas');
-        tc.width = Math.ceil(sz);
-        tc.height = Math.ceil(sz);
+        const ceilSz = Math.ceil(sz);
+        if (!drawFinderPattern._tc || drawFinderPattern._tc.width !== ceilSz || drawFinderPattern._tc.height !== ceilSz) {
+            drawFinderPattern._tc = document.createElement('canvas');
+            drawFinderPattern._tc.width = ceilSz;
+            drawFinderPattern._tc.height = ceilSz;
+        }
+        const tc = drawFinderPattern._tc;
         const tc_ctx = tc.getContext('2d');
+        tc_ctx.clearRect(0, 0, ceilSz, ceilSz);
 
         tc_ctx.fillStyle = fgColor;
         outerShape(tc_ctx, 0, outerType);
@@ -162,7 +167,9 @@ window.QRCodeStyling = (function () {
         const numModules = qr.modules.size;
         const margin = 2;
         const mSize = size / (numModules + margin * 2);
-        this.canvas = document.createElement('canvas');
+        if (!this.canvas) {
+            this.canvas = document.createElement('canvas');
+        }
         this.canvas.width = size;
         this.canvas.height = size;
         const ctx = this.canvas.getContext('2d');
@@ -527,6 +534,7 @@ function getConfig() {
         logoSize: logoSize.value,
         logoMargin: logoMargin.value,
         logoPreset: currentLogoPreset,
+        logoDataUrl: currentLogoPreset === 'custom' ? logoDataUrl : null,
         frame: selectedFrame,
         frameColor: frameColorInput.value,
         frameText: frameTextInput.value
@@ -568,19 +576,17 @@ function applyConfig(cfg) {
     frameColorTextInput.value = cfg.frameColor || '#000000';
     frameTextInput.value = cfg.frameText || '';
     currentLogoPreset = cfg.logoPreset || 'none';
-    logoDataUrl = null;
-    if (currentLogoPreset !== 'none' && currentLogoPreset !== 'custom') {
-        // preset logos are loaded from SVG data URLs, no need to store
-    }
+    logoDataUrl = cfg.logoDataUrl || null;
     updateShapeSelection();
     updateCornerSelection();
     updateFrameSelection();
     updateLogoSelection();
     logoControls.classList.toggle('hidden', currentLogoPreset === 'none');
-    if (currentLogoPreset === 'custom') {
+    if (currentLogoPreset === 'custom' && logoDataUrl) {
         customLogoBtn.style.display = 'flex';
         customLogoBtn.classList.remove('hidden');
         logoPreview.classList.remove('hidden');
+        logoImg.src = logoDataUrl;
     } else {
         customLogoBtn.style.display = '';
         customLogoBtn.classList.add('hidden');
@@ -639,9 +645,6 @@ function _updateUndoRedoButtons() {
 }
 
 // ── Toast notifications ──────────────────────────────────────────────────
-function _esc(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
 function showToast(message, type = 'info', duration = 3200) {
     const container = document.getElementById('toastContainer');
     if (!container) return;
@@ -650,7 +653,7 @@ function showToast(message, type = 'info', duration = 3200) {
     const toast = document.createElement('div');
     toast.className = 'toast toast-' + type;
     toast.setAttribute('role', 'status');
-    toast.innerHTML = '<span aria-hidden="true">' + icon + '</span><span>' + _esc(message) + '</span>';
+    toast.innerHTML = '<span aria-hidden="true">' + icon + '</span><span>' + _svgEscape(message) + '</span>';
     container.appendChild(toast);
     const fadeOut = () => {
         toast.style.animation = 'toastOut 0.3s ease forwards';
@@ -704,23 +707,7 @@ function renderTemplates() {
 }
 
 function _miniFinderMod(ctx, pattern, x, y, mSize) {
-    const r = mSize / 2;
-    switch (pattern) {
-        case 'dots':
-            ctx.beginPath(); ctx.arc(x + r, y + r, r * 0.65, 0, Math.PI * 2); ctx.fill(); break;
-        case 'rounded':
-            ctx.beginPath(); ctx.roundRect(x, y, mSize, mSize, r * 0.35); ctx.fill(); break;
-        case 'extra-rounded':
-            ctx.beginPath(); ctx.arc(x + r, y + r, r * 0.92, 0, Math.PI * 2); ctx.fill(); break;
-        case 'classy':
-            ctx.fillRect(x + 1, y + 1, mSize - 2, mSize - 2); break;
-        case 'classy-rounded':
-            ctx.beginPath(); ctx.roundRect(x + 1, y + 1, mSize - 2, mSize - 2, r * 0.45); ctx.fill(); break;
-        case 'classy-dots':
-            ctx.beginPath(); ctx.arc(x + r, y + r, r * 0.5, 0, Math.PI * 2); ctx.fill(); break;
-        default:
-            ctx.fillRect(x, y, mSize, mSize);
-    }
+    drawModule(ctx, pattern, x, y, mSize);
 }
 
 function _miniFinderPattern(ctx, px, py, mSize, outerType, innerType, fgColor) {
@@ -835,7 +822,6 @@ function applyTemplate(t) {
     captureState();
 }
 
-// Dark mode removed - dark mode only
 const qrTypeConfig = {
     url: { fields: [{ id: 'urlInput', label: 'URL', type: 'text', placeholder: 'https://example.com', value: 'https://google.com' }], encode: (values) => values.urlInput || 'https://google.com' },
     text: { fields: [{ id: 'textInput', label: 'Text', type: 'text', placeholder: 'Enter text', value: 'Hello World' }], encode: (values) => values.textInput || 'Hello World' },
@@ -900,6 +886,13 @@ const logoMarginValue = document.getElementById('logoMarginValue');
 const frameBtns = document.querySelectorAll('.frame-btn');
 let renderGeneration = 0;
 let activeRenderGeneration = 0;
+let _renderDebounceTimer = null;
+const _RENDER_DEBOUNCE_MS = 30;
+
+function _debouncedUpdateQRCode() {
+    clearTimeout(_renderDebounceTimer);
+    _renderDebounceTimer = setTimeout(() => updateQRCode(), _RENDER_DEBOUNCE_MS);
+}
 
 function renderInputFields() {
     const type = qrType.value;
@@ -938,7 +931,7 @@ function renderInputFields() {
             input.value = field.value;
             if (field.help) input.title = field.help;
             input.className = 'w-full px-3 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition';
-            input.addEventListener('input', () => { updateQRCode(); _debounceCapture(); });
+            input.addEventListener('input', () => { _debouncedUpdateQRCode(); _debounceCapture(); });
             input.addEventListener('change', () => { updateQRCode(); captureState(); });
             wrapper.appendChild(input);
             if (field.type === 'url' || field.id === 'urlInput' || field.id === 'emailInput') {
@@ -1009,8 +1002,7 @@ function checkContrast() {
 }
 
 function checkScannability() {
-    const size = parseInt(logoSize.value);
-    if (currentLogoPreset !== 'none' && size <= 20) {
+    if (currentLogoPreset !== 'none') {
         scannabilityInfo.classList.remove('hidden');
     } else {
         scannabilityInfo.classList.add('hidden');
@@ -1166,8 +1158,6 @@ function updateQRCode() {
         }
     }
 
-    qrCodeContainer.innerHTML = '';
-
     const fgColor = fgColorInput.value;
     const bgColor = bgColorInput.value;
     const activeLogoUrl = currentLogoPreset === 'custom' ? logoDataUrl
@@ -1193,7 +1183,11 @@ function updateQRCode() {
     };
 
     try {
-        qrCode = new QRCodeStyling(qrOptions);
+        if (!qrCode) {
+            qrCode = new QRCodeStyling(qrOptions);
+        } else {
+            qrCode.options = qrOptions;
+        }
         qrCode.append(qrCodeContainer);
         const baseCanvas = qrCode.canvas;
 
@@ -1397,13 +1391,13 @@ qrSize.addEventListener('input', (e) => {
     qrSizeValue.textContent = currentQRSize;
     if (qrSizeLabel) qrSizeLabel.textContent = currentQRSize;
     if (qrSizeLabel2) qrSizeLabel2.textContent = currentQRSize;
-    updateQRCode();
+    _debouncedUpdateQRCode();
     _debounceCapture();
 });
 
 fgColorInput.addEventListener('input', (e) => {
     fgColorText.value = e.target.value;
-    updateQRCode();
+    _debouncedUpdateQRCode();
     _debounceCapture();
 });
 
@@ -1417,7 +1411,7 @@ fgColorText.addEventListener('change', (e) => {
 
 bgColorInput.addEventListener('input', (e) => {
     bgColorText.value = e.target.value;
-    updateQRCode();
+    _debouncedUpdateQRCode();
     _debounceCapture();
 });
 
@@ -1466,7 +1460,7 @@ if (gradientToggleBtn) {
         gradientToggleBtn.setAttribute('aria-pressed', useGradient);
         gradientToggleBtn.classList.toggle('active', useGradient);
         if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !useGradient);
-        updateQRCode();
+        _debouncedUpdateQRCode();
         captureState();
     });
 }
@@ -1474,7 +1468,7 @@ if (gradColor2Input) {
     gradColor2Input.addEventListener('input', (e) => {
         gradientColor2 = e.target.value;
         if (gradColor2Text) gradColor2Text.value = e.target.value;
-        if (useGradient) updateQRCode();
+        if (useGradient) _debouncedUpdateQRCode();
         _debounceCapture();
     });
 }
@@ -1491,7 +1485,7 @@ if (gradColor2Text) {
 
 frameColorInput.addEventListener('input', (e) => {
     frameColorTextInput.value = e.target.value;
-    updateQRCode();
+    _debouncedUpdateQRCode();
     _debounceCapture();
 });
 frameColorTextInput.addEventListener('change', (e) => {
@@ -1516,20 +1510,20 @@ frameTextInput.addEventListener('input', (e) => {
             preview.classList.add('hidden');
         }
     }
-    updateQRCode();
+    _debouncedUpdateQRCode();
     _debounceCapture();
 });
 
 logoSize.addEventListener('input', (e) => {
     logoSizeValue.textContent = e.target.value;
-    updateQRCode();
+    _debouncedUpdateQRCode();
     checkScannability();
     _debounceCapture();
 });
 
 logoMargin.addEventListener('input', (e) => {
     logoMarginValue.textContent = e.target.value;
-    updateQRCode();
+    _debouncedUpdateQRCode();
     _debounceCapture();
 });
 

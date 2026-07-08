@@ -575,8 +575,6 @@
                                 </div>
                             </div>
                         </details>
-                        <hr id="framesDivider" class="hidden my-1 border-gray-100 dark:border-gray-700">
-                        <div id="framesSection" class="hidden"></div>
                     </div>
                 </div>
             </div>
@@ -605,8 +603,7 @@
 
         <script>
             if ('serviceWorker' in navigator) {
-                const swUrl = './sw.js?' + new Date().getTime();
-                navigator.serviceWorker.register(swUrl)
+                navigator.serviceWorker.register('./sw.js')
                     .then(reg => console.log('Service Worker registered'))
                     .catch(err => console.warn('Service Worker registration failed:', err));
             }
