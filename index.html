@@ -4,19 +4,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="google51450cda2c92fe0b">
     <meta name="description"
-        content="Create beautiful, customizable QR codes with colors, patterns, logos, and frames. 100% client-side, no server required.">
+        content="QRtist is a free, fully client-side QR code generator. Create custom, scannable QR codes with colors, gradients, patterns, frames, and logos. Export as PNG or SVG — no signup, no tracking.">
+    <meta name="keywords"
+        content="QR code generator, free QR code, custom QR code, QR code with logo, QR code maker, styled QR codes, QR code PNG, QR code SVG, offline QR generator, QR code design">
+    <meta name="author" content="QRtist">
+    <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="theme-color" content="#3b82f6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="QRtist">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="format-detection" content="telephone=no">
+    <link rel="canonical" href="https://scmlewis.github.io/qrtist/">
     <link rel="manifest" href="./manifest.json">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://scmlewis.github.io/qrtist/">
+    <meta property="og:title" content="QRtist — Free Custom QR Code Generator">
+    <meta property="og:description"
+        content="Create beautiful, scannable QR codes with custom colors, patterns, frames, and logos. 100% client-side — no signup, no tracking.">
+    <meta property="og:image" content="https://scmlewis.github.io/qrtist/og-image.svg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="QRtist QR code generator preview">
+    <meta property="og:site_name" content="QRtist">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://scmlewis.github.io/qrtist/">
+    <meta name="twitter:title" content="QRtist — Free Custom QR Code Generator">
+    <meta name="twitter:description"
+        content="Create beautiful, scannable QR codes with custom colors, patterns, frames, and logos. 100% client-side — no signup, no tracking.">
+    <meta name="twitter:image" content="https://scmlewis.github.io/qrtist/og-image.svg">
+    <meta name="twitter:image:alt" content="QRtist QR code generator preview">
+
+    <!-- Performance: warm up CDNs -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "QRtist",
+      "url": "https://scmlewis.github.io/qrtist/",
+      "description": "A free, fully client-side QR code generator for creating custom, scannable QR codes with colors, patterns, frames, and logos. Export as PNG or SVG.",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Custom colors and gradients",
+        "Patterns and frames",
+        "Logo embedding",
+        "PNG and SVG export",
+        "Offline / PWA support",
+        "100% client-side — no data leaves your device"
+      ],
+      "browserRequirements": "Requires JavaScript and a modern web browser."
+    }
+    </script>
+
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'><rect x='1' y='1' width='8' height='8' rx='1.5' fill='%233b82f6'/><rect x='13' y='1' width='8' height='8' rx='1.5' fill='%233b82f6'/><rect x='1' y='13' width='8' height='8' rx='1.5' fill='%233b82f6'/><rect x='3' y='3' width='4' height='4' fill='%23ffffff'/><rect x='15' y='3' width='4' height='4' fill='%23ffffff'/><rect x='3' y='15' width='4' height='4' fill='%23ffffff'/><rect x='13' y='13' width='3' height='3' fill='white'/><rect x='17' y='13' width='4' height='4' fill='white'/><rect x='13' y='18' width='4' height='3' fill='white'/><rect x='18' y='18' width='3' height='3' fill='white'/></svg>">
     <link rel="apple-touch-icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%233b82f6;stop-opacity:1' /><stop offset='100%' style='stop-color:%2310b981;stop-opacity:1' /></linearGradient></defs><rect fill='url(%23grad)' width='180' height='180' rx='30'/><g transform='translate(45,45)'><rect fill='%23fff' x='0' y='0' width='15' height='15' rx='2'/><rect fill='%23fff' x='30' y='0' width='15' height='15' rx='2'/><rect fill='%23fff' x='60' y='0' width='15' height='15' rx='2'/><rect fill='%23fff' x='0' y='30' width='15' height='15' rx='2'/><rect fill='%23fff' x='60' y='30' width='15' height='15' rx='2'/><rect fill='%23fff' x='0' y='60' width='15' height='15' rx='2'/><rect fill='%23fff' x='30' y='60' width='15' height='15' rx='2'/><rect fill='%23fff' x='60' y='60' width='15' height='15' rx='2'/></g></svg>">
-    <title>QRtist - Stylish QR Code Generator</title>
+    <title>QRtist — Free Custom QR Code Generator (PNG &amp; SVG, No Signup)</title>
     <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -51,7 +111,7 @@
         </defs>
     </svg>
         <div class="bg-gray-900 p-4 md:p-6 lg:p-8 flex flex-col">
-        <div class="max-w-7xl mx-auto w-full main-container">
+        <main class="max-w-7xl mx-auto w-full main-container">
 
             <!-- Header -->
             <header class="flex items-center gap-4 py-2 relative">
@@ -606,7 +666,7 @@
                     </button>
                 </div>
             </nav>
-        </div>
+        </main>
 
         <script>
             if ('serviceWorker' in navigator) {

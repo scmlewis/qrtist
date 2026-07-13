@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="QRtist — Free Custom QR Code Generator">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative blurred blobs -->
+  <circle cx="1080" cy="90" r="220" fill="#3b82f6" opacity="0.18"/>
+  <circle cx="120" cy="560" r="200" fill="#10b981" opacity="0.16"/>
+
+  <!-- QR code mock (top-right) -->
+  <g transform="translate(820,150)">
+    <rect width="260" height="260" rx="20" fill="#ffffff"/>
+    <g fill="#0f172a">
+      <rect x="20" y="20" width="60" height="60" rx="8"/>
+      <rect x="34" y="34" width="32" height="32" rx="4" fill="#ffffff"/>
+      <rect x="44" y="44" width="12" height="12" fill="#0f172a"/>
+      <rect x="180" y="20" width="60" height="60" rx="8"/>
+      <rect x="194" y="34" width="32" height="32" rx="4" fill="#ffffff"/>
+      <rect x="204" y="44" width="12" height="12" fill="#0f172a"/>
+      <rect x="20" y="180" width="60" height="60" rx="8"/>
+      <rect x="34" y="194" width="32" height="32" rx="4" fill="#ffffff"/>
+      <rect x="44" y="204" width="12" height="12" fill="#0f172a"/>
+      <rect x="100" y="24" width="16" height="16"/>
+      <rect x="124" y="24" width="16" height="16"/>
+      <rect x="100" y="48" width="16" height="16"/>
+      <rect x="24" y="100" width="16" height="16"/>
+      <rect x="48" y="100" width="16" height="16"/>
+      <rect x="100" y="100" width="16" height="16"/>
+      <rect x="160" y="100" width="16" height="16"/>
+      <rect x="184" y="100" width="16" height="16"/>
+      <rect x="100" y="160" width="16" height="16"/>
+      <rect x="160" y="160" width="16" height="16"/>
+      <rect x="184" y="160" width="16" height="16"/>
+      <rect x="208" y="160" width="16" height="16"/>
+    </g>
+    <circle cx="130" cy="130" r="34" fill="url(#accent)"/>
+    <text x="130" y="142" font-family="Arial, sans-serif" font-size="44" font-weight="700" fill="#ffffff" text-anchor="middle">Q</text>
+  </g>
+
+  <!-- Text block -->
+  <text x="80" y="220" font-family="Arial, Helvetica, sans-serif" font-size="92" font-weight="800" fill="#ffffff">QRtist</text>
+  <text x="84" y="290" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="600" fill="#93c5fd">Free Custom QR Code Generator</text>
+  <text x="84" y="350" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="400" fill="#cbd5e1">Colors · Patterns · Frames · Logos</text>
+  <text x="84" y="395" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="400" fill="#cbd5e1">Export PNG &amp; SVG · 100% client-side</text>
+
+  <rect x="84" y="440" width="430" height="64" rx="32" fill="url(#accent)"/>
+  <text x="299" y="480" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#ffffff" text-anchor="middle">No signup · No tracking</text>
+</svg>
