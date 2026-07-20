@@ -274,6 +274,10 @@
                             <option value="social">Social Profile</option>
                         </select>
                     </div>
+                    <button id="batchModeBtn" class="w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition-all" style="background: var(--md-secondary-container); color: var(--md-on-secondary-container); border: 1px solid var(--md-outline-variant);">
+                        <i data-lucide="layers" class="w-4 h-4 inline-block mr-1.5 align-middle"></i>
+                        Batch Generate
+                    </button>
                     <div id="inputFields"></div>
                     <div class="bg-gray-700/50 rounded-xl p-4">
                         <div class="flex justify-between items-center mb-3">
@@ -730,6 +734,51 @@
                 </div>
             </nav>
         </main>
+
+        <!-- Batch Generation Overlay -->
+        <div id="batchOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);">
+            <div class="w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden flex flex-col" style="background: var(--md-surface-container); border: 1px solid var(--md-outline-variant);">
+                <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--md-outline-variant);">
+                    <h2 class="text-lg font-bold" style="color: var(--md-on-surface);">Batch Generate</h2>
+                    <button id="batchCloseBtn" class="p-2 rounded-lg transition-colors" style="color: var(--md-on-surface-variant);">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-auto p-5">
+                    <div class="flex gap-1 p-1 mb-4 rounded-lg" style="background: var(--md-surface-container-highest);">
+                        <button id="batchPasteTab" class="flex-1 px-3 py-1.5 text-xs font-semibold rounded-md" style="background: var(--md-primary); color: var(--md-on-primary);">Paste List</button>
+                        <button id="batchCsvTab" class="flex-1 px-3 py-1.5 text-xs font-semibold rounded-md" style="color: var(--md-on-surface-variant);">CSV Upload</button>
+                    </div>
+                    <div id="batchPastePanel">
+                        <textarea id="batchPasteInput" rows="6" class="w-full px-3 py-2.5 rounded-xl text-sm resize-none" style="background: var(--md-surface-container-highest); border: 1px solid var(--md-outline-variant); color: var(--md-on-surface);" placeholder="One URL or text per line&#10;https://example.com&#10;https://google.com&#10;Hello World"></textarea>
+                    </div>
+                    <div id="batchCsvPanel" class="hidden">
+                        <div id="batchDropZone" class="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors" style="border-color: var(--md-outline-variant);">
+                            <p class="text-sm" style="color: var(--md-on-surface-variant);">Drop CSV file here or click to browse</p>
+                            <p class="text-xs mt-1" style="color: var(--md-outline);">Columns: data, label (optional), color (optional)</p>
+                            <input type="file" id="batchCsvInput" accept=".csv" class="hidden">
+                        </div>
+                    </div>
+                    <div id="batchPreview" class="hidden mt-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color: var(--md-on-surface-variant);">Preview (<span id="batchCount">0</span> codes)</p>
+                        <div id="batchGrid" class="grid grid-cols-4 gap-3"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between px-5 py-4" style="border-top: 1px solid var(--md-outline-variant);">
+                    <button id="batchBackBtn" class="px-4 py-2 rounded-xl text-sm font-semibold" style="color: var(--md-on-surface-variant);">Back to Generator</button>
+                    <div class="flex gap-2">
+                        <button id="batchDownloadZip" class="hidden px-4 py-2 rounded-xl text-sm font-semibold" style="background: var(--md-primary); color: var(--md-on-primary);">
+                            <i data-lucide="download" class="w-4 h-4 inline-block mr-1 align-middle"></i>
+                            Download ZIP
+                        </button>
+                        <button id="batchDownloadSheet" class="hidden px-4 py-2 rounded-xl text-sm font-semibold" style="background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);">
+                            <i data-lucide="layout-grid" class="w-4 h-4 inline-block mr-1 align-middle"></i>
+                            Download Sheet (SVG)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <script>
             if ('serviceWorker' in navigator) {

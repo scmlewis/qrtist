@@ -1034,3 +1034,17 @@ select:focus {
     width: 100%;
     border-radius: 0.75rem;
 }
+
+/* Batch overlay */
+#batchOverlay .batch-thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 0.5rem;
+    background: var(--md-surface-container-highest);
+    border: 1px solid var(--md-outline-variant);
+}
+#batchDropZone.drag-over {
+    border-color: var(--md-primary);
+    background: color-mix(in srgb, var(--md-primary) 8%, transparent);
+}
