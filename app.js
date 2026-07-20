@@ -876,7 +876,97 @@ const qrTypeConfig = {
         if (values.vcardNote) lines.push(`NOTE:${values.vcardNote}`);
         lines.push('END:VCARD');
         return lines.join('\n');
-    } }
+    } },
+    maps: {
+        fields: [
+            { id: 'mapsAddress', label: 'Address or Place', type: 'text', placeholder: 'Enter address or paste Google Maps URL', value: 'Times Square, New York', help: 'Paste a Google Maps URL or enter an address' }
+        ],
+        encode: (values) => {
+            const addr = values.mapsAddress || 'Times Square, New York';
+            if (addr.startsWith('http')) return addr;
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;
+        }
+    },
+    calendar: {
+        fields: [
+            { id: 'calTitle', label: 'Event Title', type: 'text', placeholder: 'Team Meeting', value: 'Event', help: 'Required' },
+            { id: 'calLocation', label: 'Location', type: 'text', placeholder: 'Conference Room A', value: '' },
+            { id: 'calStart', label: 'Start', type: 'datetime-local', value: '' },
+            { id: 'calEnd', label: 'End', type: 'datetime-local', value: '' },
+            { id: 'calDescription', label: 'Description', type: 'text', placeholder: 'Meeting agenda', value: '' },
+            { id: 'calUrl', label: 'More Info URL', type: 'text', placeholder: 'https://example.com', value: '' }
+        ],
+        encode: (values) => {
+            const fmt = (dt) => {
+                if (!dt) return '';
+                return dt.replace(/[-:]/g, '').replace('T', 'T') + '00Z';
+            };
+            const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//QRtist//EN', 'BEGIN:VEVENT'];
+            lines.push(`SUMMARY:${values.calTitle || 'Event'}`);
+            if (values.calStart) lines.push(`DTSTART:${fmt(values.calStart)}`);
+            if (values.calEnd) lines.push(`DTEND:${fmt(values.calEnd)}`);
+            if (values.calLocation) lines.push(`LOCATION:${values.calLocation}`);
+            if (values.calDescription) lines.push(`DESCRIPTION:${values.calDescription}`);
+            if (values.calUrl) lines.push(`URL:${values.calUrl}`);
+            lines.push('END:VEVENT', 'END:VCALENDAR');
+            return lines.join('\r\n');
+        }
+    },
+    sms: {
+        fields: [
+            { id: 'smsNumber', label: 'Phone Number', type: 'tel', placeholder: '+1234567890', value: '+14155552671' },
+            { id: 'smsBody', label: 'Message (optional)', type: 'text', placeholder: 'Hello!', value: '' }
+        ],
+        encode: (values) => {
+            const num = values.smsNumber || '+14155552671';
+            const body = values.smsBody;
+            return body ? `smsto:${num}?body=${encodeURIComponent(body)}` : `smsto:${num}`;
+        }
+    },
+    crypto: {
+        fields: [
+            { id: 'cryptoCoin', label: 'Coin', type: 'select', options: [{ value: 'bitcoin', label: 'Bitcoin (BTC)' }, { value: 'ethereum', label: 'Ethereum (ETH)' }], value: 'bitcoin' },
+            { id: 'cryptoAddress', label: 'Address', type: 'text', placeholder: 'Wallet address', value: '', help: 'Your wallet receiving address' },
+            { id: 'cryptoAmount', label: 'Amount (optional)', type: 'text', placeholder: '0.001', value: '', help: 'Amount in BTC or ETH' }
+        ],
+        encode: (values) => {
+            const coin = values.cryptoCoin || 'bitcoin';
+            const addr = values.cryptoAddress;
+            const amt = values.cryptoAmount;
+            if (!addr) return '';
+            if (!amt) return addr;
+            if (coin === 'bitcoin') return `bitcoin:${addr}?amount=${amt}`;
+            if (coin === 'ethereum') return `ethereum:${addr}?value=${amt}`;
+            return addr;
+        }
+    },
+    social: {
+        fields: [
+            { id: 'socialPlatform', label: 'Platform', type: 'select', options: [
+                { value: 'instagram', label: 'Instagram' },
+                { value: 'twitter', label: 'Twitter / X' },
+                { value: 'tiktok', label: 'TikTok' },
+                { value: 'linkedin', label: 'LinkedIn' },
+                { value: 'youtube', label: 'YouTube' },
+                { value: 'github', label: 'GitHub' }
+            ], value: 'instagram' },
+            { id: 'socialUsername', label: 'Username', type: 'text', placeholder: 'username', value: '', help: 'Without @ symbol' }
+        ],
+        encode: (values) => {
+            const platform = values.socialPlatform || 'instagram';
+            const username = values.socialUsername;
+            if (!username) return '';
+            const urls = {
+                instagram: `https://instagram.com/${username}`,
+                twitter: `https://x.com/${username}`,
+                tiktok: `https://tiktok.com/@${username}`,
+                linkedin: `https://linkedin.com/in/${username}`,
+                youtube: `https://youtube.com/@${username}`,
+                github: `https://github.com/${username}`
+            };
+            return urls[platform] || `https://${platform}.com/${username}`;
+        }
+    }
 };
 
 const qrType = document.getElementById('qrType');
