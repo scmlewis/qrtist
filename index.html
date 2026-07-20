@@ -224,6 +224,40 @@
                         </div>
                         <h2 class="text-sm font-semibold uppercase tracking-wider" style="color: var(--md-on-surface-variant);">QR Data</h2>
                     </div>
+                    <div class="flex gap-1 p-1 rounded-xl" style="background: var(--md-surface-container-highest);">
+                        <button id="modeGenerate" class="flex-1 px-3 py-2 text-xs font-semibold rounded-lg transition-all" style="background: var(--md-primary); color: var(--md-on-primary);">Generate</button>
+                        <button id="modeScan" class="flex-1 px-3 py-2 text-xs font-semibold rounded-lg transition-all" style="color: var(--md-on-surface-variant);">Scan</button>
+                    </div>
+                    <div id="scanPanel" class="hidden flex flex-col gap-4">
+                        <div class="flex gap-1 p-1 rounded-lg" style="background: var(--md-surface-container-highest);">
+                            <button id="scanCameraTab" class="flex-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-all" style="background: var(--md-primary); color: var(--md-on-primary);">Camera</button>
+                            <button id="scanUploadTab" class="flex-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-all" style="color: var(--md-on-surface-variant);">Upload Image</button>
+                        </div>
+                        <div id="scanCameraPanel">
+                            <button id="scanStartBtn" class="w-full px-4 py-3 rounded-xl text-sm font-semibold transition-all" style="background: var(--md-primary); color: var(--md-on-primary);">
+                                Start Camera
+                            </button>
+                        </div>
+                        <div id="scanUploadPanel" class="hidden">
+                            <div id="scanDropZone" class="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors" style="border-color: var(--md-outline-variant);">
+                                <p class="text-sm" style="color: var(--md-on-surface-variant);">Drop image here or click to browse</p>
+                                <p class="text-xs mt-1" style="color: var(--md-outline);">PNG, JPG, SVG</p>
+                                <input type="file" id="scanFileInput" accept=".png,.jpg,.jpeg,.svg" class="hidden">
+                            </div>
+                        </div>
+                        <div id="scanResult" class="hidden rounded-xl p-4" style="background: var(--md-surface-container-highest); border: 1px solid var(--md-outline-variant);">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="w-2 h-2 rounded-full" style="background: var(--md-tertiary);"></span>
+                                <span id="scanResultType" class="text-xs font-semibold uppercase tracking-wide" style="color: var(--md-tertiary);">Detected</span>
+                            </div>
+                            <p id="scanResultContent" class="text-sm mb-3 break-all" style="color: var(--md-on-surface);"></p>
+                            <div class="flex flex-wrap gap-2">
+                                <button id="scanOpenBtn" class="hidden px-3 py-1.5 text-xs font-semibold rounded-lg" style="background: var(--md-primary); color: var(--md-on-primary);">Open</button>
+                                <button id="scanCopyBtn" class="px-3 py-1.5 text-xs font-semibold rounded-lg" style="background: var(--md-secondary-container); color: var(--md-on-secondary-container);">Copy</button>
+                                <button id="scanGenerateBtn" class="px-3 py-1.5 text-xs font-semibold rounded-lg" style="background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);">Generate QR</button>
+                            </div>
+                        </div>
+                    </div>
                     <div>
                         <label for="qrType" class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wide">Type</label>
                         <select id="qrType" aria-label="Select QR code type" class="w-full px-3 py-2.5 border border-gray-600 rounded-xl bg-gray-700 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
@@ -302,6 +336,7 @@
                     </div>
                     <div class="flex-1 flex items-center justify-center w-full py-2">
                         <div id="qrCodeContainer" class="rounded-xl p-3" style="min-width:160px;min-height:160px; background: var(--md-surface-container-highest); border: 1px solid var(--md-outline-variant);"></div>
+                        <div id="scannerContainer" class="hidden rounded-xl overflow-hidden" style="min-width:160px;min-height:160px; background: var(--md-surface-container-highest); border: 1px solid var(--md-outline-variant);"></div>
                     </div>
                     <div class="w-full flex items-center justify-between text-xs border-t pt-3" style="color: var(--md-on-surface-variant); border-color: var(--md-outline-variant);">
                         <span id="previewStatus" class="flex items-center gap-1">

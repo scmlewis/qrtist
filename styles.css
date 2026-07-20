@@ -1020,3 +1020,17 @@ select:focus {
 .h-px { background-color: var(--md-outline-variant) !important; }
 .border-t { border-top-color: var(--md-outline-variant) !important; }
 .border-b { border-bottom-color: var(--md-outline-variant) !important; }
+
+/* Scanner styles */
+#scanPanel .tab-active {
+    background: var(--md-primary);
+    color: var(--md-on-primary);
+}
+#scanDropZone.drag-over {
+    border-color: var(--md-primary);
+    background: color-mix(in srgb, var(--md-primary) 8%, transparent);
+}
+#scannerContainer video {
+    width: 100%;
+    border-radius: 0.75rem;
+}
