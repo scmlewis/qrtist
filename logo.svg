@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 24 24" role="img" aria-label="QRtist logo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="spark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#d1fae5"/>
+    </linearGradient>
+  </defs>
+  <rect width="24" height="24" rx="6" fill="url(#bg)"/>
+  <g fill="white">
+    <path d="M4 8a4 4 0 0 1 4-4h3v3H8v3H4V8Z"/>
+    <path d="M20 4h-3v3h3v3h3V8a4 4 0 0 0-4-4Z"/>
+    <path d="M4 20v-3a4 4 0 0 0 4 4h3v-3H8v-3H4Z"/>
+    <path d="M20 16v3a4 4 0 0 1-4 4h-3v-3h3v-3h4Z"/>
+  </g>
+  <g fill="#3b82f6">
+    <rect x="6.5" y="6.5" width="3" height="3" rx="0.5"/>
+    <rect x="14.5" y="6.5" width="3" height="3" rx="0.5"/>
+    <rect x="6.5" y="14.5" width="3" height="3" rx="0.5"/>
+  </g>
+  <rect x="10" y="10" width="4" height="4" rx="1" fill="url(#spark)"/>
+</svg>
