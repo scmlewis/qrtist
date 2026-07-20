@@ -12,7 +12,9 @@ const FILES_TO_CACHE = [
     './',
     './index.html',
     './manifest.json',
-    './qr-bundle.js'
+    './qr-bundle.js',
+    'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
+    'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js'
 ];
 
 // Install event: cache essential files on first load
