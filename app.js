@@ -2161,18 +2161,24 @@ document.addEventListener('keydown', (e) => {
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const code = jsQR(imageData.data, canvas.width, canvas.height);
-                if (code) {
-                    showResult(code.data);
-                } else {
-                    scanResultType.textContent = 'Not Found';
-                    scanResultContent.textContent = 'No QR code detected in this image.';
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, canvas.width, canvas.height);
+                    if (code) {
+                        showResult(code.data);
+                    } else {
+                        scanResultType.textContent = 'Not Found';
+                        scanResultContent.textContent = 'No QR code detected in this image.';
+                        scanResult.classList.remove('hidden');
+                    }
+                } catch (e) {
+                    scanResultType.textContent = 'Error';
+                    scanResultContent.textContent = 'Could not decode image. Try a different file.';
                     scanResult.classList.remove('hidden');
                 }
             };
@@ -2338,26 +2344,34 @@ document.addEventListener('keydown', (e) => {
         downloadZip.textContent = 'Generating...';
         downloadZip.disabled = true;
 
+        let skipped = 0;
         for (const item of batchItems) {
-            const qr = new QRCodeStyling({
-                width: size,
-                height: size,
-                data: item.data.substring(0, 200),
-                dotsOptions: { color: item.color || fgColor, type: currentPattern },
-                backgroundOptions: { color: bgColor },
-                cornersSquareOptions: { type: currentOuterCorner },
-                cornersDotOptions: { type: currentInnerCorner },
-                margin: 10,
-                errorCorrectionLevel: 'M'
-            });
-            const wrap = document.createElement('div');
-            wrap.style.width = size + 'px';
-            wrap.style.height = size + 'px';
-            qr.append(wrap);
-            const canvas = qr.canvas;
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-            zip.file(`${item.label}.png`, blob);
+            try {
+                const qr = new QRCodeStyling({
+                    width: size,
+                    height: size,
+                    data: item.data.substring(0, 200),
+                    dotsOptions: { color: item.color || fgColor, type: currentPattern },
+                    backgroundOptions: { color: bgColor },
+                    cornersSquareOptions: { type: currentOuterCorner },
+                    cornersDotOptions: { type: currentInnerCorner },
+                    margin: 10,
+                    errorCorrectionLevel: 'M'
+                });
+                const wrap = document.createElement('div');
+                wrap.style.width = size + 'px';
+                wrap.style.height = size + 'px';
+                qr.append(wrap);
+                const canvas = qr.canvas;
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                zip.file(`${item.label}.png`, blob);
+            } catch (e) {
+                skipped++;
+                console.warn('Skipping batch item ' + item.label + ': ' + e.message);
+            }
         }
+
+        if (skipped > 0) showToast(skipped + ' item(s) skipped due to invalid data', 'warn');
 
         const content = await zip.generateAsync({ type: 'blob' });
         const url = URL.createObjectURL(content);
@@ -2390,9 +2404,9 @@ document.addEventListener('keydown', (e) => {
             const row = Math.floor(idx / cols);
             const x = padding + col * (cellSize + padding);
             const y = padding + row * (cellSize + padding + 30);
-            svgContent += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="white" stroke="#e0e0e0" rx="8"/>`;
+            svgContent += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="white" stroke="#ccc" stroke-width="2" rx="8"/>`;
             svgContent += `<text x="${x + cellSize / 2}" y="${y + cellSize / 2}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#666">QR: ${item.label}</text>`;
-            svgContent += `<text x="${x + cellSize / 2}" y="${y + cellSize + 16}" text-anchor="middle" font-size="11" fill="#333">${item.label}</text>`;
+            svgContent += `<text x="${x + cellSize / 2}" y="${y + cellSize + 16}" text-anchor="middle" font-size="11" fill="#333" font-weight="600">${item.label}</text>`;
         });
 
         svgContent += '</svg>';
