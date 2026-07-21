@@ -249,7 +249,7 @@
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <div id="qrTypeSection">
                         <label for="qrType" class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wide">Type</label>
                         <select id="qrType" aria-label="Select QR code type" class="w-full px-3 py-2.5 border border-gray-600 rounded-xl bg-gray-700 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
                             <option value="url">URL</option>
@@ -270,7 +270,7 @@
                         Batch Generate
                     </button>
                     <div id="inputFields"></div>
-                    <div class="bg-gray-700/50 rounded-xl p-4">
+                    <div id="sizeSection" class="bg-gray-700/50 rounded-xl p-4">
                         <div class="flex justify-between items-center mb-3">
                             <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">Size</label>
                             <span class="text-sm font-semibold text-blue-400"><span id="qrSizeValue">300</span> px</span>
@@ -278,42 +278,52 @@
                         <input type="range" id="qrSize" min="200" max="600" value="300" class="w-full">
                     </div>
                     <div class="mobile-hidden">
-                    <div>
-                        <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Download</p>
-                        <div class="grid grid-cols-2 gap-3">
-                            <button id="downloadPng" class="desktop-download-btn flex flex-col items-center justify-center gap-3 px-3 py-4 font-bold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95" style="background: var(--md-primary); color: var(--md-on-primary);">
-                                <i data-lucide="download" class="w-7 h-7 flex-shrink-0"></i>
-                                <span class="text-base leading-tight">PNG</span>
-                            </button>
-                            <button id="downloadSvg" class="desktop-download-btn flex flex-col items-center justify-center gap-3 px-3 py-4 font-bold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95" style="background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);">
-                                <i data-lucide="file-down" class="w-7 h-7 flex-shrink-0"></i>
-                                <span class="text-base leading-tight">SVG</span>
-                            </button>
-                        </div>
-                    </div>
-                        <div class="border-t border-gray-700 pt-4">
-                        <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Share & Config</p>
-                        <div class="flex flex-col gap-1.5">
-                            <button id="copyShareLink" class="flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
-                                <i data-lucide="link" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
-                                Copy Share Link
-                            </button>
-                            <div class="grid grid-cols-2 gap-1.5">
-                                <button id="exportConfig" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
-                                    <i data-lucide="cloud-upload" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
-                                    Export
-                                </button>
-                                <button id="importConfig" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
-                                    <i data-lucide="cloud-download" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
-                                    Import
-                                </button>
+                        <details class="group mb-2">
+                            <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl transition-colors" style="border-radius: var(--md-shape-medium);">
+                                <span class="text-xs font-medium uppercase tracking-wide" style="color: var(--md-on-surface-variant);">Download</span>
+                                <i data-lucide="chevron-down" class="acc-chevron w-4 h-4" style="color: var(--md-on-surface-variant);"></i>
+                            </summary>
+                            <div class="acc-body px-1 pt-2 pb-1">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button id="downloadPng" class="desktop-download-btn flex flex-col items-center justify-center gap-3 px-3 py-4 font-bold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95" style="background: var(--md-primary); color: var(--md-on-primary);">
+                                        <i data-lucide="download" class="w-7 h-7 flex-shrink-0"></i>
+                                        <span class="text-base leading-tight">PNG</span>
+                                    </button>
+                                    <button id="downloadSvg" class="desktop-download-btn flex flex-col items-center justify-center gap-3 px-3 py-4 font-bold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95" style="background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);">
+                                        <i data-lucide="file-down" class="w-7 h-7 flex-shrink-0"></i>
+                                        <span class="text-base leading-tight">SVG</span>
+                                    </button>
+                                </div>
                             </div>
-                            <button id="resetDesign" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 transition-colors border border-gray-600">
-                                <i data-lucide="rotate-ccw" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
-                                Reset
-                            </button>
-                        </div>
-                    </div>
+                        </details>
+                        <details class="group">
+                            <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl transition-colors" style="border-radius: var(--md-shape-medium);">
+                                <span class="text-xs font-medium uppercase tracking-wide" style="color: var(--md-on-surface-variant);">Share &amp; Config</span>
+                                <i data-lucide="chevron-down" class="acc-chevron w-4 h-4" style="color: var(--md-on-surface-variant);"></i>
+                            </summary>
+                            <div class="acc-body px-1 pt-2 pb-1">
+                                <div class="flex flex-col gap-1.5">
+                                    <button id="copyShareLink" class="flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors border" style="color: var(--md-on-surface); background: var(--md-surface-container-highest); border-color: var(--md-outline-variant);">
+                                        <i data-lucide="link" class="w-4 h-4 flex-shrink-0" style="color: var(--md-on-surface-variant);"></i>
+                                        Copy Share Link
+                                    </button>
+                                    <div class="grid grid-cols-2 gap-1.5">
+                                        <button id="exportConfig" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors border" style="color: var(--md-on-surface); background: var(--md-surface-container-highest); border-color: var(--md-outline-variant);">
+                                            <i data-lucide="cloud-upload" class="w-4 h-4 flex-shrink-0" style="color: var(--md-on-surface-variant);"></i>
+                                            Export
+                                        </button>
+                                        <button id="importConfig" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors border" style="color: var(--md-on-surface); background: var(--md-surface-container-highest); border-color: var(--md-outline-variant);">
+                                            <i data-lucide="cloud-download" class="w-4 h-4 flex-shrink-0" style="color: var(--md-on-surface-variant);"></i>
+                                            Import
+                                        </button>
+                                    </div>
+                                    <button id="resetDesign" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors border" style="color: var(--md-on-surface); background: var(--md-surface-container-highest); border-color: var(--md-outline-variant);">
+                                        <i data-lucide="rotate-ccw" class="w-4 h-4 flex-shrink-0" style="color: var(--md-on-surface-variant);"></i>
+                                        Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </details>
                     </div>
                     <button id="mobileNextBtn" class="mobile-next-btn" aria-label="View QR code preview">
                         Preview my QR →
@@ -436,7 +446,7 @@
                         </details>
                         <div class="h-px bg-gray-700 my-1"></div>
                         <!-- Dot Shape -->
-                        <details open class="group mb-1">
+                        <details class="group mb-1">
                             <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
                                 <div class="flex items-center gap-2">
                                     <div class="w-5 h-5 rounded-lg bg-blue-900/30 text-blue-400 flex items-center justify-center flex-shrink-0">
@@ -481,7 +491,7 @@
                         </details>
                         <div class="h-px bg-gray-700 my-1"></div>
                         <!-- Corner Style -->
-                        <details open class="group mb-1">
+                        <details class="group mb-1">
                             <summary class="flex items-center justify-between cursor-pointer select-none px-3 py-2.5 rounded-xl hover:bg-gray-700/60 transition-colors">
                                 <div class="flex items-center gap-2">
                                     <div class="w-5 h-5 rounded-lg bg-indigo-900/30 text-indigo-400 flex items-center justify-center flex-shrink-0">

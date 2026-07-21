@@ -2055,7 +2055,10 @@ document.addEventListener('keydown', (e) => {
     const scanCopyBtn = document.getElementById('scanCopyBtn');
     const scanGenerateBtn = document.getElementById('scanGenerateBtn');
     const qrTypeSelect = document.getElementById('qrType');
-    const qrTypeSection = panelData.querySelector('.mb-4');
+    const qrTypeSection = document.getElementById('qrTypeSection');
+    const batchModeBtn = document.getElementById('batchModeBtn');
+    const sizeSection = document.getElementById('sizeSection');
+    const qrCodeContainer = panelPreview.querySelector('#qrCodeContainer');
 
     if (!modeGenerate || !modeScan) return;
 
@@ -2065,11 +2068,15 @@ document.addEventListener('keydown', (e) => {
         modeScan.style.background = 'transparent';
         modeScan.style.color = 'var(--md-on-surface-variant)';
         scanPanel.classList.add('hidden');
-        qrTypeSection.style.display = '';
+        if (qrTypeSection) qrTypeSection.style.display = '';
         document.getElementById('inputFields').style.display = '';
+        if (batchModeBtn) batchModeBtn.style.display = '';
+        if (sizeSection) sizeSection.style.display = '';
         document.querySelector('.mobile-hidden').style.display = '';
-        panelPreview.querySelector('#qrCodeContainer').classList.remove('hidden');
+        qrCodeContainer.classList.remove('hidden');
+        qrCodeContainer.innerHTML = '';
         if (panelDesign) panelDesign.style.display = '';
+        scanResult.classList.add('hidden');
     }
 
     function showScanMode() {
@@ -2078,10 +2085,12 @@ document.addEventListener('keydown', (e) => {
         modeGenerate.style.background = 'transparent';
         modeGenerate.style.color = 'var(--md-on-surface-variant)';
         scanPanel.classList.remove('hidden');
-        qrTypeSection.style.display = 'none';
+        if (qrTypeSection) qrTypeSection.style.display = 'none';
         document.getElementById('inputFields').style.display = 'none';
+        if (batchModeBtn) batchModeBtn.style.display = 'none';
+        if (sizeSection) sizeSection.style.display = 'none';
         document.querySelector('.mobile-hidden').style.display = 'none';
-        panelPreview.querySelector('#qrCodeContainer').classList.add('hidden');
+        qrCodeContainer.classList.add('hidden');
         if (panelDesign) panelDesign.style.display = 'none';
         scanResult.classList.add('hidden');
     }
@@ -2171,7 +2180,9 @@ document.addEventListener('keydown', (e) => {
                     const code = jsQR(imageData.data, canvas.width, canvas.height);
                     if (code) {
                         showResult(code.data);
+                        showScanPreview(img, code.location);
                     } else {
+                        showScanPreview(img, null);
                         scanResultType.textContent = 'Not Found';
                         scanResultContent.textContent = 'No QR code detected in this image.';
                         scanResult.classList.remove('hidden');
@@ -2185,6 +2196,44 @@ document.addEventListener('keydown', (e) => {
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
+    }
+
+    function showScanPreview(img, location) {
+        const container = qrCodeContainer;
+        container.innerHTML = '';
+        container.classList.remove('hidden');
+
+        const maxDim = Math.min(container.clientWidth || 320, 480);
+        const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+
+        const previewCanvas = document.createElement('canvas');
+        previewCanvas.width = w;
+        previewCanvas.height = h;
+        previewCanvas.style.width = w + 'px';
+        previewCanvas.style.height = h + 'px';
+        previewCanvas.style.borderRadius = '0.5rem';
+        container.appendChild(previewCanvas);
+
+        const pctx = previewCanvas.getContext('2d');
+        pctx.drawImage(img, 0, 0, w, h);
+
+        if (location) {
+            const pts = ['topLeftCorner', 'topRightCorner', 'bottomRightCorner', 'bottomLeftCorner'];
+            pctx.strokeStyle = '#4ade80';
+            pctx.lineWidth = Math.max(2, Math.round(3 * scale));
+            pctx.beginPath();
+            pts.forEach((key, i) => {
+                const x = location[key].x * scale;
+                const y = location[key].y * scale;
+                i === 0 ? pctx.moveTo(x, y) : pctx.lineTo(x, y);
+            });
+            pctx.closePath();
+            pctx.stroke();
+            pctx.fillStyle = 'rgba(74, 222, 128, 0.1)';
+            pctx.fill();
+        }
     }
 })();
 
