@@ -4,7 +4,7 @@
  * GitHub Pages optimized with automatic cache busting
  */
 
-const CACHE_VERSION = 'v8'; // Increment this to bust all caches
+const CACHE_VERSION = 'v9'; // Increment this to bust all caches
 const CACHE_NAME = 'qrtist-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'qrtist-runtime-' + CACHE_VERSION;
 
@@ -13,6 +13,7 @@ const FILES_TO_CACHE = [
     './index.html',
     './manifest.json',
     './qr-bundle.js',
+    'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js',
     'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js'
 ];
 
