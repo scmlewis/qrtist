@@ -2427,15 +2427,19 @@ document.addEventListener('keydown', (e) => {
         batchItems.forEach((item, idx) => {
             const thumb = document.createElement('div');
             thumb.className = 'flex flex-col items-center gap-1';
-            const canvas = document.createElement('canvas');
-            canvas.width = 80;
-            canvas.height = 80;
-            canvas.className = 'batch-thumb';
+            const canvasWrap = document.createElement('div');
+            canvasWrap.className = 'batch-thumb';
+            canvasWrap.style.width = '80px';
+            canvasWrap.style.height = '80px';
+            canvasWrap.style.borderRadius = '0.5rem';
+            canvasWrap.style.background = 'var(--md-surface-container-highest)';
+            canvasWrap.style.border = '1px solid var(--md-outline-variant)';
+            canvasWrap.style.overflow = 'hidden';
             const label = document.createElement('span');
             label.className = 'text-[10px] truncate w-full text-center';
             label.style.color = 'var(--md-on-surface-variant)';
             label.textContent = item.label;
-            thumb.appendChild(canvas);
+            thumb.appendChild(canvasWrap);
             thumb.appendChild(label);
             grid.appendChild(thumb);
 
@@ -2450,7 +2454,7 @@ document.addEventListener('keydown', (e) => {
                 margin: 2,
                 errorCorrectionLevel: 'M'
             });
-            miniQr.append(canvas);
+            miniQr.append(canvasWrap);
         });
     }
 
@@ -2479,10 +2483,11 @@ document.addEventListener('keydown', (e) => {
                 margin: 10,
                 errorCorrectionLevel: 'M'
             });
-            const canvas = document.createElement('canvas');
-            canvas.width = size;
-            canvas.height = size;
-            qr.append(canvas);
+            const wrap = document.createElement('div');
+            wrap.style.width = size + 'px';
+            wrap.style.height = size + 'px';
+            qr.append(wrap);
+            const canvas = qr.canvas;
             const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
             zip.file(`${item.label}.png`, blob);
         }
