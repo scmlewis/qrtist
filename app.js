@@ -2262,6 +2262,19 @@ document.addEventListener('keydown', (e) => {
             cameraOverlayStatus.textContent = 'Failed to initialize scanner: ' + e.message;
             return;
         }
+
+        const fixVideoForIOS = () => {
+            const video = cameraOverlayScanner.querySelector('video');
+            if (video) {
+                video.setAttribute('playsinline', '');
+                video.setAttribute('muted', '');
+                video.muted = true;
+                video.style.width = '100%';
+                video.style.height = '100%';
+                video.style.objectFit = 'cover';
+            }
+        };
+
         scanning = true;
         html5QrCode.start(
             { facingMode: 'environment' },
@@ -2271,8 +2284,13 @@ document.addEventListener('keydown', (e) => {
                 showOverlayResult(decodedText);
             },
             () => {}
-        ).catch((err) => {
+        ).then(() => {
+            fixVideoForIOS();
+            setTimeout(fixVideoForIOS, 500);
+            setTimeout(fixVideoForIOS, 1500);
+        }).catch((err) => {
             scanning = false;
+            console.error('Camera start failed:', err);
             cameraOverlayStatus.textContent = 'Camera access denied or unavailable. Try Upload mode instead.';
         });
     });
