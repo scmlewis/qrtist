@@ -57,3 +57,8 @@ tests/
 # Project-specific files to ignore
 refactor_complete.py
 mockup/
+
+# Superpowers planning artifacts
+.superpowers/
+docs/superpowers/plans/
+docs/superpowers/specs/
