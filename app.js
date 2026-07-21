@@ -2062,10 +2062,37 @@ document.addEventListener('keydown', (e) => {
     const qrTypeSelect = document.getElementById('qrType');
     const qrTypeSection = panelData.querySelector('.mb-4');
 
+    const cameraOverlay = document.getElementById('cameraOverlay');
+    const cameraOverlayScanner = document.getElementById('cameraOverlayScanner');
+    const cameraOverlayClose = document.getElementById('cameraOverlayClose');
+    const cameraOverlayStatus = document.getElementById('cameraOverlayStatus');
+    const cameraOverlayResult = document.getElementById('cameraOverlayResult');
+    const cameraOverlayResultType = document.getElementById('cameraOverlayResultType');
+    const cameraOverlayResultContent = document.getElementById('cameraOverlayResultContent');
+    const cameraOverlayOpen = document.getElementById('cameraOverlayOpen');
+    const cameraOverlayCopy = document.getElementById('cameraOverlayCopy');
+    const cameraOverlayGenerate = document.getElementById('cameraOverlayGenerate');
+
     let html5QrCode = null;
     let scanning = false;
 
     if (!modeGenerate || !modeScan) return;
+
+    function stopScanner() {
+        if (html5QrCode && scanning) {
+            html5QrCode.stop().catch(() => {});
+            scanning = false;
+        }
+    }
+
+    function closeCameraOverlay() {
+        stopScanner();
+        cameraOverlay.classList.add('hidden');
+        cameraOverlayScanner.innerHTML = '';
+        cameraOverlayResult.classList.add('hidden');
+        cameraOverlayStatus.textContent = 'Point camera at a QR code';
+        scanStartBtn.textContent = 'Start Camera';
+    }
 
     function showGenerateMode() {
         modeGenerate.style.background = 'var(--md-primary)';
@@ -2092,7 +2119,7 @@ document.addEventListener('keydown', (e) => {
         document.getElementById('inputFields').style.display = 'none';
         document.querySelector('.mobile-hidden').style.display = 'none';
         panelPreview.querySelector('#qrCodeContainer').classList.add('hidden');
-        panelPreview.querySelector('#scannerContainer').classList.remove('hidden');
+        panelPreview.querySelector('#scannerContainer').classList.add('hidden');
         if (panelDesign) panelDesign.style.display = 'none';
         scanResult.classList.add('hidden');
     }
@@ -2131,7 +2158,26 @@ document.addEventListener('keydown', (e) => {
         return { type: 'Text', action: null };
     }
 
-    function showResult(decodedText) {
+    function showOverlayResult(decodedText) {
+        const content = detectContentType(decodedText);
+        cameraOverlayResultType.textContent = content.type;
+        cameraOverlayResultContent.textContent = decodedText;
+        cameraOverlayResult.classList.remove('hidden');
+        cameraOverlayStatus.textContent = 'QR code detected!';
+        if (content.action === 'url') {
+            cameraOverlayOpen.classList.remove('hidden');
+            cameraOverlayOpen.textContent = 'Open';
+            cameraOverlayOpen.onclick = () => window.open(content.value, '_blank');
+        } else if (content.action === 'email') {
+            cameraOverlayOpen.classList.remove('hidden');
+            cameraOverlayOpen.textContent = 'Email';
+            cameraOverlayOpen.onclick = () => window.location.href = `mailto:${content.value}`;
+        } else {
+            cameraOverlayOpen.classList.add('hidden');
+        }
+    }
+
+    function showPanelResult(decodedText) {
         const content = detectContentType(decodedText);
         scanResultType.textContent = content.type;
         scanResultContent.textContent = decodedText;
@@ -2172,50 +2218,62 @@ document.addEventListener('keydown', (e) => {
         }, 100);
     });
 
-    function stopScanner() {
-        if (html5QrCode && scanning) {
-            html5QrCode.stop().catch(() => {});
-            scanning = false;
+    cameraOverlayClose.addEventListener('click', closeCameraOverlay);
+
+    cameraOverlayCopy.addEventListener('click', () => {
+        navigator.clipboard.writeText(cameraOverlayResultContent.textContent).catch(() => {});
+    });
+
+    cameraOverlayGenerate.addEventListener('click', () => {
+        closeCameraOverlay();
+        showGenerateMode();
+        const text = cameraOverlayResultContent.textContent;
+        const content = detectContentType(text);
+        if (content.action === 'url') {
+            qrTypeSelect.value = 'url';
+        } else {
+            qrTypeSelect.value = 'text';
         }
-    }
+        qrTypeSelect.dispatchEvent(new Event('change'));
+        setTimeout(() => {
+            const inputField = document.querySelector('#inputFields input');
+            if (inputField) {
+                inputField.value = text;
+                inputField.dispatchEvent(new Event('input'));
+            }
+        }, 100);
+    });
 
     scanStartBtn.addEventListener('click', () => {
-        if (scanning) {
-            stopScanner();
-            scanStartBtn.textContent = 'Start Camera';
-            return;
-        }
         if (typeof Html5Qrcode === 'undefined') {
             scanResultType.textContent = 'Error';
             scanResultContent.textContent = 'Scanner library not loaded. Check your connection.';
             scanResult.classList.remove('hidden');
             return;
         }
+
+        cameraOverlay.classList.remove('hidden');
+        cameraOverlayResult.classList.add('hidden');
+        cameraOverlayStatus.textContent = 'Starting camera...';
+
         try {
-            html5QrCode = new Html5Qrcode('scannerContainer');
+            html5QrCode = new Html5Qrcode('cameraOverlayScanner');
         } catch (e) {
-            scanResultType.textContent = 'Error';
-            scanResultContent.textContent = 'Failed to initialize scanner: ' + e.message;
-            scanResult.classList.remove('hidden');
+            cameraOverlayStatus.textContent = 'Failed to initialize scanner: ' + e.message;
             return;
         }
         scanning = true;
-        scanStartBtn.textContent = 'Stop Camera';
         html5QrCode.start(
             { facingMode: 'environment' },
-            { fps: 10, qrbox: { width: 150, height: 150 } },
+            { fps: 10, qrbox: { width: 250, height: 250 } },
             (decodedText) => {
                 stopScanner();
-                scanStartBtn.textContent = 'Start Camera';
-                showResult(decodedText);
+                showOverlayResult(decodedText);
             },
             () => {}
         ).catch((err) => {
             scanning = false;
-            scanStartBtn.textContent = 'Start Camera';
-            scanResultType.textContent = 'Error';
-            scanResultContent.textContent = 'Camera access denied or unavailable. Use Upload mode instead.';
-            scanResult.classList.remove('hidden');
+            cameraOverlayStatus.textContent = 'Camera access denied or unavailable. Try Upload mode instead.';
         });
     });
 

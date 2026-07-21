@@ -1030,11 +1030,16 @@ select:focus {
     border-color: var(--md-primary);
     background: color-mix(in srgb, var(--md-primary) 8%, transparent);
 }
-#scannerContainer video {
-    width: 100%;
-    height: auto;
-    border-radius: 0.75rem;
-    object-fit: cover;
+
+/* Camera overlay scanner */
+#cameraOverlayScanner video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 0 !important;
+}
+#cameraOverlayScanner img {
+    display: none !important;
 }
 
 /* Batch overlay */

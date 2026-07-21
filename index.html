@@ -788,6 +788,32 @@
             }
         </script>
 
+        <!-- Camera Scanner Overlay -->
+        <div id="cameraOverlay" class="hidden" style="position:fixed;inset:0;z-index:100;background:var(--md-surface);display:flex;flex-direction:column;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--md-outline-variant);background:var(--md-surface-container);">
+                <span style="font-size:1rem;font-weight:500;color:var(--md-on-surface);">Scan QR Code</span>
+                <button id="cameraOverlayClose" style="width:40px;height:40px;border-radius:var(--md-shape-full);background:transparent;border:none;color:var(--md-on-surface-variant);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div id="cameraOverlayScanner" style="flex:1;display:flex;align-items:center;justify-content:center;background:#000;position:relative;overflow:hidden;"></div>
+            <div id="cameraOverlayStatus" style="padding:16px;text-align:center;color:var(--md-on-surface-variant);font-size:0.875rem;background:var(--md-surface-container);border-top:1px solid var(--md-outline-variant);">
+                Point camera at a QR code
+            </div>
+            <div id="cameraOverlayResult" class="hidden" style="padding:16px;border-top:1px solid var(--md-outline-variant);background:var(--md-surface-container);">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <span style="width:8px;height:8px;border-radius:50%;background:var(--md-tertiary);flex-shrink:0;"></span>
+                    <span id="cameraOverlayResultType" style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--md-tertiary);">Detected</span>
+                </div>
+                <p id="cameraOverlayResultContent" style="font-size:0.875rem;color:var(--md-on-surface);word-break:break-all;margin-bottom:12px;"></p>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                    <button id="cameraOverlayOpen" class="hidden" style="padding:8px 16px;font-size:0.8125rem;font-weight:500;border-radius:var(--md-shape-full);background:var(--md-primary);color:var(--md-on-primary);border:none;cursor:pointer;">Open</button>
+                    <button id="cameraOverlayCopy" style="padding:8px 16px;font-size:0.8125rem;font-weight:500;border-radius:var(--md-shape-full);background:var(--md-secondary-container);color:var(--md-on-secondary-container);border:none;cursor:pointer;">Copy</button>
+                    <button id="cameraOverlayGenerate" style="padding:8px 16px;font-size:0.8125rem;font-weight:500;border-radius:var(--md-shape-full);background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);border:none;cursor:pointer;">Generate QR</button>
+                </div>
+            </div>
+        </div>
+
         <div id="toastContainer" aria-live="polite" aria-atomic="false"></div>
         <script src="./qr-bundle.js"></script>
         <script src="./app.js"></script>
