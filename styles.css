@@ -189,8 +189,11 @@ header {
     flex-shrink: 0;
     position: relative;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, transform 0.15s var(--spring-snappy);
     -webkit-tap-highlight-color: transparent;
+}
+.header-action-btn:active {
+    transform: scale(0.92);
 }
 .header-action-btn::before {
     content: '';
@@ -212,6 +215,7 @@ header {
     opacity: 0.38;
     cursor: default;
     pointer-events: none;
+    transition: opacity 0.25s ease;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -403,8 +407,11 @@ button:active { transform: scale(0.97); transition: transform 0.15s var(--spring
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease, background 0.2s ease, transform 0.15s var(--spring-snappy);
     -webkit-tap-highlight-color: transparent;
+}
+.tonal-btn:active {
+    transform: scale(0.97);
 }
 .tonal-btn::before {
     content: '';
@@ -505,11 +512,14 @@ input[type="range"]::-webkit-slider-thumb {
     cursor: pointer;
     border: none;
     box-shadow: var(--md-elevation-1);
-    transition: box-shadow 0.2s ease, transform 0.1s ease;
+    transition: box-shadow 0.2s ease, transform 0.15s var(--spring-snappy);
 }
 input[type="range"]::-webkit-slider-thumb:hover {
     box-shadow: var(--md-elevation-2);
     transform: scale(1.1);
+}
+input[type="range"]:focus::-webkit-slider-thumb {
+    box-shadow: var(--md-elevation-2), 0 0 0 4px color-mix(in srgb, var(--md-primary) 25%, transparent);
 }
 input[type="range"]::-moz-range-thumb {
     width: 20px;
@@ -519,6 +529,10 @@ input[type="range"]::-moz-range-thumb {
     cursor: pointer;
     border: none;
     box-shadow: var(--md-elevation-1);
+    transition: box-shadow 0.2s ease, transform 0.15s var(--spring-snappy);
+}
+input[type="range"]:focus::-moz-range-thumb {
+    box-shadow: var(--md-elevation-2), 0 0 0 4px color-mix(in srgb, var(--md-primary) 25%, transparent);
 }
 
 /* Color inputs */
@@ -630,11 +644,12 @@ hr {
 /* ══════════════════════════════════════════════════════════════════════════════
    M3 Focus Rings
    ══════════════════════════════════════════════════════════════════════════════ */
-input:focus,
-select:focus,
+input:focus-visible,
+select:focus-visible,
 button:focus-visible {
     outline: 2px solid var(--md-primary);
-    outline-offset: 2px;
+    outline-offset: 3px;
+    transition: outline-offset 0.15s ease;
 }
 
 /* Logo grid drag feedback */
