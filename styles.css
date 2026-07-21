@@ -75,7 +75,7 @@
     --md-shape-full:        9999px;
 
     /* M3 Typography — Roboto with system fallback */
-    --md-font: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --md-font: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -142,6 +142,7 @@ header {
     font-size: 1.375rem;
     letter-spacing: 0;
     line-height: 1.5;
+    text-wrap: balance;
 }
 
 .header-subtitle {
@@ -803,7 +804,12 @@ button:focus-visible {
    Responsive & Utility
    ══════════════════════════════════════════════════════════════════════════════ */
 .uppercase {
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+}
+
+/* Tabular figures for dimensions */
+.qr-dimension {
+    font-variant-numeric: tabular-nums;
 }
 
 .cursor-pointers,
