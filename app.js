@@ -261,6 +261,7 @@ window.QRCodeStyling = (function () {
         }
     };
 
+    window.drawModule = drawModule;
     return QRCodeStyling;
 })();
 
@@ -726,7 +727,7 @@ function renderTemplates() {
 }
 
 function _miniFinderMod(ctx, pattern, x, y, mSize) {
-    drawModule(ctx, pattern, x, y, mSize);
+    window.drawModule(ctx, pattern, x, y, mSize);
 }
 
 function _miniFinderPattern(ctx, px, py, mSize, outerType, innerType, fgColor) {
@@ -840,6 +841,9 @@ function applyTemplate(t) {
     if (t.logo) {
         currentLogoPreset = t.logo;
         logoControls.classList.remove('hidden');
+        logoColor = t.fg;
+        if (logoColorInput) logoColorInput.value = t.fg;
+        if (logoColorText) logoColorText.value = t.fg;
     } else {
         currentLogoPreset = 'none';
         logoControls.classList.add('hidden');
