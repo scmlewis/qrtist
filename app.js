@@ -2046,11 +2046,6 @@ document.addEventListener('keydown', (e) => {
     const panelData = document.getElementById('panelData');
     const panelPreview = document.getElementById('panelPreview');
     const panelDesign = document.getElementById('panelDesign');
-    const scanCameraTab = document.getElementById('scanCameraTab');
-    const scanUploadTab = document.getElementById('scanUploadTab');
-    const scanCameraPanel = document.getElementById('scanCameraPanel');
-    const scanUploadPanel = document.getElementById('scanUploadPanel');
-    const scanStartBtn = document.getElementById('scanStartBtn');
     const scanDropZone = document.getElementById('scanDropZone');
     const scanFileInput = document.getElementById('scanFileInput');
     const scanResult = document.getElementById('scanResult');
@@ -2062,37 +2057,7 @@ document.addEventListener('keydown', (e) => {
     const qrTypeSelect = document.getElementById('qrType');
     const qrTypeSection = panelData.querySelector('.mb-4');
 
-    const cameraOverlay = document.getElementById('cameraOverlay');
-    const cameraOverlayScanner = document.getElementById('cameraOverlayScanner');
-    const cameraOverlayClose = document.getElementById('cameraOverlayClose');
-    const cameraOverlayStatus = document.getElementById('cameraOverlayStatus');
-    const cameraOverlayResult = document.getElementById('cameraOverlayResult');
-    const cameraOverlayResultType = document.getElementById('cameraOverlayResultType');
-    const cameraOverlayResultContent = document.getElementById('cameraOverlayResultContent');
-    const cameraOverlayOpen = document.getElementById('cameraOverlayOpen');
-    const cameraOverlayCopy = document.getElementById('cameraOverlayCopy');
-    const cameraOverlayGenerate = document.getElementById('cameraOverlayGenerate');
-
-    let html5QrCode = null;
-    let scanning = false;
-
     if (!modeGenerate || !modeScan) return;
-
-    function stopScanner() {
-        if (html5QrCode && scanning) {
-            html5QrCode.stop().catch(() => {});
-            scanning = false;
-        }
-    }
-
-    function closeCameraOverlay() {
-        stopScanner();
-        cameraOverlay.classList.add('hidden');
-        cameraOverlayScanner.innerHTML = '';
-        cameraOverlayResult.classList.add('hidden');
-        cameraOverlayStatus.textContent = 'Point camera at a QR code';
-        scanStartBtn.textContent = 'Start Camera';
-    }
 
     function showGenerateMode() {
         modeGenerate.style.background = 'var(--md-primary)';
@@ -2104,9 +2069,7 @@ document.addEventListener('keydown', (e) => {
         document.getElementById('inputFields').style.display = '';
         document.querySelector('.mobile-hidden').style.display = '';
         panelPreview.querySelector('#qrCodeContainer').classList.remove('hidden');
-        panelPreview.querySelector('#scannerContainer').classList.add('hidden');
         if (panelDesign) panelDesign.style.display = '';
-        stopScanner();
     }
 
     function showScanMode() {
@@ -2119,30 +2082,12 @@ document.addEventListener('keydown', (e) => {
         document.getElementById('inputFields').style.display = 'none';
         document.querySelector('.mobile-hidden').style.display = 'none';
         panelPreview.querySelector('#qrCodeContainer').classList.add('hidden');
-        panelPreview.querySelector('#scannerContainer').classList.add('hidden');
         if (panelDesign) panelDesign.style.display = 'none';
         scanResult.classList.add('hidden');
     }
 
     modeGenerate.addEventListener('click', showGenerateMode);
     modeScan.addEventListener('click', showScanMode);
-
-    scanCameraTab.addEventListener('click', () => {
-        scanCameraTab.style.background = 'var(--md-primary)';
-        scanCameraTab.style.color = 'var(--md-on-primary)';
-        scanUploadTab.style.background = 'transparent';
-        scanUploadTab.style.color = 'var(--md-on-surface-variant)';
-        scanCameraPanel.classList.remove('hidden');
-        scanUploadPanel.classList.add('hidden');
-    });
-    scanUploadTab.addEventListener('click', () => {
-        scanUploadTab.style.background = 'var(--md-primary)';
-        scanUploadTab.style.color = 'var(--md-on-primary)';
-        scanCameraTab.style.background = 'transparent';
-        scanCameraTab.style.color = 'var(--md-on-surface-variant)';
-        scanUploadPanel.classList.remove('hidden');
-        scanCameraPanel.classList.add('hidden');
-    });
 
     function detectContentType(text) {
         if (!text) return { type: 'Text', action: null };
@@ -2158,26 +2103,7 @@ document.addEventListener('keydown', (e) => {
         return { type: 'Text', action: null };
     }
 
-    function showOverlayResult(decodedText) {
-        const content = detectContentType(decodedText);
-        cameraOverlayResultType.textContent = content.type;
-        cameraOverlayResultContent.textContent = decodedText;
-        cameraOverlayResult.classList.remove('hidden');
-        cameraOverlayStatus.textContent = 'QR code detected!';
-        if (content.action === 'url') {
-            cameraOverlayOpen.classList.remove('hidden');
-            cameraOverlayOpen.textContent = 'Open';
-            cameraOverlayOpen.onclick = () => window.open(content.value, '_blank');
-        } else if (content.action === 'email') {
-            cameraOverlayOpen.classList.remove('hidden');
-            cameraOverlayOpen.textContent = 'Email';
-            cameraOverlayOpen.onclick = () => window.location.href = `mailto:${content.value}`;
-        } else {
-            cameraOverlayOpen.classList.add('hidden');
-        }
-    }
-
-    function showPanelResult(decodedText) {
+    function showResult(decodedText) {
         const content = detectContentType(decodedText);
         scanResultType.textContent = content.type;
         scanResultContent.textContent = decodedText;
@@ -2216,83 +2142,6 @@ document.addEventListener('keydown', (e) => {
                 inputField.dispatchEvent(new Event('input'));
             }
         }, 100);
-    });
-
-    cameraOverlayClose.addEventListener('click', closeCameraOverlay);
-
-    cameraOverlayCopy.addEventListener('click', () => {
-        navigator.clipboard.writeText(cameraOverlayResultContent.textContent).catch(() => {});
-    });
-
-    cameraOverlayGenerate.addEventListener('click', () => {
-        closeCameraOverlay();
-        showGenerateMode();
-        const text = cameraOverlayResultContent.textContent;
-        const content = detectContentType(text);
-        if (content.action === 'url') {
-            qrTypeSelect.value = 'url';
-        } else {
-            qrTypeSelect.value = 'text';
-        }
-        qrTypeSelect.dispatchEvent(new Event('change'));
-        setTimeout(() => {
-            const inputField = document.querySelector('#inputFields input');
-            if (inputField) {
-                inputField.value = text;
-                inputField.dispatchEvent(new Event('input'));
-            }
-        }, 100);
-    });
-
-    scanStartBtn.addEventListener('click', () => {
-        if (typeof Html5Qrcode === 'undefined') {
-            scanResultType.textContent = 'Error';
-            scanResultContent.textContent = 'Scanner library not loaded. Check your connection.';
-            scanResult.classList.remove('hidden');
-            return;
-        }
-
-        cameraOverlay.classList.remove('hidden');
-        cameraOverlayResult.classList.add('hidden');
-        cameraOverlayStatus.textContent = 'Starting camera...';
-
-        try {
-            html5QrCode = new Html5Qrcode('cameraOverlayScanner');
-        } catch (e) {
-            cameraOverlayStatus.textContent = 'Failed to initialize scanner: ' + e.message;
-            return;
-        }
-
-        const fixVideoForIOS = () => {
-            const video = cameraOverlayScanner.querySelector('video');
-            if (video) {
-                video.setAttribute('playsinline', '');
-                video.setAttribute('muted', '');
-                video.muted = true;
-                video.style.width = '100%';
-                video.style.height = '100%';
-                video.style.objectFit = 'cover';
-            }
-        };
-
-        scanning = true;
-        html5QrCode.start(
-            { facingMode: 'environment' },
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            (decodedText) => {
-                stopScanner();
-                showOverlayResult(decodedText);
-            },
-            () => {}
-        ).then(() => {
-            fixVideoForIOS();
-            setTimeout(fixVideoForIOS, 500);
-            setTimeout(fixVideoForIOS, 1500);
-        }).catch((err) => {
-            scanning = false;
-            console.error('Camera start failed:', err);
-            cameraOverlayStatus.textContent = 'Camera access denied or unavailable. Try Upload mode instead.';
-        });
     });
 
     scanDropZone.addEventListener('click', () => scanFileInput.click());

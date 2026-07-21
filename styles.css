@@ -1022,32 +1022,9 @@ select:focus {
 .border-b { border-bottom-color: var(--md-outline-variant) !important; }
 
 /* Scanner styles */
-#scanPanel .tab-active {
-    background: var(--md-primary);
-    color: var(--md-on-primary);
-}
 #scanDropZone.drag-over {
     border-color: var(--md-primary);
     background: color-mix(in srgb, var(--md-primary) 8%, transparent);
-}
-
-/* Camera overlay scanner */
-#cameraOverlayScanner video {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 100% !important;
-    object-fit: cover !important;
-    border-radius: 0 !important;
-}
-#cameraOverlayScanner video[playsinline] {
-    -webkit-object-fit: cover !important;
-}
-#cameraOverlayScanner img {
-    display: none !important;
-}
-#cameraOverlayScanner {
-    width: 100%;
-    height: 100%;
 }
 
 /* Batch overlay */
