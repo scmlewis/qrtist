@@ -1348,6 +1348,18 @@ function updateQRCode() {
             );
         }
     }
+
+    // QR preview subtle entry animation
+    const qrContainer = document.getElementById('qrCodeContainer');
+    if (qrContainer) {
+        qrContainer.style.transition = 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        qrContainer.style.opacity = '0.7';
+        qrContainer.style.transform = 'scale(0.98)';
+        requestAnimationFrame(() => {
+            qrContainer.style.opacity = '1';
+            qrContainer.style.transform = 'scale(1)';
+        });
+    }
 }
 
 function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken) {
@@ -2473,3 +2485,25 @@ document.addEventListener('keydown', (e) => {
         URL.revokeObjectURL(url);
     });
 })();
+
+// ── Staggered Entry Animation ───────────────────────────────────────────
+function initStaggerAnimation() {
+    const panels = document.querySelectorAll('.grid-layout > .panel-card');
+    if (panels.length) {
+        panels.forEach((panel, i) => {
+            panel.style.opacity = '0';
+            panel.style.transform = 'translateY(12px)';
+            panel.style.transition = `opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)`;
+            panel.style.transitionDelay = `${i * 80}ms`;
+            requestAnimationFrame(() => {
+                panel.style.opacity = '1';
+                panel.style.transform = 'translateY(0)';
+            });
+        });
+    }
+}
+if (document.readyState === 'complete') {
+    initStaggerAnimation();
+} else {
+    window.addEventListener('load', initStaggerAnimation);
+}
