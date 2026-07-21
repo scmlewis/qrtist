@@ -2185,12 +2185,25 @@ document.addEventListener('keydown', (e) => {
             scanStartBtn.textContent = 'Start Camera';
             return;
         }
-        html5QrCode = new Html5Qrcode('scannerContainer');
+        if (typeof Html5Qrcode === 'undefined') {
+            scanResultType.textContent = 'Error';
+            scanResultContent.textContent = 'Scanner library not loaded. Check your connection.';
+            scanResult.classList.remove('hidden');
+            return;
+        }
+        try {
+            html5QrCode = new Html5Qrcode('scannerContainer');
+        } catch (e) {
+            scanResultType.textContent = 'Error';
+            scanResultContent.textContent = 'Failed to initialize scanner: ' + e.message;
+            scanResult.classList.remove('hidden');
+            return;
+        }
         scanning = true;
         scanStartBtn.textContent = 'Stop Camera';
         html5QrCode.start(
             { facingMode: 'environment' },
-            { fps: 10, qrbox: { width: 200, height: 200 } },
+            { fps: 10, qrbox: { width: 150, height: 150 } },
             (decodedText) => {
                 stopScanner();
                 scanStartBtn.textContent = 'Start Camera';
@@ -2201,7 +2214,7 @@ document.addEventListener('keydown', (e) => {
             scanning = false;
             scanStartBtn.textContent = 'Start Camera';
             scanResultType.textContent = 'Error';
-            scanResultContent.textContent = 'Camera access denied or unavailable. Use Upload mode.';
+            scanResultContent.textContent = 'Camera access denied or unavailable. Use Upload mode instead.';
             scanResult.classList.remove('hidden');
         });
     });
