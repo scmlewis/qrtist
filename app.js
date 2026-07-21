@@ -990,6 +990,7 @@ const scannabilityInfo = document.getElementById('scannabilityInfo');
 const qrSizeLabel = document.getElementById('qrSizeLabel');
 const qrSizeLabel2 = document.getElementById('qrSizeLabel2');
 const qrCodeContainer = document.getElementById('qrCodeContainer');
+let qrAnimFrame;
 const downloadPng = document.getElementById('downloadPng');
 const downloadSvg = document.getElementById('downloadSvg');
 
@@ -1350,12 +1351,13 @@ function updateQRCode() {
     }
 
     // QR preview subtle entry animation
+    if (qrAnimFrame) cancelAnimationFrame(qrAnimFrame);
     const qrContainer = document.getElementById('qrCodeContainer');
     if (qrContainer) {
         qrContainer.style.transition = 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
         qrContainer.style.opacity = '0.7';
         qrContainer.style.transform = 'scale(0.98)';
-        requestAnimationFrame(() => {
+        qrAnimFrame = requestAnimationFrame(() => {
             qrContainer.style.opacity = '1';
             qrContainer.style.transform = 'scale(1)';
         });
