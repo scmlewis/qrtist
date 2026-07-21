@@ -62,3 +62,7 @@ mockup/
 .superpowers/
 docs/superpowers/plans/
 docs/superpowers/specs/
+
+
+# AI agent prompts (not app code)
+.github/prompts/
