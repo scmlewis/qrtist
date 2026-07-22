@@ -2540,3 +2540,20 @@ if (document.readyState === 'complete') {
 } else {
     window.addEventListener('load', initStaggerAnimation);
 }
+
+// ── Accordion Auto-Scroll ──────────────────────────────────────────────
+// When a design section opens, scroll it into view if needed
+(function initAccordionScroll() {
+    const panel = document.getElementById('panelDesign');
+    if (!panel) return;
+
+    panel.querySelectorAll('details').forEach((details) => {
+        details.addEventListener('toggle', () => {
+            if (!details.open) return;
+            const summary = details.querySelector('summary');
+            if (summary) {
+                summary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        });
+    });
+})();
