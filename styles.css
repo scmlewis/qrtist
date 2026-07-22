@@ -239,20 +239,47 @@ header {
     border-color: color-mix(in srgb, var(--md-primary) 30%, var(--md-outline-variant));
 }
 
-/* Spotlight border on card hover — gradient keyline */
-.panel-card::after {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    background: linear-gradient(135deg, transparent 40%, color-mix(in srgb, var(--md-primary) 25%, transparent) 60%, transparent 80%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-    z-index: 0;
+/* Scan panel slide animation */
+#scanPanel {
+    overflow: hidden;
+    transition: max-height 0.35s var(--spring-smooth), opacity 0.25s ease;
 }
-.panel-card:hover::after {
+#scanPanel.panel-hidden {
+    max-height: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+}
+#scanPanel.panel-visible {
+    max-height: 800px;
     opacity: 1;
+}
+
+/* Header popup menu animation */
+#headerMenu {
+    transform-origin: top right;
+    transition: opacity 0.2s ease, transform 0.25s var(--spring-smooth);
+}
+#headerMenu.menu-hidden {
+    opacity: 0;
+    transform: scale(0.92) translateY(-6px);
+    pointer-events: none;
+}
+#headerMenu.menu-visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+/* Scan result slide-in animation */
+#scanResult {
+    transition: opacity 0.3s ease, transform 0.3s var(--spring-smooth);
+}
+#scanResult.result-hidden {
+    opacity: 0;
+    transform: translateY(8px);
+}
+#scanResult.result-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 @media (min-width: 1024px) {
@@ -574,10 +601,10 @@ details[open] .acc-chevron {
     transition: transform 0.35s var(--spring-smooth);
 }
 .acc-body {
-    animation: accFade 0.3s var(--spring-standard);
+    animation: accFade 0.35s var(--spring-smooth);
 }
 @keyframes accFade {
-    from { opacity: 0; transform: translateY(-6px); }
+    from { opacity: 0; transform: translateY(-10px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -720,9 +747,16 @@ button:focus-visible {
 #onboardingBanner {
     animation: bannerFadeIn 0.3s cubic-bezier(0.2, 0, 0, 1);
 }
+#onboardingBanner.banner-hiding {
+    animation: bannerFadeOut 0.3s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
 @keyframes bannerFadeIn {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bannerFadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-4px); }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════

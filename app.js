@@ -698,12 +698,17 @@ function getLogoPresetDataUrl(preset, color) {
 const TEMPLATES = [
     { id: 'classic-black', name: 'Classic', fg: '#000000', bg: '#ffffff', dots: 'square', outer: 'square', inner: 'square', frame: 'none', frameColor: '#000000' },
     { id: 'corporate-blue', name: 'Corporate', fg: '#1a56db', bg: '#ffffff', dots: 'rounded', outer: 'rounded', inner: 'dot', frame: 'none', frameColor: '#1a56db' },
+    { id: 'facebook-blue', name: 'Facebook', fg: '#1877f2', bg: '#ffffff', dots: 'rounded', outer: 'rounded', inner: 'dot', frame: 'none', frameColor: '#1877f2', logo: 'facebook' },
+    { id: 'x-black', name: 'X (Twitter)', fg: '#000000', bg: '#ffffff', dots: 'square', outer: 'square', inner: 'square', frame: 'simple', frameColor: '#000000', logo: 'x-twitter' },
     { id: 'instagram-pink', name: 'Instagram', fg: '#c13584', bg: '#fdf2f8', dots: 'dots', outer: 'circle', inner: 'dot', frame: 'none', frameColor: '#c13584', logo: 'instagram' },
-    { id: 'discord-purple', name: 'Discord', fg: '#5865f2', bg: '#ffffff', dots: 'rounded', outer: 'rounded', inner: 'dot', frame: 'none', frameColor: '#5865f2', logo: 'discord' },
     { id: 'youtube-red', name: 'YouTube', fg: '#ff0000', bg: '#ffffff', dots: 'square', outer: 'square', inner: 'square', frame: 'simple', frameColor: '#ff0000', logo: 'youtube' },
+    { id: 'spotify-green', name: 'Spotify', fg: '#1db954', bg: '#ffffff', dots: 'dots', outer: 'circle', inner: 'dot', frame: 'none', frameColor: '#1db954', logo: 'spotify' },
+    { id: 'tiktok-cyan', name: 'TikTok', fg: '#010101', bg: '#ffffff', dots: 'extra-rounded', outer: 'rounded', inner: 'dot', frame: 'none', frameColor: '#010101', logo: 'tiktok' },
+    { id: 'whatsapp-green', name: 'WhatsApp', fg: '#25d366', bg: '#ffffff', dots: 'rounded', outer: 'rounded', inner: 'dot', frame: 'none', frameColor: '#25d366', logo: 'whatsapp' },
+    { id: 'discord-purple', name: 'Discord', fg: '#5865f2', bg: '#ffffff', dots: 'rounded', outer: 'rounded', inner: 'dot', frame: 'none', frameColor: '#5865f2', logo: 'discord' },
+    { id: 'linkedin-navy', name: 'LinkedIn', fg: '#0a66c2', bg: '#ffffff', dots: 'square', outer: 'square', inner: 'square', frame: 'simple', frameColor: '#0a66c2', logo: 'linkedin' },
     { id: 'ocean-breeze', name: 'Ocean', fg: '#0ea5e9', bg: '#f0f9ff', dots: 'dots', outer: 'circle', inner: 'dot', frame: 'rounded-rect', frameColor: '#0ea5e9' },
     { id: 'minimal-gray', name: 'Minimal', fg: '#374151', bg: '#f9fafb', dots: 'rounded', outer: 'rounded', inner: 'rounded', frame: 'none', frameColor: '#374151' },
-    { id: 'linkedin-navy', name: 'LinkedIn', fg: '#0a66c2', bg: '#ffffff', dots: 'square', outer: 'square', inner: 'square', frame: 'simple', frameColor: '#0a66c2', logo: 'linkedin' },
 ];
 
 function renderTemplates() {
@@ -1979,7 +1984,10 @@ function doReset() {
     }
     if (dismissBtn) {
         dismissBtn.addEventListener('click', () => {
-            banner.style.display = 'none';
+            banner.classList.add('banner-hiding');
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 300);
             localStorage.setItem('qrtist_v1_welcomed', '1');
         });
     }
@@ -1990,15 +1998,23 @@ function doReset() {
     const resetFromMenu = document.getElementById('resetDesignFromMenu');
 
     if (headerMenuBtn && headerMenu) {
+        headerMenu.classList.add('menu-hidden');
         headerMenuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const isOpen = !headerMenu.classList.contains('hidden');
-            headerMenu.classList.toggle('hidden');
+            const isOpen = headerMenu.classList.contains('menu-visible');
+            if (isOpen) {
+                headerMenu.classList.remove('menu-visible');
+                headerMenu.classList.add('menu-hidden');
+            } else {
+                headerMenu.classList.remove('menu-hidden');
+                headerMenu.classList.add('menu-visible');
+            }
             headerMenuBtn.setAttribute('aria-expanded', !isOpen);
             if (!isOpen) {
                 const close = (ev) => {
                     if (!headerMenu.contains(ev.target) && ev.target !== headerMenuBtn) {
-                        headerMenu.classList.add('hidden');
+                        headerMenu.classList.remove('menu-visible');
+                        headerMenu.classList.add('menu-hidden');
                         headerMenuBtn.setAttribute('aria-expanded', 'false');
                         document.removeEventListener('click', close);
                     }
@@ -2011,7 +2027,8 @@ function doReset() {
     if (resetFromMenu) {
         resetFromMenu.addEventListener('click', () => {
             doReset();
-            headerMenu?.classList.add('hidden');
+            headerMenu?.classList.remove('menu-visible');
+            headerMenu?.classList.add('menu-hidden');
             headerMenuBtn?.setAttribute('aria-expanded', 'false');
         });
     }
@@ -2085,6 +2102,8 @@ document.addEventListener('keydown', (e) => {
         modeGenerate.style.color = 'var(--md-on-primary)';
         modeScan.style.background = 'transparent';
         modeScan.style.color = 'var(--md-on-surface-variant)';
+        scanPanel.classList.remove('panel-visible');
+        scanPanel.classList.add('panel-hidden');
         scanPanel.classList.add('hidden');
         if (qrTypeSection) qrTypeSection.style.display = '';
         document.getElementById('inputFields').style.display = '';
@@ -2094,6 +2113,8 @@ document.addEventListener('keydown', (e) => {
         qrCodeContainer.classList.remove('hidden');
         qrCodeContainer.innerHTML = '';
         if (panelDesign) panelDesign.style.display = '';
+        scanResult.classList.remove('result-visible');
+        scanResult.classList.add('result-hidden');
         scanResult.classList.add('hidden');
     }
 
@@ -2103,6 +2124,8 @@ document.addEventListener('keydown', (e) => {
         modeGenerate.style.background = 'transparent';
         modeGenerate.style.color = 'var(--md-on-surface-variant)';
         scanPanel.classList.remove('hidden');
+        scanPanel.classList.remove('panel-hidden');
+        scanPanel.classList.add('panel-visible');
         if (qrTypeSection) qrTypeSection.style.display = 'none';
         document.getElementById('inputFields').style.display = 'none';
         if (batchModeBtn) batchModeBtn.style.display = 'none';
@@ -2110,6 +2133,8 @@ document.addEventListener('keydown', (e) => {
         document.querySelector('.mobile-hidden').style.display = 'none';
         qrCodeContainer.classList.add('hidden');
         if (panelDesign) panelDesign.style.display = 'none';
+        scanResult.classList.remove('result-visible');
+        scanResult.classList.add('result-hidden');
         scanResult.classList.add('hidden');
     }
 
@@ -2135,6 +2160,8 @@ document.addEventListener('keydown', (e) => {
         scanResultType.textContent = content.type;
         scanResultContent.textContent = decodedText;
         scanResult.classList.remove('hidden');
+        scanResult.classList.remove('result-hidden');
+        scanResult.classList.add('result-visible');
         if (content.action === 'url') {
             scanOpenBtn.classList.remove('hidden');
             scanOpenBtn.textContent = 'Open';
@@ -2204,11 +2231,15 @@ document.addEventListener('keydown', (e) => {
                         scanResultType.textContent = 'Not Found';
                         scanResultContent.textContent = 'No QR code detected in this image.';
                         scanResult.classList.remove('hidden');
+                        scanResult.classList.remove('result-hidden');
+                        scanResult.classList.add('result-visible');
                     }
                 } catch (e) {
                     scanResultType.textContent = 'Error';
                     scanResultContent.textContent = 'Could not decode image. Try a different file.';
                     scanResult.classList.remove('hidden');
+                    scanResult.classList.remove('result-hidden');
+                    scanResult.classList.add('result-visible');
                 }
             };
             img.src = e.target.result;
