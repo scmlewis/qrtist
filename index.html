@@ -118,24 +118,47 @@
 
             <!-- Header -->
             <header class="flex items-center gap-4 py-2 relative">
-                <div class="logo-icon w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Finder patterns (corners) -->
-                        <path d="M2 6a4 4 0 0 1 4-4h3v3H8v3H2V6Z" fill="white"/>
-                        <path d="M20 4h-3v3h3v3h3V8a4 4 0 0 0-4-4Z" fill="white"/>
-                        <path d="M4 20v-3a4 4 0 0 0 4 4h3v-3H8v-3H4Z" fill="white"/>
-                        <path d="M22 16v3a4 4 0 0 1-4 4h-3v-3h3v-3h4Z" fill="white"/>
-                        <!-- Finder inner squares -->
-                        <rect x="4.5" y="4.5" width="3" height="3" rx="0.5" fill="#60a5fa"/>
-                        <rect x="16.5" y="4.5" width="3" height="3" rx="0.5" fill="#60a5fa"/>
-                        <rect x="4.5" y="16.5" width="3" height="3" rx="0.5" fill="#60a5fa"/>
-                        <!-- Center accent -->
-                        <rect x="10" y="10" width="4" height="4" rx="1" fill="#10b981"/>
-                        <!-- Symmetric data dots -->
-                        <rect x="10" y="3" width="2" height="2" rx="0.4" fill="white" opacity="0.85"/>
-                        <rect x="10" y="18" width="2" height="2" rx="0.4" fill="white" opacity="0.85"/>
-                        <rect x="3" y="10" width="2" height="2" rx="0.4" fill="white" opacity="0.85"/>
-                        <rect x="18" y="10" width="2" height="2" rx="0.4" fill="white" opacity="0.85"/>
+                <div class="logo-icon w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, #7aa2f7, #5cd9c0);">
+                    <svg width="22" height="22" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Center accent circle -->
+                        <circle cx="128" cy="128" r="4" fill="#5cd9c0"/>
+                        <!-- Cross/plus sign -->
+                        <path d="M96 96 L136 136 M136 96 L96 136" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <!-- Data dots -->
+                        <circle cx="120" cy="72" r="2.5" fill="#bec6dc"/>
+                        <circle cx="136" cy="72" r="2.5" fill="#bec6dc"/>
+                        <circle cx="152" cy="72" r="2.5" fill="#bec6dc"/>
+                        <circle cx="108" cy="72" r="2.5" fill="#bec6dc"/>
+                        <!-- Chevron -->
+                        <path d="M144 144 L168 168 L192 144" fill="none" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+                        <path d="M150 146 L162 156 L176 146" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                        <!-- Swoosh curve -->
+                        <path d="M176 136 C156 156, 186 176, 166 196 C146 216, 126 196, 106 216 C86 236, 106 176, 126 156" 
+                              fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                        <!-- QR data grid dots -->
+                        <g fill="#7aa2f7" opacity="0.7">
+                            <rect x="84" y="84" width="10" height="10" rx="2"/>
+                            <rect x="104" y="84" width="10" height="10" rx="2"/>
+                            <rect x="124" y="84" width="10" height="10" rx="2"/>
+                            <rect x="144" y="84" width="10" height="10" rx="2"/>
+                            <rect x="164" y="84" width="10" height="10" rx="2"/>
+                            <rect x="84" y="104" width="10" height="10" rx="2"/>
+                            <rect x="104" y="104" width="10" height="10" rx="2"/>
+                            <rect x="124" y="104" width="10" height="10" rx="2"/>
+                            <rect x="144" y="104" width="10" height="10" rx="2"/>
+                            <rect x="164" y="104" width="10" height="10" rx="2"/>
+                            <rect x="84" y="124" width="10" height="10" rx="2"/>
+                            <rect x="104" y="124" width="10" height="10" rx="2"/>
+                            <rect x="124" y="124" width="10" height="10" rx="2"/>
+                            <rect x="144" y="124" width="10" height="10" rx="2"/>
+                            <rect x="164" y="124" width="10" height="10" rx="2"/>
+                            <rect x="84" y="144" width="10" height="10" rx="2"/>
+                            <rect x="104" y="144" width="10" height="10" rx="2"/>
+                            <rect x="124" y="144" width="10" height="10" rx="2" opacity="0.5"/>
+                            <rect x="144" y="144" width="10" height="10" rx="2"/>
+                            <rect x="164" y="144" width="10" height="10" rx="2"/>
+                            <rect x="124" y="144" width="4" height="4" rx="0.5" fill="#10b981"/>
+                        </g>
                     </svg>
                 </div>
                 <div class="flex-1">
