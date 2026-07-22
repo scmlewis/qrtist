@@ -1,25 +1,83 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 24 24" role="img" aria-label="QRtist logo">
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="QRtist logo">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#3b82f6"/>
-      <stop offset="100%" stop-color="#10b981"/>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7aa2f7"/>
+      <stop offset="100%" stop-color="#5cd9c0"/>
     </linearGradient>
-    <linearGradient id="spark" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#d1fae5"/>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5cd9c0"/>
+      <stop offset="100%" stop-color="#7aa2f7"/>
     </linearGradient>
+    <linearGradient id="secondaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#bec6dc"/>
+      <stop offset="100%" stop-color="#7aa2f7"/>
+    </linearGradient>
+    <filter id="softShadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
   </defs>
-  <rect width="24" height="24" rx="6" fill="url(#bg)"/>
-  <g fill="white">
-    <path d="M4 8a4 4 0 0 1 4-4h3v3H8v3H4V8Z"/>
-    <path d="M20 4h-3v3h3v3h3V8a4 4 0 0 0-4-4Z"/>
-    <path d="M4 20v-3a4 4 0 0 0 4 4h3v-3H8v-3H4Z"/>
-    <path d="M20 16v3a4 4 0 0 1-4 4h-3v-3h3v-3h4Z"/>
+
+  <rect width="256" height="256" rx="32" fill="url(#bgGradient)" filter="url(#softShadow)"/>
+
+  <g fill="white" stroke="rgba(0,0,0,0.05)" stroke-width="0.5">
+    <circle cx="128" cy="128" r="4" fill="url(#accentGradient)"/>
+    
+    <path d="M96 96 L136 136 M136 96 L96 136" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+    <circle cx="120" cy="72" r="2.5" fill="url(#secondaryGradient)"/>
+    <circle cx="136" cy="72" r="2.5" fill="url(#secondaryGradient)"/>
+    <circle cx="152" cy="72" r="2.5" fill="url(#secondaryGradient)"/>
+    <circle cx="108" cy="72" r="2.5" fill="url(#secondaryGradient)"/>
+
+    <path d="M144 144 L168 168 L192 144" fill="none" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M150 146 L162 156 L176 146" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+
+    <path d="M176 136 C156 156, 186 176, 166 196 C146 216, 126 196, 106 216 C86 236, 106 176, 126 156" 
+          fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
   </g>
-  <g fill="#3b82f6">
-    <rect x="6.5" y="6.5" width="3" height="3" rx="0.5"/>
-    <rect x="14.5" y="6.5" width="3" height="3" rx="0.5"/>
-    <rect x="6.5" y="14.5" width="3" height="3" rx="0.5"/>
+
+  <g fill="#7aa2f7" opacity="0.7">
+    <rect x="84" y="84" width="10" height="10" rx="2"/>
+    <rect x="104" y="84" width="10" height="10" rx="2"/>
+    <rect x="124" y="84" width="10" height="10" rx="2"/>
+    <rect x="144" y="84" width="10" height="10" rx="2"/>
+    <rect x="164" y="84" width="10" height="10" rx="2"/>
+
+    <rect x="84" y="104" width="10" height="10" rx="2"/>
+    <rect x="104" y="104" width="10" height="10" rx="2"/>
+    <rect x="124" y="104" width="10" height="10" rx="2"/>
+    <rect x="144" y="104" width="10" height="10" rx="2"/>
+    <rect x="164" y="104" width="10" height="10" rx="2"/>
+
+    <rect x="84" y="124" width="10" height="10" rx="2"/>
+    <rect x="104" y="124" width="10" height="10" rx="2"/>
+    <rect x="124" y="124" width="10" height="10" rx="2"/>
+    <rect x="144" y="124" width="10" height="10" rx="2"/>
+    <rect x="164" y="124" width="10" height="10" rx="2"/>
+
+    <rect x="84" y="144" width="10" height="10" rx="2"/>
+    <rect x="104" y="144" width="10" height="10" rx="2"/>
+    <rect x="124" y="144" width="10" height="10" rx="2" opacity="0.5"/>
+    <rect x="144" y="144" width="10" height="10" rx="2"/>
+    <rect x="164" y="144" width="10" height="10" rx="2"/>
+
+    <rect x="124" y="144" width="4" height="4" rx="0.5" fill="#10b981"/>
   </g>
-  <rect x="10" y="10" width="4" height="4" rx="1" fill="url(#spark)"/>
+
+  <g fill="#5cd9c0" opacity="0.4">
+    <ellipse cx="128" cy="64" rx="28" ry="8"/>
+    <ellipse cx="128" cy="192" rx="28" ry="8"/>
+  </g>
+
+  <g stroke="#7aa2f7" stroke-width="1" opacity="0.2">
+    <path d="M60 100 Q128 72, 196 100" fill="none"/>
+    <path d="M60 160 Q128 232, 196 160" fill="none"/>
+    <path d="M100 72 Q176 132, 196 100" fill="none"/>
+    <path d="M100 200 Q176 148, 196 160" fill="none"/>
+  </g>
+
+  <path d="M10 128 L246 128" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <path d="M128 10 L128 246" stroke="white" stroke-width="0.5" opacity="0.3"/>
+
+  <rect x="8" y="8" width="240" height="240" rx="28" fill="none" stroke="white" stroke-width="0.8" opacity="0.15"/>
 </svg>
