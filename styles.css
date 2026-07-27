@@ -601,11 +601,20 @@ details[open] .acc-chevron {
     transition: transform 0.35s var(--spring-smooth);
 }
 .acc-body {
-    animation: accFade 0.35s var(--spring-smooth);
+    overflow: hidden;
+    animation: accSlide 0.4s var(--spring-smooth);
 }
-@keyframes accFade {
-    from { opacity: 0; transform: translateY(-10px); }
-    to   { opacity: 1; transform: translateY(0); }
+@keyframes accSlide {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        max-height: 800px;
+        transform: translateY(0);
+    }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════

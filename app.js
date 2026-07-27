@@ -2552,7 +2552,7 @@ if (document.readyState === 'complete') {
             if (!details.open) return;
             const summary = details.querySelector('summary');
             if (summary) {
-                summary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
     });
