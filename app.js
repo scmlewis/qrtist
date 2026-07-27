@@ -2541,17 +2541,38 @@ if (document.readyState === 'complete') {
     window.addEventListener('load', initStaggerAnimation);
 }
 
-// ── Accordion Auto-Scroll ──────────────────────────────────────────────
-// When a design section opens, scroll it into view if needed
-(function initAccordionScroll() {
+// ── Accordion Slide Animation ──────────────────────────────────────────
+// Animates both expand and collapse with smooth slide + center scroll
+(function initAccordionAnimations() {
     const panel = document.getElementById('panelDesign');
     if (!panel) return;
 
+    const DURATION = 450;
+
+    function initOpenState(details, body) {
+        if (details.open) {
+            details.classList.add('acc-open');
+        }
+    }
+
     panel.querySelectorAll('details').forEach((details) => {
-        details.addEventListener('toggle', () => {
-            if (!details.open) return;
-            const summary = details.querySelector('summary');
-            if (summary) {
+        const body = details.querySelector('.acc-body');
+        const summary = details.querySelector('summary');
+        if (!body || !summary) return;
+
+        initOpenState(details, body);
+
+        summary.addEventListener('click', (e) => {
+            if (details.classList.contains('acc-open')) {
+                e.preventDefault();
+                details.classList.remove('acc-open');
+                setTimeout(() => {
+                    details.removeAttribute('open');
+                }, DURATION);
+            } else {
+                e.preventDefault();
+                details.setAttribute('open', '');
+                details.classList.add('acc-open');
                 summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
