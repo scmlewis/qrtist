@@ -2544,8 +2544,8 @@ if (document.readyState === 'complete') {
 // ── Accordion Slide Animation ──────────────────────────────────────────
 // Animates both expand and collapse with smooth slide + center scroll
 (function initAccordionAnimations() {
-    const panel = document.getElementById('panelDesign');
-    if (!panel) return;
+    const panels = document.querySelectorAll('#panelDesign, #panelData');
+    if (!panels.length) return;
 
     const DURATION = 450;
 
@@ -2555,7 +2555,7 @@ if (document.readyState === 'complete') {
         }
     }
 
-    panel.querySelectorAll('details').forEach((details) => {
+    panels.forEach(panel => panel.querySelectorAll('details').forEach((details) => {
         const body = details.querySelector('.acc-body');
         const summary = details.querySelector('summary');
         if (!body || !summary) return;
@@ -2576,5 +2576,5 @@ if (document.readyState === 'complete') {
                 summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
-    });
+    }));
 })();
