@@ -595,7 +595,7 @@ details > summary:hover {
 }
 
 .acc-chevron {
-    transition: transform 0.35s var(--spring-smooth);
+    transition: transform 0.25s var(--spring-smooth);
 }
 details.acc-open .acc-chevron {
     transform: rotate(180deg);
@@ -605,10 +605,9 @@ details.acc-open .acc-chevron {
     max-height: 0;
     opacity: 0;
     transform: translateY(-8px);
-    transition: max-height 0.45s var(--spring-smooth), opacity 0.35s ease, transform 0.35s ease;
+    transition: max-height 0.3s var(--spring-smooth), opacity 0.25s ease, transform 0.25s ease;
 }
 details.acc-open .acc-body {
-    max-height: 800px;
     opacity: 1;
     transform: translateY(0);
 }

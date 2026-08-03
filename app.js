@@ -2547,11 +2547,12 @@ if (document.readyState === 'complete') {
     const panels = document.querySelectorAll('#panelDesign, #panelData');
     if (!panels.length) return;
 
-    const DURATION = 450;
+    const DURATION = 300;
 
     function initOpenState(details, body) {
         if (details.open) {
             details.classList.add('acc-open');
+            body.style.maxHeight = body.scrollHeight + 'px';
         }
     }
 
@@ -2563,16 +2564,20 @@ if (document.readyState === 'complete') {
         initOpenState(details, body);
 
         summary.addEventListener('click', (e) => {
+            e.preventDefault();
             if (details.classList.contains('acc-open')) {
-                e.preventDefault();
+                body.style.maxHeight = body.scrollHeight + 'px';
+                requestAnimationFrame(() => {
+                    body.style.maxHeight = '0';
+                });
                 details.classList.remove('acc-open');
                 setTimeout(() => {
                     details.removeAttribute('open');
                 }, DURATION);
             } else {
-                e.preventDefault();
                 details.setAttribute('open', '');
                 details.classList.add('acc-open');
+                body.style.maxHeight = body.scrollHeight + 'px';
                 summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
