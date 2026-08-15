@@ -1,5 +1,7 @@
 ﻿import { st } from './core/state.js';
 import { qrType, inputFields, fgColorInput, fgColorText, bgColorInput, bgColorText, frameColorInput, frameColorTextInput, frameTextInput, qrSize, qrSizeValue, contrastWarning, contrastWarningText, scannabilityInfo, qrSizeLabel, qrSizeLabel2, qrCodeContainer, logoInput, logoPreview, logoImg, logoRemove, logoControls, customLogoBtn, logoSize, logoSizeValue, logoMargin, logoMarginValue, logoColorInput, logoColorText, frameBtns, downloadPng, downloadSvg } from './core/dom.js';
+import { getLuminance, getContrastRatio } from './core/color.js';
+import { showToast } from './core/toast.js';
 
 // roundRect polyfill for older browsers
 if (!CanvasRenderingContext2D.prototype.roundRect) {
@@ -645,24 +647,6 @@ function _updateUndoRedoButtons() {
     if (redoBtn) redoBtn.disabled = _historyIndex >= _historyStack.length - 1;
 }
 
-// ── Toast notifications ──────────────────────────────────────────────────
-function showToast(message, type = 'info', duration = 3200) {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
-    const icons = { success: '&#10003;', error: '&#10007;', warn: '&#9888;', info: '&#8505;' };
-    const icon = icons[type] || icons.info;
-    const toast = document.createElement('div');
-    toast.className = 'toast toast-' + type;
-    toast.setAttribute('role', 'status');
-    toast.innerHTML = '<span aria-hidden="true">' + icon + '</span><span>' + _svgEscape(message) + '</span>';
-    container.appendChild(toast);
-    const fadeOut = () => {
-        toast.style.animation = 'toastOut 0.3s ease forwards';
-        setTimeout(() => { if (toast.parentNode) toast.remove(); }, 290);
-    };
-    setTimeout(fadeOut, duration);
-}
-
 const LOGO_PRESETS = {
     'globe': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`,
     'scan-brackets': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`,
@@ -1058,22 +1042,6 @@ function getInputValues() {
         values[field.id] = element ? element.value : '';
     });
     return values;
-}
-
-function getLuminance(color) {
-    const rgb = parseInt(color.slice(1), 16);
-    const r = (rgb >> 16) & 0xff;
-    const g = (rgb >> 8) & 0xff;
-    const b = (rgb >> 0) & 0xff;
-    return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-}
-
-function getContrastRatio(color1, color2) {
-    const lum1 = getLuminance(color1);
-    const lum2 = getLuminance(color2);
-    const lighter = Math.max(lum1, lum2);
-    const darker = Math.min(lum1, lum2);
-    return (lighter + 0.05) / (darker + 0.05);
 }
 
 function checkContrast() {
