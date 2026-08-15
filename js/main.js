@@ -1,4 +1,7 @@
-﻿// roundRect polyfill for older browsers
+﻿import { st } from './core/state.js';
+import { qrType, inputFields, fgColorInput, fgColorText, bgColorInput, bgColorText, frameColorInput, frameColorTextInput, frameTextInput, qrSize, qrSizeValue, contrastWarning, contrastWarningText, scannabilityInfo, qrSizeLabel, qrSizeLabel2, qrCodeContainer, logoInput, logoPreview, logoImg, logoRemove, logoControls, customLogoBtn, logoSize, logoSizeValue, logoMargin, logoMarginValue, logoColorInput, logoColorText, frameBtns, downloadPng, downloadSvg } from './core/dom.js';
+
+// roundRect polyfill for older browsers
 if (!CanvasRenderingContext2D.prototype.roundRect) {
     CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         if (w < 2 * r) r = w / 2;
@@ -505,18 +508,6 @@ function generateStyledSVG(data, opts) {
     return svgParts.join('\n');
 }
 
-let qrCode = null;
-let logoDataUrl = null;
-let currentLogoPreset = 'none';
-let logoColor = '#000000';
-let selectedFrame = 'none';
-let currentQRSize = 300;
-let currentPattern = 'square';
-let currentOuterCorner = 'square';
-let currentInnerCorner = 'square';
-let useGradient = false;
-let gradientColor2 = '#3b82f6';
-
 // ── Undo/Redo History ────────────────────────────────────────────────
 let _historyStack = [];
 let _historyIndex = -1;
@@ -531,18 +522,18 @@ function getConfig() {
         values: JSON.parse(JSON.stringify(values)),
         fg: fgColorInput.value,
         bg: bgColorInput.value,
-        pattern: currentPattern,
-        outerCorner: currentOuterCorner,
-        innerCorner: currentInnerCorner,
-        useGradient: useGradient,
-        gradientColor2: gradientColor2,
-        size: currentQRSize,
+        pattern: st.currentPattern,
+        outerCorner: st.currentOuterCorner,
+        innerCorner: st.currentInnerCorner,
+        useGradient: st.useGradient,
+        gradientColor2: st.gradientColor2,
+        size: st.currentQRSize,
         logoSize: logoSize.value,
         logoMargin: logoMargin.value,
-        logoPreset: currentLogoPreset,
-        logoColor: logoColor,
-        logoDataUrl: currentLogoPreset === 'custom' ? logoDataUrl : null,
-        frame: selectedFrame,
+        logoPreset: st.currentLogoPreset,
+        logoColor: st.logoColor,
+        logoDataUrl: st.currentLogoPreset === 'custom' ? st.logoDataUrl : null,
+        frame: st.selectedFrame,
         frameColor: frameColorInput.value,
         frameText: frameTextInput.value
     };
@@ -562,41 +553,41 @@ function applyConfig(cfg) {
     fgColorText.value = cfg.fg || '#000000';
     bgColorInput.value = cfg.bg || '#ffffff';
     bgColorText.value = cfg.bg || '#ffffff';
-    currentPattern = cfg.pattern || 'square';
-    currentOuterCorner = cfg.outerCorner || 'square';
-    currentInnerCorner = cfg.innerCorner || 'square';
-    useGradient = cfg.useGradient || false;
-    gradientColor2 = cfg.gradientColor2 || '#3b82f6';
-    if (gradColor2Input) gradColor2Input.value = gradientColor2;
-    if (gradColor2Text) gradColor2Text.value = gradientColor2;
-    if (gradientToggleBtn) { gradientToggleBtn.setAttribute('aria-pressed', useGradient); gradientToggleBtn.classList.toggle('active', useGradient); }
-    if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !useGradient);
-    currentQRSize = cfg.size || 300;
-    qrSize.value = currentQRSize;
-    qrSizeValue.textContent = currentQRSize;
+    st.currentPattern = cfg.pattern || 'square';
+    st.currentOuterCorner = cfg.outerCorner || 'square';
+    st.currentInnerCorner = cfg.innerCorner || 'square';
+    st.useGradient = cfg.useGradient || false;
+    st.gradientColor2 = cfg.gradientColor2 || '#3b82f6';
+    if (gradColor2Input) gradColor2Input.value = st.gradientColor2;
+    if (gradColor2Text) gradColor2Text.value = st.gradientColor2;
+    if (gradientToggleBtn) { gradientToggleBtn.setAttribute('aria-pressed', st.useGradient); gradientToggleBtn.classList.toggle('active', st.useGradient); }
+    if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !st.useGradient);
+    st.currentQRSize = cfg.size || 300;
+    qrSize.value = st.currentQRSize;
+    qrSizeValue.textContent = st.currentQRSize;
     logoSize.value = cfg.logoSize || 20;
     logoSizeValue.textContent = cfg.logoSize || 20;
     logoMargin.value = cfg.logoMargin || 10;
     logoMarginValue.textContent = cfg.logoMargin || 10;
-    selectedFrame = cfg.frame || 'none';
+    st.selectedFrame = cfg.frame || 'none';
     frameColorInput.value = cfg.frameColor || '#000000';
     frameColorTextInput.value = cfg.frameColor || '#000000';
     frameTextInput.value = cfg.frameText || '';
-    currentLogoPreset = cfg.logoPreset || 'none';
-    logoColor = cfg.logoColor || '#000000';
-    logoDataUrl = cfg.logoDataUrl || null;
-    if (logoColorInput) logoColorInput.value = logoColor;
-    if (logoColorText) logoColorText.value = logoColor;
+    st.currentLogoPreset = cfg.logoPreset || 'none';
+    st.logoColor = cfg.logoColor || '#000000';
+    st.logoDataUrl = cfg.logoDataUrl || null;
+    if (logoColorInput) logoColorInput.value = st.logoColor;
+    if (logoColorText) logoColorText.value = st.logoColor;
     updateShapeSelection();
     updateCornerSelection();
     updateFrameSelection();
     updateLogoSelection();
-    logoControls.classList.toggle('hidden', currentLogoPreset === 'none');
-    if (currentLogoPreset === 'custom' && logoDataUrl) {
+    logoControls.classList.toggle('hidden', st.currentLogoPreset === 'none');
+    if (st.currentLogoPreset === 'custom' && st.logoDataUrl) {
         customLogoBtn.style.display = 'flex';
         customLogoBtn.classList.remove('hidden');
         logoPreview.classList.remove('hidden');
-        logoImg.src = logoDataUrl;
+        logoImg.src = st.logoDataUrl;
     } else {
         customLogoBtn.style.display = '';
         customLogoBtn.classList.add('hidden');
@@ -834,23 +825,23 @@ function applyTemplate(t) {
     fgColorText.value = t.fg;
     bgColorInput.value = t.bg;
     bgColorText.value = t.bg;
-    currentPattern = t.dots;
+    st.currentPattern = t.dots;
     updateShapeSelection();
-    currentOuterCorner = t.outer;
-    currentInnerCorner = t.inner;
+    st.currentOuterCorner = t.outer;
+    st.currentInnerCorner = t.inner;
     updateCornerSelection();
-    selectedFrame = t.frame || 'none';
+    st.selectedFrame = t.frame || 'none';
     frameColorInput.value = t.frameColor || '#000000';
     frameColorTextInput.value = t.frameColor || '#000000';
     updateFrameSelection();
     if (t.logo) {
-        currentLogoPreset = t.logo;
+        st.currentLogoPreset = t.logo;
         logoControls.classList.remove('hidden');
-        logoColor = t.fg;
+        st.logoColor = t.fg;
         if (logoColorInput) logoColorInput.value = t.fg;
         if (logoColorText) logoColorText.value = t.fg;
     } else {
-        currentLogoPreset = 'none';
+        st.currentLogoPreset = 'none';
         logoControls.classList.add('hidden');
     }
     updateLogoSelection();
@@ -978,43 +969,7 @@ const qrTypeConfig = {
     }
 };
 
-const qrType = document.getElementById('qrType');
-const inputFields = document.getElementById('inputFields');
-const fgColorInput = document.getElementById('fgColor');
-const fgColorText = document.getElementById('fgColorText');
-const bgColorInput = document.getElementById('bgColor');
-const bgColorText = document.getElementById('bgColorText');
-const frameColorInput = document.getElementById('frameColor');
-const frameColorTextInput = document.getElementById('frameColorText');
-const frameTextInput = document.getElementById('frameText');
-const qrSize = document.getElementById('qrSize');
-const qrSizeValue = document.getElementById('qrSizeValue');
-const contrastWarning = document.getElementById('contrastWarning');
-const contrastWarningText = document.getElementById('contrastWarningText');
-const scannabilityInfo = document.getElementById('scannabilityInfo');
-const qrSizeLabel = document.getElementById('qrSizeLabel');
-const qrSizeLabel2 = document.getElementById('qrSizeLabel2');
-const qrCodeContainer = document.getElementById('qrCodeContainer');
 let qrAnimFrame;
-const downloadPng = document.getElementById('downloadPng');
-const downloadSvg = document.getElementById('downloadSvg');
-
-const logoInput = document.getElementById('logoInput');
-const logoPreview = document.getElementById('logoPreview');
-const logoImg = document.getElementById('logoImg');
-const logoRemove = document.getElementById('logoRemove');
-const logoControls = document.getElementById('logoControls');
-const customLogoBtn = document.getElementById('customLogoBtn');
-const logoSize = document.getElementById('logoSize');
-const logoSizeValue = document.getElementById('logoSizeValue');
-const logoMargin = document.getElementById('logoMargin');
-const logoMarginValue = document.getElementById('logoMarginValue');
-const logoColorInput = document.getElementById('logoColor');
-const logoColorText = document.getElementById('logoColorText');
-
-const frameBtns = document.querySelectorAll('.frame-btn');
-let renderGeneration = 0;
-let activeRenderGeneration = 0;
 let _renderDebounceTimer = null;
 const _RENDER_DEBOUNCE_MS = 30;
 
@@ -1131,7 +1086,7 @@ function checkContrast() {
 }
 
 function checkScannability() {
-    if (currentLogoPreset !== 'none') {
+    if (st.currentLogoPreset !== 'none') {
         scannabilityInfo.classList.remove('hidden');
     } else {
         scannabilityInfo.classList.add('hidden');
@@ -1140,7 +1095,7 @@ function checkScannability() {
 
 function updateLogoSelection() {
     document.querySelectorAll('.logo-btn').forEach(btn => {
-        const active = btn.getAttribute('data-logo') === currentLogoPreset;
+        const active = btn.getAttribute('data-logo') === st.currentLogoPreset;
         btn.classList.toggle('selected', active);
         btn.classList.toggle('border-2', active);
         btn.classList.toggle('border-blue-500', active);
@@ -1158,13 +1113,13 @@ function handleLogoUpload(file) {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-        logoDataUrl = e.target.result;
-        logoImg.src = logoDataUrl;
+        st.logoDataUrl = e.target.result;
+        logoImg.src = st.logoDataUrl;
         customLogoBtn.style.display = 'flex';
         customLogoBtn.classList.remove('hidden');
         logoPreview.classList.remove('hidden');
         logoControls.classList.remove('hidden');
-        currentLogoPreset = 'custom';
+        st.currentLogoPreset = 'custom';
         updateLogoSelection();
         updateQRCode();
         checkScannability();
@@ -1177,7 +1132,7 @@ document.getElementById('logoGrid').addEventListener('click', (e) => {
     if (!btn) return;
     const preset = btn.getAttribute('data-logo');
     if (preset === null) return;
-    currentLogoPreset = preset;
+    st.currentLogoPreset = preset;
     updateLogoSelection();
     logoControls.classList.toggle('hidden', preset === 'none');
     updateQRCode();
@@ -1191,13 +1146,13 @@ logoInput.addEventListener('change', (e) => {
 });
 
 logoRemove.addEventListener('click', () => {
-    logoDataUrl = null;
+    st.logoDataUrl = null;
     customLogoBtn.style.display = '';
     customLogoBtn.classList.add('hidden');
     logoPreview.classList.add('hidden');
     logoInput.value = '';
-    if (currentLogoPreset === 'custom') {
-        currentLogoPreset = 'none';
+    if (st.currentLogoPreset === 'custom') {
+        st.currentLogoPreset = 'none';
         updateLogoSelection();
         logoControls.classList.add('hidden');
     }
@@ -1207,7 +1162,7 @@ logoRemove.addEventListener('click', () => {
 
 frameBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-        selectedFrame = btn.getAttribute('data-frame');
+        st.selectedFrame = btn.getAttribute('data-frame');
         updateFrameSelection();
         updateQRCode();
         captureState();
@@ -1264,8 +1219,8 @@ function drawFrame(ctx, size, frame, frameColor, frameText, textBarHeight) {
 }
 
 function updateQRCode() {
-    const renderToken = ++renderGeneration;
-    activeRenderGeneration = renderToken;
+    const renderToken = ++st.renderGeneration;
+    st.activeRenderGeneration = renderToken;
     const type = qrType.value;
     const config = qrTypeConfig[type];
     const values = getInputValues();
@@ -1289,39 +1244,39 @@ function updateQRCode() {
 
     const fgColor = fgColorInput.value;
     const bgColor = bgColorInput.value;
-    const activeLogoUrl = currentLogoPreset === 'custom' ? logoDataUrl
-        : currentLogoPreset !== 'none' ? getLogoPresetDataUrl(currentLogoPreset, logoColor)
+    const activeLogoUrl = st.currentLogoPreset === 'custom' ? st.logoDataUrl
+        : st.currentLogoPreset !== 'none' ? getLogoPresetDataUrl(st.currentLogoPreset, st.logoColor)
             : null;
     const logoPercent = activeLogoUrl ? parseInt(logoSize.value) : undefined;
     const frameText = frameTextInput.value.trim();
     const TEXT_BAR_H = 44;
 
-    const dotsOpts = { color: fgColor, type: currentPattern };
-    if (useGradient) dotsOpts.gradient = gradientColor2;
+    const dotsOpts = { color: fgColor, type: st.currentPattern };
+    if (st.useGradient) dotsOpts.gradient = st.gradientColor2;
 
     const qrOptions = {
-        width: currentQRSize,
-        height: currentQRSize,
+        width: st.currentQRSize,
+        height: st.currentQRSize,
         data: data,
         dotsOptions: dotsOpts,
         backgroundOptions: { color: bgColor },
-        cornersSquareOptions: { type: currentOuterCorner },
-        cornersDotOptions: { type: currentInnerCorner },
+        cornersSquareOptions: { type: st.currentOuterCorner },
+        cornersDotOptions: { type: st.currentInnerCorner },
         margin: 10,
         errorCorrectionLevel: logoPercent && logoPercent > 20 ? 'H' : 'M'
     };
 
     try {
-        if (!qrCode) {
-            qrCode = new QRCodeStyling(qrOptions);
+        if (!st.qrCode) {
+            st.qrCode = new QRCodeStyling(qrOptions);
         } else {
-            qrCode.options = qrOptions;
+            st.qrCode.options = qrOptions;
         }
-        qrCode.append(qrCodeContainer);
-        const baseCanvas = qrCode.canvas;
+        st.qrCode.append(qrCodeContainer);
+        const baseCanvas = st.qrCode.canvas;
 
         requestAnimationFrame(() => {
-            if (renderToken !== activeRenderGeneration) return;
+            if (renderToken !== st.activeRenderGeneration) return;
             if (!baseCanvas || baseCanvas.width === 0) return;
 
             const ctx = baseCanvas.getContext('2d');
@@ -1370,14 +1325,14 @@ function updateQRCode() {
 }
 
 function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken) {
-    if (renderToken !== activeRenderGeneration) return;
-    if (selectedFrame === undefined || selectedFrame === null) {
-        selectedFrame = 'none';
+    if (renderToken !== st.activeRenderGeneration) return;
+    if (st.selectedFrame === undefined || st.selectedFrame === null) {
+        st.selectedFrame = 'none';
     }
 
-    const hasFrame = selectedFrame !== 'none';
+    const hasFrame = st.selectedFrame !== 'none';
     const hasText = frameTextInput && frameTextInput.value.trim().length > 0;
-    const hasLogo = currentLogoPreset !== 'none';
+    const hasLogo = st.currentLogoPreset !== 'none';
 
     if (!hasFrame && !hasText && !hasLogo) {
         constrainPreviewCanvas();
@@ -1391,8 +1346,8 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken) {
     let finalHeight = canvas.height;
 
     if (hasFrame) {
-        finalWidth = currentQRSize + FRAME_PAD * 2;
-        finalHeight = currentQRSize + FRAME_PAD * 2;
+        finalWidth = st.currentQRSize + FRAME_PAD * 2;
+        finalHeight = st.currentQRSize + FRAME_PAD * 2;
     }
     if (hasText) {
         finalHeight = (hasFrame ? finalHeight : canvas.height) + TEXT_BAR_H;
@@ -1414,7 +1369,7 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken) {
 
         qrCodeContainer.innerHTML = '';
         qrCodeContainer.appendChild(finalCanvas);
-        if (qrCode) qrCode.canvas = finalCanvas;
+        if (st.qrCode) st.qrCode.canvas = finalCanvas;
     }
 
     if (hasFrame || hasText) {
@@ -1423,20 +1378,20 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken) {
         frameCtx.imageSmoothingQuality = 'high';
 
         if (hasFrame) {
-            drawFrame(frameCtx, finalWidth, selectedFrame, frameColorInput.value, hasText ? frameTextInput.value.trim() : '', TEXT_BAR_H);
+            drawFrame(frameCtx, finalWidth, st.selectedFrame, frameColorInput.value, hasText ? frameTextInput.value.trim() : '', TEXT_BAR_H);
         } else if (hasText) {
             drawFrame(frameCtx, finalWidth, 'text-only', frameColorInput.value, frameTextInput.value.trim(), TEXT_BAR_H);
         }
     }
 
     if (hasLogo) {
-        const logoUrl = currentLogoPreset === 'custom' ? logoDataUrl
-            : getLogoPresetDataUrl(currentLogoPreset, logoColor);
+        const logoUrl = st.currentLogoPreset === 'custom' ? st.logoDataUrl
+            : getLogoPresetDataUrl(st.currentLogoPreset, st.logoColor);
 
         if (logoUrl) {
             const logoImg = new Image();
             logoImg.onload = () => {
-                if (renderToken !== activeRenderGeneration) return;
+                if (renderToken !== st.activeRenderGeneration) return;
 
                 let logoPercent = parseInt(logoSize.value) || 20;
                 if (logoPercent > 30) {
@@ -1446,14 +1401,14 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken) {
                 }
 
                 const logoMarginVal = parseInt(logoMargin.value) || 10;
-                const logoSize_px = (currentQRSize * logoPercent) / 100;
+                const logoSize_px = (st.currentQRSize * logoPercent) / 100;
 
                 const ctx = finalCanvas.getContext('2d');
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
 
-                const logoX = (currentQRSize - logoSize_px) / 2 + (hasFrame ? FRAME_PAD : 0);
-                const logoY = (currentQRSize - logoSize_px) / 2 + (hasFrame ? FRAME_PAD : 0);
+                const logoX = (st.currentQRSize - logoSize_px) / 2 + (hasFrame ? FRAME_PAD : 0);
+                const logoY = (st.currentQRSize - logoSize_px) / 2 + (hasFrame ? FRAME_PAD : 0);
 
                 ctx.fillStyle = bgColor;
                 ctx.fillRect(logoX - logoMarginVal, logoY - logoMarginVal,
@@ -1461,10 +1416,10 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken) {
 
                 ctx.drawImage(logoImg, logoX, logoY, logoSize_px, logoSize_px);
 
-                if (currentLogoPreset === 'custom' && logoColor && logoColor !== '#000000') {
+                if (st.currentLogoPreset === 'custom' && st.logoColor && st.logoColor !== '#000000') {
                     ctx.save();
                     ctx.globalCompositeOperation = 'source-atop';
-                    ctx.fillStyle = logoColor;
+                    ctx.fillStyle = st.logoColor;
                     ctx.fillRect(logoX, logoY, logoSize_px, logoSize_px);
                     ctx.restore();
                 }
@@ -1472,7 +1427,7 @@ function processFrameAndLogo(canvas, originalCanvas, bgColor, renderToken) {
                 constrainPreviewCanvas();
             };
             logoImg.onerror = () => {
-                if (renderToken !== activeRenderGeneration) return;
+                if (renderToken !== st.activeRenderGeneration) return;
                 showToast('Failed to load logo image', 'error');
                 constrainPreviewCanvas();
             };
@@ -1511,24 +1466,24 @@ function generateQRFilename() {
 
 function getSvgDownloadOptions() {
     return {
-        frameStyle: selectedFrame,
+        frameStyle: st.selectedFrame,
         frameColor: frameColorInput.value,
         frameText: frameTextInput.value.trim(),
-        logoDataUrl: currentLogoPreset === 'custom' ? logoDataUrl
-            : currentLogoPreset !== 'none' ? getLogoPresetDataUrl(currentLogoPreset, logoColor)
+        logoDataUrl: st.currentLogoPreset === 'custom' ? st.logoDataUrl
+            : st.currentLogoPreset !== 'none' ? getLogoPresetDataUrl(st.currentLogoPreset, st.logoColor)
             : null,
         logoSize: parseInt(logoSize.value) || 20,
         logoMargin: parseInt(logoMargin.value) || 10,
-        logoColor: currentLogoPreset === 'custom' ? logoColor : null
+        logoColor: st.currentLogoPreset === 'custom' ? st.logoColor : null
     };
 }
 
 downloadPng.addEventListener('click', () => {
-    if (qrCode) qrCode.download({ name: generateQRFilename(), extension: 'png' });
+    if (st.qrCode) st.qrCode.download({ name: generateQRFilename(), extension: 'png' });
 });
 
 downloadSvg.addEventListener('click', () => {
-    if (qrCode) qrCode.download(Object.assign({ name: generateQRFilename(), extension: 'svg' }, getSvgDownloadOptions()));
+    if (st.qrCode) st.qrCode.download(Object.assign({ name: generateQRFilename(), extension: 'svg' }, getSvgDownloadOptions()));
 });
 
 qrType.addEventListener('change', () => {
@@ -1538,10 +1493,10 @@ qrType.addEventListener('change', () => {
 });
 
 qrSize.addEventListener('input', (e) => {
-    currentQRSize = parseInt(e.target.value);
-    qrSizeValue.textContent = currentQRSize;
-    if (qrSizeLabel) qrSizeLabel.textContent = currentQRSize;
-    if (qrSizeLabel2) qrSizeLabel2.textContent = currentQRSize;
+    st.currentQRSize = parseInt(e.target.value);
+    qrSizeValue.textContent = st.currentQRSize;
+    if (qrSizeLabel) qrSizeLabel.textContent = st.currentQRSize;
+    if (qrSizeLabel2) qrSizeLabel2.textContent = st.currentQRSize;
     _debouncedUpdateQRCode();
     _debounceCapture();
 });
@@ -1577,7 +1532,7 @@ bgColorText.addEventListener('change', (e) => {
 document.getElementById('shapeGrid').addEventListener('click', (e) => {
     const btn = e.target.closest('.shape-btn');
     if (!btn) return;
-    currentPattern = btn.getAttribute('data-pattern');
+    st.currentPattern = btn.getAttribute('data-pattern');
     updateShapeSelection();
     updateQRCode();
     captureState();
@@ -1586,7 +1541,7 @@ document.getElementById('shapeGrid').addEventListener('click', (e) => {
 document.getElementById('outerCornerGrid').addEventListener('click', (e) => {
     const btn = e.target.closest('.corner-btn[data-outer]');
     if (!btn) return;
-    currentOuterCorner = btn.getAttribute('data-outer');
+    st.currentOuterCorner = btn.getAttribute('data-outer');
     updateCornerSelection();
     updateQRCode();
     captureState();
@@ -1595,7 +1550,7 @@ document.getElementById('outerCornerGrid').addEventListener('click', (e) => {
 document.getElementById('innerCornerGrid').addEventListener('click', (e) => {
     const btn = e.target.closest('.corner-btn[data-inner]');
     if (!btn) return;
-    currentInnerCorner = btn.getAttribute('data-inner');
+    st.currentInnerCorner = btn.getAttribute('data-inner');
     updateCornerSelection();
     updateQRCode();
     captureState();
@@ -1607,28 +1562,28 @@ const gradColor2Text = document.getElementById('gradColor2Text');
 const gradColor2Row = document.getElementById('gradColor2Row');
 if (gradientToggleBtn) {
     gradientToggleBtn.addEventListener('click', () => {
-        useGradient = !useGradient;
-        gradientToggleBtn.setAttribute('aria-pressed', useGradient);
-        gradientToggleBtn.classList.toggle('active', useGradient);
-        if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !useGradient);
+        st.useGradient = !st.useGradient;
+        gradientToggleBtn.setAttribute('aria-pressed', st.useGradient);
+        gradientToggleBtn.classList.toggle('active', st.useGradient);
+        if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !st.useGradient);
         _debouncedUpdateQRCode();
         captureState();
     });
 }
 if (gradColor2Input) {
     gradColor2Input.addEventListener('input', (e) => {
-        gradientColor2 = e.target.value;
+        st.gradientColor2 = e.target.value;
         if (gradColor2Text) gradColor2Text.value = e.target.value;
-        if (useGradient) _debouncedUpdateQRCode();
+        if (st.useGradient) _debouncedUpdateQRCode();
         _debounceCapture();
     });
 }
 if (gradColor2Text) {
     gradColor2Text.addEventListener('change', (e) => {
         if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-            gradientColor2 = e.target.value;
+            st.gradientColor2 = e.target.value;
             if (gradColor2Input) gradColor2Input.value = e.target.value;
-            if (useGradient) updateQRCode();
+            if (st.useGradient) updateQRCode();
             captureState();
         }
     });
@@ -1680,7 +1635,7 @@ logoMargin.addEventListener('input', (e) => {
 
 if (logoColorInput) {
     logoColorInput.addEventListener('input', (e) => {
-        logoColor = e.target.value;
+        st.logoColor = e.target.value;
         if (logoColorText) logoColorText.value = e.target.value;
         _debouncedUpdateQRCode();
         _debounceCapture();
@@ -1689,7 +1644,7 @@ if (logoColorInput) {
 if (logoColorText) {
     logoColorText.addEventListener('change', (e) => {
         if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-            logoColor = e.target.value;
+            st.logoColor = e.target.value;
             if (logoColorInput) logoColorInput.value = e.target.value;
             updateQRCode();
             captureState();
@@ -1706,17 +1661,17 @@ function getConfigHash() {
         values: values,
         fg: fgColorInput.value,
         bg: bgColorInput.value,
-        pattern: currentPattern,
-        outerCorner: currentOuterCorner,
-        innerCorner: currentInnerCorner,
-        useGradient: useGradient,
-        gradientColor2: gradientColor2,
-        size: currentQRSize,
+        pattern: st.currentPattern,
+        outerCorner: st.currentOuterCorner,
+        innerCorner: st.currentInnerCorner,
+        useGradient: st.useGradient,
+        gradientColor2: st.gradientColor2,
+        size: st.currentQRSize,
         logoSize: logoSize.value,
         logoMargin: logoMargin.value,
-        logoPreset: currentLogoPreset,
-        logoColor: logoColor,
-        frame: selectedFrame,
+        logoPreset: st.currentLogoPreset,
+        logoColor: st.logoColor,
+        frame: st.selectedFrame,
         frameColor: frameColorInput.value,
         frameText: frameTextInput.value,
     };
@@ -1735,7 +1690,7 @@ function setConfigFromHash(hash) {
 
 function updateShapeSelection() {
     document.querySelectorAll('.shape-btn').forEach(btn => {
-        const active = btn.getAttribute('data-pattern') === currentPattern;
+        const active = btn.getAttribute('data-pattern') === st.currentPattern;
         if (active) {
             btn.classList.remove('border', 'border-gray-200', 'dark:border-gray-600');
             btn.classList.add('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
@@ -1748,7 +1703,7 @@ function updateShapeSelection() {
 
 function updateCornerSelection() {
     document.querySelectorAll('#outerCornerGrid .corner-btn').forEach(btn => {
-        const active = btn.getAttribute('data-outer') === currentOuterCorner;
+        const active = btn.getAttribute('data-outer') === st.currentOuterCorner;
         if (active) {
             btn.classList.remove('border', 'border-gray-200', 'dark:border-gray-600');
             btn.classList.add('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
@@ -1758,7 +1713,7 @@ function updateCornerSelection() {
         }
     });
     document.querySelectorAll('#innerCornerGrid .corner-btn').forEach(btn => {
-        const active = btn.getAttribute('data-inner') === currentInnerCorner;
+        const active = btn.getAttribute('data-inner') === st.currentInnerCorner;
         if (active) {
             btn.classList.remove('border', 'border-gray-200', 'dark:border-gray-600');
             btn.classList.add('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
@@ -1771,7 +1726,7 @@ function updateCornerSelection() {
 
 function updateFrameSelection() {
     frameBtns.forEach(btn => {
-        if (btn.getAttribute('data-frame') === selectedFrame) {
+        if (btn.getAttribute('data-frame') === st.selectedFrame) {
             btn.classList.remove('border', 'border-gray-200', 'dark:border-gray-600');
             btn.classList.add('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
         } else {
@@ -1800,20 +1755,20 @@ function exportConfig() {
         values: values,
         fg: fgColorInput.value,
         bg: bgColorInput.value,
-        pattern: currentPattern,
-        outerCorner: currentOuterCorner,
-        innerCorner: currentInnerCorner,
-        useGradient: useGradient,
-        gradientColor2: gradientColor2,
-        size: currentQRSize,
+        pattern: st.currentPattern,
+        outerCorner: st.currentOuterCorner,
+        innerCorner: st.currentInnerCorner,
+        useGradient: st.useGradient,
+        gradientColor2: st.gradientColor2,
+        size: st.currentQRSize,
         logoSize: logoSize.value,
         logoMargin: logoMargin.value,
-        logoPreset: currentLogoPreset,
-        logoColor: logoColor,
-        frame: selectedFrame,
+        logoPreset: st.currentLogoPreset,
+        logoColor: st.logoColor,
+        frame: st.selectedFrame,
         frameColor: frameColorInput.value,
         frameText: frameTextInput.value,
-        logo: logoDataUrl
+        logo: st.logoDataUrl
     };
     const json = JSON.stringify(configObj, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
@@ -1838,12 +1793,12 @@ document.getElementById('importConfigInput').addEventListener('change', (e) => {
             applyConfig(configObj);
             // Handle custom logo from import
             if (configObj.logo) {
-                logoDataUrl = configObj.logo;
-                logoImg.src = logoDataUrl;
+                st.logoDataUrl = configObj.logo;
+                logoImg.src = st.logoDataUrl;
                 customLogoBtn.style.display = 'flex';
                 customLogoBtn.classList.remove('hidden');
                 logoPreview.classList.remove('hidden');
-                currentLogoPreset = 'custom';
+                st.currentLogoPreset = 'custom';
                 updateLogoSelection();
                 logoControls.classList.remove('hidden');
                 updateQRCode();
@@ -1877,31 +1832,31 @@ function doReset() {
     fgColorText.value = '#000000';
     bgColorInput.value = '#ffffff';
     bgColorText.value = '#ffffff';
-    currentPattern = 'square';
-    currentOuterCorner = 'square';
-    currentInnerCorner = 'square';
-    useGradient = false;
-    gradientColor2 = '#3b82f6';
-    if (gradColor2Input) gradColor2Input.value = gradientColor2;
-    if (gradColor2Text) gradColor2Text.value = gradientColor2;
+    st.currentPattern = 'square';
+    st.currentOuterCorner = 'square';
+    st.currentInnerCorner = 'square';
+    st.useGradient = false;
+    st.gradientColor2 = '#3b82f6';
+    if (gradColor2Input) gradColor2Input.value = st.gradientColor2;
+    if (gradColor2Text) gradColor2Text.value = st.gradientColor2;
     if (gradientToggleBtn) { gradientToggleBtn.setAttribute('aria-pressed', false); gradientToggleBtn.classList.remove('active'); }
     if (gradColor2Row) gradColor2Row.classList.add('hidden');
-    currentQRSize = 300;
+    st.currentQRSize = 300;
     qrSize.value = 300;
     qrSizeValue.textContent = '300';
     logoSize.value = 20;
     logoSizeValue.textContent = '20';
     logoMargin.value = 10;
     logoMarginValue.textContent = '10';
-    logoColor = '#000000';
+    st.logoColor = '#000000';
     if (logoColorInput) logoColorInput.value = '#000000';
     if (logoColorText) logoColorText.value = '#000000';
-    selectedFrame = 'none';
+    st.selectedFrame = 'none';
     frameColorInput.value = '#000000';
     frameColorTextInput.value = '#000000';
     frameTextInput.value = '';
-    currentLogoPreset = 'none';
-    logoDataUrl = null;
+    st.currentLogoPreset = 'none';
+    st.logoDataUrl = null;
     logoImg.src = '';
     customLogoBtn.style.display = '';
     customLogoBtn.classList.add('hidden');
@@ -1967,10 +1922,10 @@ function doReset() {
     const dlPngM = document.getElementById('downloadPngMobile');
     const dlSvgM = document.getElementById('downloadSvgMobile');
     if (dlPngM) dlPngM.addEventListener('click', () => {
-        if (qrCode) qrCode.download({ name: generateQRFilename(), extension: 'png' });
+        if (st.qrCode) st.qrCode.download({ name: generateQRFilename(), extension: 'png' });
     });
     if (dlSvgM) dlSvgM.addEventListener('click', () => {
-        if (qrCode) qrCode.download(Object.assign({ name: generateQRFilename(), extension: 'svg' }, getSvgDownloadOptions()));
+        if (st.qrCode) st.qrCode.download(Object.assign({ name: generateQRFilename(), extension: 'svg' }, getSvgDownloadOptions()));
     });
 })();
 
