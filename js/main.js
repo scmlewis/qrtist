@@ -1,8 +1,41 @@
 ﻿import { st } from './core/state.js';
-import { qrType, inputFields, fgColorInput, fgColorText, bgColorInput, bgColorText, frameColorInput, frameColorTextInput, frameTextInput, qrSize, qrSizeValue, contrastWarning, contrastWarningText, scannabilityInfo, qrSizeLabel, qrSizeLabel2, qrCodeContainer, logoInput, logoPreview, logoImg, logoRemove, logoControls, customLogoBtn, logoSize, logoSizeValue, logoMargin, logoMarginValue, logoColorInput, logoColorText, frameBtns, downloadPng, downloadSvg } from './core/dom.js';
+import { qrType, fgColorInput, fgColorText, bgColorInput, bgColorText, frameColorInput, frameColorTextInput, frameTextInput, qrSize, qrSizeValue, contrastWarning, contrastWarningText, scannabilityInfo, qrSizeLabel, qrSizeLabel2, qrCodeContainer, logoInput, logoPreview, logoImg, logoRemove, logoControls, customLogoBtn, logoSize, logoSizeValue, logoMargin, logoMarginValue, logoColorInput, logoColorText, frameBtns, downloadPng, downloadSvg } from './core/dom.js';
 import { getLuminance, getContrastRatio } from './core/color.js';
 import { showToast } from './core/toast.js';
 import { encodeConfigHash, decodeConfigHash } from './core/hash.js';
+import { getConfig, applyConfig } from './core/config.js';
+import { createHistory } from './core/undo-redo.js';
+import { qrTypeConfig } from './input/types.js';
+import { renderInputFields, getInputValues } from './input/fields.js';
+import { updateShapeSelection, updateCornerSelection, updateFrameSelection, updateLogoSelection } from './ui/controls.js';
+
+const deps = {
+    render: () => updateQRCode(),
+    renderDebounced: () => _debouncedUpdateQRCode(),
+    capture: () => captureState(),
+    captureDebounced: () => _debounceCapture(),
+    constrainPreview: () => constrainPreviewCanvas(),
+    filename: () => generateQRFilename(),
+    svgOptions: () => getSvgDownloadOptions(),
+    reset: () => doReset()
+};
+
+const history = createHistory({
+    getState: getConfig,
+    applyState: (s) => applyConfig(s, deps),
+    onChange: updateUndoRedoButtons
+});
+const captureState = history.capture;
+const _debounceCapture = history.debouncedCapture;
+const undo = history.undo;
+const redo = history.redo;
+
+function updateUndoRedoButtons() {
+    const undoBtn = document.getElementById('undoBtn');
+    const redoBtn = document.getElementById('redoBtn');
+    if (undoBtn) undoBtn.disabled = !history.canUndo();
+    if (redoBtn) redoBtn.disabled = !history.canRedo();
+}
 
 // roundRect polyfill for older browsers
 if (!CanvasRenderingContext2D.prototype.roundRect) {
@@ -511,143 +544,6 @@ function generateStyledSVG(data, opts) {
     return svgParts.join('\n');
 }
 
-// ── Undo/Redo History ────────────────────────────────────────────────
-let _historyStack = [];
-let _historyIndex = -1;
-const _MAX_HISTORY = 50;
-let _historyCaptureTimer = null;
-
-function getConfig() {
-    const type = qrType.value;
-    const values = getInputValues();
-    return {
-        type: type,
-        values: JSON.parse(JSON.stringify(values)),
-        fg: fgColorInput.value,
-        bg: bgColorInput.value,
-        pattern: st.currentPattern,
-        outerCorner: st.currentOuterCorner,
-        innerCorner: st.currentInnerCorner,
-        useGradient: st.useGradient,
-        gradientColor2: st.gradientColor2,
-        size: st.currentQRSize,
-        logoSize: logoSize.value,
-        logoMargin: logoMargin.value,
-        logoPreset: st.currentLogoPreset,
-        logoColor: st.logoColor,
-        logoDataUrl: st.currentLogoPreset === 'custom' ? st.logoDataUrl : null,
-        frame: st.selectedFrame,
-        frameColor: frameColorInput.value,
-        frameText: frameTextInput.value
-    };
-}
-
-function applyConfig(cfg) {
-    if (!cfg) return;
-    qrType.value = cfg.type || 'url';
-    renderInputFields();
-    if (cfg.values) {
-        Object.keys(cfg.values).forEach(key => {
-            const el = document.getElementById(key);
-            if (el) el.value = cfg.values[key];
-        });
-    }
-    fgColorInput.value = cfg.fg || '#000000';
-    fgColorText.value = cfg.fg || '#000000';
-    bgColorInput.value = cfg.bg || '#ffffff';
-    bgColorText.value = cfg.bg || '#ffffff';
-    st.currentPattern = cfg.pattern || 'square';
-    st.currentOuterCorner = cfg.outerCorner || 'square';
-    st.currentInnerCorner = cfg.innerCorner || 'square';
-    st.useGradient = cfg.useGradient || false;
-    st.gradientColor2 = cfg.gradientColor2 || '#3b82f6';
-    if (gradColor2Input) gradColor2Input.value = st.gradientColor2;
-    if (gradColor2Text) gradColor2Text.value = st.gradientColor2;
-    if (gradientToggleBtn) { gradientToggleBtn.setAttribute('aria-pressed', st.useGradient); gradientToggleBtn.classList.toggle('active', st.useGradient); }
-    if (gradColor2Row) gradColor2Row.classList.toggle('hidden', !st.useGradient);
-    st.currentQRSize = cfg.size || 300;
-    qrSize.value = st.currentQRSize;
-    qrSizeValue.textContent = st.currentQRSize;
-    logoSize.value = cfg.logoSize || 20;
-    logoSizeValue.textContent = cfg.logoSize || 20;
-    logoMargin.value = cfg.logoMargin || 10;
-    logoMarginValue.textContent = cfg.logoMargin || 10;
-    st.selectedFrame = cfg.frame || 'none';
-    frameColorInput.value = cfg.frameColor || '#000000';
-    frameColorTextInput.value = cfg.frameColor || '#000000';
-    frameTextInput.value = cfg.frameText || '';
-    st.currentLogoPreset = cfg.logoPreset || 'none';
-    st.logoColor = cfg.logoColor || '#000000';
-    st.logoDataUrl = cfg.logoDataUrl || null;
-    if (logoColorInput) logoColorInput.value = st.logoColor;
-    if (logoColorText) logoColorText.value = st.logoColor;
-    updateShapeSelection();
-    updateCornerSelection();
-    updateFrameSelection();
-    updateLogoSelection();
-    logoControls.classList.toggle('hidden', st.currentLogoPreset === 'none');
-    if (st.currentLogoPreset === 'custom' && st.logoDataUrl) {
-        customLogoBtn.style.display = 'flex';
-        customLogoBtn.classList.remove('hidden');
-        logoPreview.classList.remove('hidden');
-        logoImg.src = st.logoDataUrl;
-    } else {
-        customLogoBtn.style.display = '';
-        customLogoBtn.classList.add('hidden');
-        logoPreview.classList.add('hidden');
-    }
-    updateQRCode();
-}
-
-function _deepClone(obj) {
-    return JSON.parse(JSON.stringify(obj));
-}
-
-function captureState() {
-    const state = getConfig();
-    // Truncate any future states if we're in the middle of the stack
-    if (_historyIndex < _historyStack.length - 1) {
-        _historyStack = _historyStack.slice(0, _historyIndex + 1);
-    }
-    // Avoid duplicate consecutive states
-    if (_historyStack.length > 0) {
-        const last = _historyStack[_historyStack.length - 1];
-        if (JSON.stringify(last) === JSON.stringify(state)) return;
-    }
-    _historyStack.push(_deepClone(state));
-    if (_historyStack.length > _MAX_HISTORY) {
-        _historyStack.shift();
-    }
-    _historyIndex = _historyStack.length - 1;
-    _updateUndoRedoButtons();
-}
-
-function _debounceCapture() {
-    clearTimeout(_historyCaptureTimer);
-    _historyCaptureTimer = setTimeout(() => captureState(), 600);
-}
-
-function undo() {
-    if (_historyIndex <= 0) return;
-    _historyIndex--;
-    applyConfig(_deepClone(_historyStack[_historyIndex]));
-    _updateUndoRedoButtons();
-}
-
-function redo() {
-    if (_historyIndex >= _historyStack.length - 1) return;
-    _historyIndex++;
-    applyConfig(_deepClone(_historyStack[_historyIndex]));
-    _updateUndoRedoButtons();
-}
-
-function _updateUndoRedoButtons() {
-    const undoBtn = document.getElementById('undoBtn');
-    const redoBtn = document.getElementById('redoBtn');
-    if (undoBtn) undoBtn.disabled = _historyIndex <= 0;
-    if (redoBtn) redoBtn.disabled = _historyIndex >= _historyStack.length - 1;
-}
-
 const LOGO_PRESETS = {
     'globe': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`,
     'scan-brackets': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`,
@@ -834,126 +730,6 @@ function applyTemplate(t) {
     captureState();
 }
 
-const qrTypeConfig = {
-    url: { fields: [{ id: 'urlInput', label: 'URL', type: 'text', placeholder: 'https://example.com', value: 'https://google.com' }], encode: (values) => values.urlInput || 'https://google.com' },
-    text: { fields: [{ id: 'textInput', label: 'Text', type: 'text', placeholder: 'Enter text', value: 'Hello World' }], encode: (values) => values.textInput || 'Hello World' },
-    email: { fields: [{ id: 'emailInput', label: 'Email', type: 'email', placeholder: 'test@example.com', value: 'test@example.com' }, { id: 'subjectInput', label: 'Subject (optional)', type: 'text', placeholder: 'Subject' }], encode: (values) => `mailto:${values.emailInput || 'test@example.com'}${values.subjectInput ? '?subject=' + encodeURIComponent(values.subjectInput) : ''}` },
-    phone: { fields: [{ id: 'phoneInput', label: 'Phone Number', type: 'tel', placeholder: '+1234567890', value: '+14155552671' }], encode: (values) => `tel:${values.phoneInput || '+14155552671'}` },
-    wifi: { fields: [{ id: 'wifiSsid', label: 'Network Name (SSID)', type: 'text', placeholder: 'MyWiFi', value: 'MyNetwork', help: 'The WiFi network name users will see' }, { id: 'wifiPassword', label: 'Password', type: 'password', placeholder: 'password', value: 'password123', help: 'Leave blank for open networks' }, { id: 'wifiSecurity', label: 'Security Type', type: 'select', options: [{ value: 'WPA', label: 'WPA/WPA2' }, { value: 'WEP', label: 'WEP' }, { value: 'nopass', label: 'Open' }], value: 'WPA', help: 'Select your network security type' }], encode: (values) => `WIFI:S:${values.wifiSsid || 'MyNetwork'};T:${values.wifiSecurity || 'WPA'};P:${values.wifiPassword || 'password123'};;` },
-    vcard: { fields: [
-        { id: 'vcardName', label: 'Full Name', type: 'text', placeholder: 'John Doe', value: 'John Doe', help: 'Person or business name' },
-        { id: 'vcardOrg', label: 'Organization', type: 'text', placeholder: 'Acme Inc.', value: '', help: 'Company or organization name' },
-        { id: 'vcardTitle', label: 'Job Title', type: 'text', placeholder: 'Software Engineer', value: '', help: 'Role or position' },
-        { id: 'vcardEmail', label: 'Email', type: 'email', placeholder: 'john@example.com', value: 'john@example.com', help: 'Contact email address' },
-        { id: 'vcardPhone', label: 'Phone', type: 'tel', placeholder: '+1234567890', value: '+14155552671', help: 'Phone number with country code' },
-        { id: 'vcardUrl', label: 'Website', type: 'url', placeholder: 'https://example.com', value: '', help: 'Personal or business website' },
-        { id: 'vcardAddress', label: 'Address', type: 'text', placeholder: '123 Main St, City, Country', value: '', help: 'Physical address' },
-        { id: 'vcardNote', label: 'Notes', type: 'text', placeholder: 'Additional info', value: '', help: 'Free-text notes (keep short for QR scanning)' }
-    ], encode: (values) => {
-        const lines = ['BEGIN:VCARD', 'VERSION:3.0'];
-        lines.push(`FN:${values.vcardName || 'John Doe'}`);
-        if (values.vcardOrg) lines.push(`ORG:${values.vcardOrg}`);
-        if (values.vcardTitle) lines.push(`TITLE:${values.vcardTitle}`);
-        lines.push(`EMAIL:${values.vcardEmail || 'john@example.com'}`);
-        lines.push(`TEL:${values.vcardPhone || '+14155552671'}`);
-        if (values.vcardUrl) lines.push(`URL:${values.vcardUrl}`);
-        if (values.vcardAddress) lines.push(`ADR:;;${values.vcardAddress};;;;`);
-        if (values.vcardNote) lines.push(`NOTE:${values.vcardNote}`);
-        lines.push('END:VCARD');
-        return lines.join('\n');
-    } },
-    maps: {
-        fields: [
-            { id: 'mapsAddress', label: 'Address or Place', type: 'text', placeholder: 'Enter address or paste Google Maps URL', value: 'Times Square, New York', help: 'Paste a Google Maps URL or enter an address' }
-        ],
-        encode: (values) => {
-            const addr = values.mapsAddress || 'Times Square, New York';
-            if (addr.startsWith('http')) return addr;
-            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;
-        }
-    },
-    calendar: {
-        fields: [
-            { id: 'calTitle', label: 'Event Title', type: 'text', placeholder: 'Team Meeting', value: 'Event', help: 'Required' },
-            { id: 'calLocation', label: 'Location', type: 'text', placeholder: 'Conference Room A', value: '' },
-            { id: 'calStart', label: 'Start', type: 'datetime-local', value: '' },
-            { id: 'calEnd', label: 'End', type: 'datetime-local', value: '' },
-            { id: 'calDescription', label: 'Description', type: 'text', placeholder: 'Meeting agenda', value: '' },
-            { id: 'calUrl', label: 'More Info URL', type: 'text', placeholder: 'https://example.com', value: '' }
-        ],
-        encode: (values) => {
-            const fmt = (dt) => {
-                if (!dt) return '';
-                return dt.replace(/[-:]/g, '').replace('T', 'T') + '00Z';
-            };
-            const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//QRtist//EN', 'BEGIN:VEVENT'];
-            lines.push(`SUMMARY:${values.calTitle || 'Event'}`);
-            if (values.calStart) lines.push(`DTSTART:${fmt(values.calStart)}`);
-            if (values.calEnd) lines.push(`DTEND:${fmt(values.calEnd)}`);
-            if (values.calLocation) lines.push(`LOCATION:${values.calLocation}`);
-            if (values.calDescription) lines.push(`DESCRIPTION:${values.calDescription}`);
-            if (values.calUrl) lines.push(`URL:${values.calUrl}`);
-            lines.push('END:VEVENT', 'END:VCALENDAR');
-            return lines.join('\r\n');
-        }
-    },
-    sms: {
-        fields: [
-            { id: 'smsNumber', label: 'Phone Number', type: 'tel', placeholder: '+1234567890', value: '+14155552671' },
-            { id: 'smsBody', label: 'Message (optional)', type: 'text', placeholder: 'Hello!', value: '' }
-        ],
-        encode: (values) => {
-            const num = values.smsNumber || '+14155552671';
-            const body = values.smsBody;
-            return body ? `smsto:${num}?body=${encodeURIComponent(body)}` : `smsto:${num}`;
-        }
-    },
-    crypto: {
-        fields: [
-            { id: 'cryptoCoin', label: 'Coin', type: 'select', options: [{ value: 'bitcoin', label: 'Bitcoin (BTC)' }, { value: 'ethereum', label: 'Ethereum (ETH)' }], value: 'bitcoin' },
-            { id: 'cryptoAddress', label: 'Address', type: 'text', placeholder: 'Wallet address', value: '', help: 'Your wallet receiving address' },
-            { id: 'cryptoAmount', label: 'Amount (optional)', type: 'text', placeholder: '0.001', value: '', help: 'Amount in BTC or ETH' }
-        ],
-        encode: (values) => {
-            const coin = values.cryptoCoin || 'bitcoin';
-            const addr = values.cryptoAddress;
-            const amt = values.cryptoAmount;
-            if (!addr) return '';
-            if (!amt) return addr;
-            if (coin === 'bitcoin') return `bitcoin:${addr}?amount=${amt}`;
-            if (coin === 'ethereum') return `ethereum:${addr}?value=${amt}`;
-            return addr;
-        }
-    },
-    social: {
-        fields: [
-            { id: 'socialPlatform', label: 'Platform', type: 'select', options: [
-                { value: 'instagram', label: 'Instagram' },
-                { value: 'twitter', label: 'Twitter / X' },
-                { value: 'tiktok', label: 'TikTok' },
-                { value: 'linkedin', label: 'LinkedIn' },
-                { value: 'youtube', label: 'YouTube' },
-                { value: 'github', label: 'GitHub' }
-            ], value: 'instagram' },
-            { id: 'socialUsername', label: 'Username', type: 'text', placeholder: 'username', value: '', help: 'Without @ symbol' }
-        ],
-        encode: (values) => {
-            const platform = values.socialPlatform || 'instagram';
-            const username = values.socialUsername;
-            if (!username) return '';
-            const urls = {
-                instagram: `https://instagram.com/${username}`,
-                twitter: `https://x.com/${username}`,
-                tiktok: `https://tiktok.com/@${username}`,
-                linkedin: `https://linkedin.com/in/${username}`,
-                youtube: `https://youtube.com/@${username}`,
-                github: `https://github.com/${username}`
-            };
-            return urls[platform] || `https://${platform}.com/${username}`;
-        }
-    }
-};
-
 let qrAnimFrame;
 let _renderDebounceTimer = null;
 const _RENDER_DEBOUNCE_MS = 30;
@@ -961,88 +737,6 @@ const _RENDER_DEBOUNCE_MS = 30;
 function _debouncedUpdateQRCode() {
     clearTimeout(_renderDebounceTimer);
     _renderDebounceTimer = setTimeout(() => updateQRCode(), _RENDER_DEBOUNCE_MS);
-}
-
-function renderInputFields() {
-    const type = qrType.value;
-    const config = qrTypeConfig[type];
-    inputFields.innerHTML = '';
-
-    config.fields.forEach(field => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'mb-4';
-
-        const label = document.createElement('label');
-        label.htmlFor = field.id;
-        label.className = 'block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide';
-        label.textContent = field.label;
-        wrapper.appendChild(label);
-
-        if (field.type === 'select') {
-            const select = document.createElement('select');
-            select.id = field.id;
-            select.className = 'w-full px-3 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition';
-            if (field.help) select.title = field.help;
-            select.value = field.value;
-            field.options.forEach(opt => {
-                const option = document.createElement('option');
-                option.value = opt.value;
-                option.textContent = opt.label;
-                select.appendChild(option);
-            });
-            select.addEventListener('change', () => { updateQRCode(); captureState(); });
-            wrapper.appendChild(select);
-        } else {
-            const input = document.createElement('input');
-            input.id = field.id;
-            input.type = field.type;
-            input.placeholder = field.placeholder;
-            input.value = field.value;
-            if (field.help) input.title = field.help;
-            input.className = 'w-full px-3 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition';
-            input.addEventListener('input', () => { _debouncedUpdateQRCode(); _debounceCapture(); });
-            input.addEventListener('change', () => { updateQRCode(); captureState(); });
-            wrapper.appendChild(input);
-            if (field.type === 'url' || field.id === 'urlInput' || field.id === 'emailInput') {
-                const errEl = document.createElement('p');
-                errEl.className = 'field-error-msg';
-                errEl.setAttribute('aria-live', 'polite');
-                errEl.textContent = (field.id === 'emailInput')
-                    ? '\u26a0 Enter a valid email, e.g. name@example.com'
-                    : '\u26a0 Include a protocol, e.g. https://example.com';
-                wrapper.appendChild(errEl);
-                const valPattern = (field.id === 'emailInput')
-                    ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                    : /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\/.+/;
-                const validate = () => {
-                    const invalid = input.value.trim().length > 0 && !valPattern.test(input.value.trim());
-                    input.classList.toggle('field-input-error', invalid);
-                    errEl.style.display = invalid ? 'flex' : 'none';
-                };
-                input.addEventListener('blur', validate);
-                input.addEventListener('input', () => { if (input.classList.contains('field-input-error')) validate(); });
-            }
-        }
-        if (field.help) {
-            const helpText = document.createElement('p');
-            helpText.className = 'text-xs text-gray-400 dark:text-gray-500 mt-1';
-            helpText.textContent = field.help;
-            wrapper.appendChild(helpText);
-        }
-
-        inputFields.appendChild(wrapper);
-    });
-}
-
-function getInputValues() {
-    const type = qrType.value;
-    const config = qrTypeConfig[type];
-    const values = {};
-    config.fields.forEach(field => {
-        const element = document.getElementById(field.id);
-        values[field.id] = element ? element.value : '';
-    });
-    return values;
 }
 
 function checkContrast() {
@@ -1060,21 +754,6 @@ function checkScannability() {
     } else {
         scannabilityInfo.classList.add('hidden');
     }
-}
-
-function updateLogoSelection() {
-    document.querySelectorAll('.logo-btn').forEach(btn => {
-        const active = btn.getAttribute('data-logo') === st.currentLogoPreset;
-        btn.classList.toggle('selected', active);
-        btn.classList.toggle('border-2', active);
-        btn.classList.toggle('border-blue-500', active);
-        btn.classList.toggle('bg-blue-50', active);
-        btn.classList.toggle('dark:bg-gray-700', active);
-        btn.classList.toggle('dark:border-blue-400', active);
-        btn.classList.toggle('border', !active);
-        btn.classList.toggle('border-gray-200', !active);
-        btn.classList.toggle('dark:border-gray-600', !active);
-    });
 }
 
 function handleLogoUpload(file) {
@@ -1456,7 +1135,7 @@ downloadSvg.addEventListener('click', () => {
 });
 
 qrType.addEventListener('change', () => {
-    renderInputFields();
+    renderInputFields(deps);
     updateQRCode();
     captureState();
 });
@@ -1621,54 +1300,6 @@ if (logoColorText) {
     });
 }
 
-function updateShapeSelection() {
-    document.querySelectorAll('.shape-btn').forEach(btn => {
-        const active = btn.getAttribute('data-pattern') === st.currentPattern;
-        if (active) {
-            btn.classList.remove('border', 'border-gray-200', 'dark:border-gray-600');
-            btn.classList.add('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
-        } else {
-            btn.classList.remove('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
-            btn.classList.add('border', 'border-gray-200', 'dark:border-gray-600');
-        }
-    });
-}
-
-function updateCornerSelection() {
-    document.querySelectorAll('#outerCornerGrid .corner-btn').forEach(btn => {
-        const active = btn.getAttribute('data-outer') === st.currentOuterCorner;
-        if (active) {
-            btn.classList.remove('border', 'border-gray-200', 'dark:border-gray-600');
-            btn.classList.add('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
-        } else {
-            btn.classList.remove('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
-            btn.classList.add('border', 'border-gray-200', 'dark:border-gray-600');
-        }
-    });
-    document.querySelectorAll('#innerCornerGrid .corner-btn').forEach(btn => {
-        const active = btn.getAttribute('data-inner') === st.currentInnerCorner;
-        if (active) {
-            btn.classList.remove('border', 'border-gray-200', 'dark:border-gray-600');
-            btn.classList.add('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
-        } else {
-            btn.classList.remove('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
-            btn.classList.add('border', 'border-gray-200', 'dark:border-gray-600');
-        }
-    });
-}
-
-function updateFrameSelection() {
-    frameBtns.forEach(btn => {
-        if (btn.getAttribute('data-frame') === st.selectedFrame) {
-            btn.classList.remove('border', 'border-gray-200', 'dark:border-gray-600');
-            btn.classList.add('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
-        } else {
-            btn.classList.remove('selected', 'border-2', 'border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
-            btn.classList.add('border', 'border-gray-200', 'dark:border-gray-600');
-        }
-    });
-}
-
 function copyShareLink() {
     const hash = encodeConfigHash({
         type: qrType.value,
@@ -1741,7 +1372,7 @@ document.getElementById('importConfigInput').addEventListener('change', (e) => {
     reader.onload = (event) => {
         try {
             const configObj = JSON.parse(event.target.result);
-            applyConfig(configObj);
+            applyConfig(configObj, deps);
             // Handle custom logo from import
             if (configObj.logo) {
                 st.logoDataUrl = configObj.logo;
@@ -1769,9 +1400,9 @@ document.getElementById('importConfig').addEventListener('click', importConfig);
 if (window.location.hash) {
     const hash = window.location.hash.substring(1);
     const cfg = decodeConfigHash(hash);
-    if (cfg) applyConfig(cfg);
+    if (cfg) applyConfig(cfg, deps);
 } else {
-    renderInputFields();
+    renderInputFields(deps);
     updateQRCode();
 }
 renderTemplates();
@@ -1779,7 +1410,7 @@ renderTemplates();
 // ── Reset Design ─────────────────────────────────────────────────────
 function doReset() {
     qrType.value = 'url';
-    renderInputFields();
+    renderInputFields(deps);
     fgColorInput.value = '#000000';
     fgColorText.value = '#000000';
     bgColorInput.value = '#ffffff';
