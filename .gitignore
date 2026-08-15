@@ -63,6 +63,9 @@ mockup/
 docs/superpowers/plans/
 docs/superpowers/specs/
 
+# Isolated git worktrees
+.worktrees/
+
 
 # AI agent prompts (not app code)
 .github/prompts/
