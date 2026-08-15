@@ -10,6 +10,15 @@ const mainSrc = fs.readFileSync(path.join(ROOT, 'js/main.js'), 'utf8').split('\n
 // SVG region: lines 268-506 (1-indexed) = indexes 267-505 (0-indexed)
 const svgRegion = mainSrc.slice(267, 506).join('\n');
 
+// Guard: this script is a one-shot pre-move snapshot tool. After Task 7 moves
+// the SVG region out of js/main.js, the hard-coded slice no longer points at
+// the helpers — refuse to run rather than silently writing garbage fixtures.
+if (!svgRegion.includes('function generateStyledSVG')) {
+    console.error('gen-golden: SVG region (lines 268-506) not found in js/main.js. ' +
+        'This is a one-shot pre-refactor tool; restore the pre-move js/main.js first.');
+    process.exit(1);
+}
+
 const bundleSrc = fs.readFileSync(path.join(ROOT, 'qr-bundle.js'), 'utf8');
 
 // Note: strict-mode eval does not leak function declarations, and Node has no
