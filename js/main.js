@@ -2,6 +2,7 @@
 import { qrType, inputFields, fgColorInput, fgColorText, bgColorInput, bgColorText, frameColorInput, frameColorTextInput, frameTextInput, qrSize, qrSizeValue, contrastWarning, contrastWarningText, scannabilityInfo, qrSizeLabel, qrSizeLabel2, qrCodeContainer, logoInput, logoPreview, logoImg, logoRemove, logoControls, customLogoBtn, logoSize, logoSizeValue, logoMargin, logoMarginValue, logoColorInput, logoColorText, frameBtns, downloadPng, downloadSvg } from './core/dom.js';
 import { getLuminance, getContrastRatio } from './core/color.js';
 import { showToast } from './core/toast.js';
+import { encodeConfigHash, decodeConfigHash } from './core/hash.js';
 
 // roundRect polyfill for older browsers
 if (!CanvasRenderingContext2D.prototype.roundRect) {
@@ -1620,42 +1621,6 @@ if (logoColorText) {
     });
 }
 
-// URL Hash Serialization
-function getConfigHash() {
-    const type = qrType.value;
-    const values = getInputValues();
-    const configObj = {
-        type: type,
-        values: values,
-        fg: fgColorInput.value,
-        bg: bgColorInput.value,
-        pattern: st.currentPattern,
-        outerCorner: st.currentOuterCorner,
-        innerCorner: st.currentInnerCorner,
-        useGradient: st.useGradient,
-        gradientColor2: st.gradientColor2,
-        size: st.currentQRSize,
-        logoSize: logoSize.value,
-        logoMargin: logoMargin.value,
-        logoPreset: st.currentLogoPreset,
-        logoColor: st.logoColor,
-        frame: st.selectedFrame,
-        frameColor: frameColorInput.value,
-        frameText: frameTextInput.value,
-    };
-    return btoa(encodeURIComponent(JSON.stringify(configObj)));
-}
-
-function setConfigFromHash(hash) {
-    try {
-        const rawHash = hash.startsWith('settings=') ? hash.slice('settings='.length) : hash;
-        const configObj = JSON.parse(decodeURIComponent(atob(rawHash)));
-        applyConfig(configObj);
-    } catch (e) {
-        console.error('Invalid config hash', e);
-    }
-}
-
 function updateShapeSelection() {
     document.querySelectorAll('.shape-btn').forEach(btn => {
         const active = btn.getAttribute('data-pattern') === st.currentPattern;
@@ -1705,7 +1670,25 @@ function updateFrameSelection() {
 }
 
 function copyShareLink() {
-    const hash = getConfigHash();
+    const hash = encodeConfigHash({
+        type: qrType.value,
+        values: getInputValues(),
+        fg: fgColorInput.value,
+        bg: bgColorInput.value,
+        pattern: st.currentPattern,
+        outerCorner: st.currentOuterCorner,
+        innerCorner: st.currentInnerCorner,
+        useGradient: st.useGradient,
+        gradientColor2: st.gradientColor2,
+        size: st.currentQRSize,
+        logoSize: logoSize.value,
+        logoMargin: logoMargin.value,
+        logoPreset: st.currentLogoPreset,
+        logoColor: st.logoColor,
+        frame: st.selectedFrame,
+        frameColor: frameColorInput.value,
+        frameText: frameTextInput.value
+    });
     const url = window.location.href.split('#')[0] + '#' + hash;
     navigator.clipboard.writeText(url).then(() => {
         const btn = document.getElementById('copyShareLink');
@@ -1785,7 +1768,8 @@ document.getElementById('importConfig').addEventListener('click', importConfig);
 
 if (window.location.hash) {
     const hash = window.location.hash.substring(1);
-    setConfigFromHash(hash);
+    const cfg = decodeConfigHash(hash);
+    if (cfg) applyConfig(cfg);
 } else {
     renderInputFields();
     updateQRCode();
