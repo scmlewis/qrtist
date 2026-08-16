@@ -12,6 +12,9 @@ import { generateStyledSVG } from './design/render-svg.js';
 import { getLogoPresetDataUrl } from './design/logo.js';
 import { renderTemplates } from './design/templates.js';
 import './design/renderer.js';
+import { initPanels } from './ui/panels.js';
+import { initMenu } from './ui/menu.js';
+import { initAnimations } from './ui/animations.js';
 
 const deps = {
     render: () => updateQRCode(),
@@ -748,6 +751,10 @@ if (window.location.hash) {
 }
 renderTemplates({ onApply: (t) => applyTemplate(t) });
 
+initPanels(deps);
+initMenu(deps);
+initAnimations();
+
 // ── Reset Design ─────────────────────────────────────────────────────
 function doReset() {
     qrType.value = 'url';
@@ -798,119 +805,6 @@ function doReset() {
 (function initResetDesign() {
     const btn = document.getElementById('resetDesign');
     if (btn) btn.addEventListener('click', doReset);
-})();
-
-// ── Mobile Tab Navigation ───────────────────────────────────────────────
-(function () {
-    const panels = [
-        document.getElementById('panelData'),
-        document.getElementById('panelPreview'),
-        document.getElementById('panelDesign')
-    ];
-    const tabBtns = document.querySelectorAll('.mobile-tab-btn');
-    let currentMobileTab = 0;
-
-    function switchMobileTab(index) {
-        currentMobileTab = index;
-        panels.forEach((p, i) => {
-            if (!p) return;
-            p.classList.toggle('mobile-active-panel', i === index);
-        });
-        tabBtns.forEach((btn, i) => {
-            btn.classList.toggle('tab-active', i === index);
-        });
-        if (index === 1) {
-            const previewBtn = document.querySelector('.mobile-tab-btn[data-tab="1"]');
-            if (previewBtn) previewBtn.classList.remove('tab-badge');
-            constrainPreviewCanvas();
-        }
-    }
-
-    function applyMobileLayout() {
-        if (window.innerWidth < 768) {
-            switchMobileTab(currentMobileTab);
-        } else {
-            panels.forEach(p => { if (p) p.classList.remove('mobile-active-panel'); });
-        }
-    }
-
-    window.__isMobilePreviewTab = () => currentMobileTab === 1 && window.innerWidth < 768;
-
-    tabBtns.forEach((btn, i) => {
-        btn.addEventListener('click', () => switchMobileTab(i));
-    });
-
-    window.addEventListener('resize', applyMobileLayout);
-    applyMobileLayout();
-
-    const dlPngM = document.getElementById('downloadPngMobile');
-    const dlSvgM = document.getElementById('downloadSvgMobile');
-    if (dlPngM) dlPngM.addEventListener('click', () => {
-        if (st.qrCode) st.qrCode.download({ name: generateQRFilename(), extension: 'png' });
-    });
-    if (dlSvgM) dlSvgM.addEventListener('click', () => {
-        if (st.qrCode) st.qrCode.download(Object.assign({ name: generateQRFilename(), extension: 'svg' }, getSvgDownloadOptions()));
-    });
-})();
-
-// ── Onboarding banner ──────────────────────────────────────────────────
-(function initOnboarding() {
-    const banner = document.getElementById('onboardingBanner');
-    const dismissBtn = document.getElementById('dismissOnboarding');
-    if (!banner) return;
-    if (!localStorage.getItem('qrtist_v1_welcomed')) {
-        banner.style.display = 'block';
-    }
-    if (dismissBtn) {
-        dismissBtn.addEventListener('click', () => {
-            banner.classList.add('banner-hiding');
-            setTimeout(() => {
-                banner.style.display = 'none';
-            }, 300);
-            localStorage.setItem('qrtist_v1_welcomed', '1');
-        });
-    }
-
-    // Header menu (replaces help & about)
-    const headerMenuBtn = document.getElementById('headerMenuBtn');
-    const headerMenu = document.getElementById('headerMenu');
-    const resetFromMenu = document.getElementById('resetDesignFromMenu');
-
-    if (headerMenuBtn && headerMenu) {
-        headerMenu.classList.add('menu-hidden');
-        headerMenuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isOpen = headerMenu.classList.contains('menu-visible');
-            if (isOpen) {
-                headerMenu.classList.remove('menu-visible');
-                headerMenu.classList.add('menu-hidden');
-            } else {
-                headerMenu.classList.remove('menu-hidden');
-                headerMenu.classList.add('menu-visible');
-            }
-            headerMenuBtn.setAttribute('aria-expanded', !isOpen);
-            if (!isOpen) {
-                const close = (ev) => {
-                    if (!headerMenu.contains(ev.target) && ev.target !== headerMenuBtn) {
-                        headerMenu.classList.remove('menu-visible');
-                        headerMenu.classList.add('menu-hidden');
-                        headerMenuBtn.setAttribute('aria-expanded', 'false');
-                        document.removeEventListener('click', close);
-                    }
-                };
-                setTimeout(() => document.addEventListener('click', close), 0);
-            }
-        });
-    }
-
-    if (resetFromMenu) {
-        resetFromMenu.addEventListener('click', () => {
-            doReset();
-            headerMenu?.classList.remove('menu-visible');
-            headerMenu?.classList.add('menu-hidden');
-            headerMenuBtn?.setAttribute('aria-expanded', 'false');
-        });
-    }
 })();
 
 // ── Mobile "Preview my QR" CTA ─────────────────────────────────────────
@@ -1398,67 +1292,3 @@ document.addEventListener('keydown', (e) => {
     });
 })();
 
-// ── Staggered Entry Animation ───────────────────────────────────────────
-function initStaggerAnimation() {
-    const panels = document.querySelectorAll('.grid-layout > .panel-card');
-    if (panels.length) {
-        panels.forEach((panel, i) => {
-            panel.style.opacity = '0';
-            panel.style.transform = 'translateY(12px)';
-            panel.style.transition = `opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)`;
-            panel.style.transitionDelay = `${i * 80}ms`;
-            requestAnimationFrame(() => {
-                panel.style.opacity = '1';
-                panel.style.transform = 'translateY(0)';
-            });
-        });
-    }
-}
-if (document.readyState === 'complete') {
-    initStaggerAnimation();
-} else {
-    window.addEventListener('load', initStaggerAnimation);
-}
-
-// ── Accordion Slide Animation ──────────────────────────────────────────
-// Animates both expand and collapse with smooth slide + center scroll
-(function initAccordionAnimations() {
-    const panels = document.querySelectorAll('#panelDesign, #panelData');
-    if (!panels.length) return;
-
-    const DURATION = 300;
-
-    function initOpenState(details, body) {
-        if (details.open) {
-            details.classList.add('acc-open');
-            body.style.maxHeight = body.scrollHeight + 'px';
-        }
-    }
-
-    panels.forEach(panel => panel.querySelectorAll('details').forEach((details) => {
-        const body = details.querySelector('.acc-body');
-        const summary = details.querySelector('summary');
-        if (!body || !summary) return;
-
-        initOpenState(details, body);
-
-        summary.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (details.classList.contains('acc-open')) {
-                body.style.maxHeight = body.scrollHeight + 'px';
-                requestAnimationFrame(() => {
-                    body.style.maxHeight = '0';
-                });
-                details.classList.remove('acc-open');
-                setTimeout(() => {
-                    details.removeAttribute('open');
-                }, DURATION);
-            } else {
-                details.setAttribute('open', '');
-                details.classList.add('acc-open');
-                body.style.maxHeight = body.scrollHeight + 'px';
-                summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        });
-    }));
-})();
