@@ -1,21 +1,19 @@
-export function _svgEscape(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
+import { escapeHtml } from '../core/sanitize.js';
 
-export function _svgRoundRect(x, y, w, h, r) {
+function _svgRoundRect(x, y, w, h, r) {
     return `M${x + r},${y} L${x + w - r},${y} Q${x + w},${y} ${x + w},${y + r} L${x + w},${y + h - r} Q${x + w},${y + h} ${x + w - r},${y + h} L${x + r},${y + h} Q${x},${y + h} ${x},${y + h - r} L${x},${y + r} Q${x},${y} ${x + r},${y} Z`;
 }
 
-export function _svgOctagon(x, y, s) {
+function _svgOctagon(x, y, s) {
     const cut = s * 0.22;
     return `M${x + cut},${y} L${x + s - cut},${y} L${x + s},${y + cut} L${x + s},${y + s - cut} L${x + s - cut},${y + s} L${x + cut},${y + s} L${x},${y + s - cut} L${x},${y + cut} Z`;
 }
 
-export function _svgSquircle(x, y, s) {
+function _svgSquircle(x, y, s) {
     return _svgRoundRect(x, y, s, s, s * 0.38);
 }
 
-export function _svgStarPoints(cx, cy, outerR, innerR, points) {
+function _svgStarPoints(cx, cy, outerR, innerR, points) {
     let pts = [];
     for (let i = 0; i < points * 2; i++) {
         const angle = (i * Math.PI / points) - Math.PI / 2;
@@ -25,7 +23,7 @@ export function _svgStarPoints(cx, cy, outerR, innerR, points) {
     return pts.join(' ');
 }
 
-export function _svgModuleShape(pattern, x, y, mSize) {
+function _svgModuleShape(pattern, x, y, mSize) {
     const r = mSize / 2;
     switch (pattern) {
         case 'dots':
@@ -45,7 +43,7 @@ export function _svgModuleShape(pattern, x, y, mSize) {
     }
 }
 
-export function _svgOuterFinder(type, x, y, s) {
+function _svgOuterFinder(type, x, y, s) {
     const cx = x + s / 2, cy = y + s / 2;
     switch (type) {
         case 'circle':
@@ -63,7 +61,7 @@ export function _svgOuterFinder(type, x, y, s) {
     }
 }
 
-export function _svgInnerFinder(type, cx, cy, s) {
+function _svgInnerFinder(type, cx, cy, s) {
     const hs = s / 2;
     switch (type) {
         case 'dot':
@@ -132,13 +130,13 @@ export function generateStyledSVG(data, opts) {
 
     // Defs: gradient
     if (fgColor2) {
-        svgParts.push(`<defs><linearGradient id="qrGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${_svgEscape(fgColor)}"/><stop offset="100%" stop-color="${_svgEscape(fgColor2)}"/></linearGradient></defs>`);
+        svgParts.push(`<defs><linearGradient id="qrGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${escapeHtml(fgColor)}"/><stop offset="100%" stop-color="${escapeHtml(fgColor2)}"/></linearGradient></defs>`);
     }
 
     // Background
-    svgParts.push(`<rect width="${finalW}" height="${finalH}" fill="${_svgEscape(bgColor)}"/>`);
+    svgParts.push(`<rect width="${finalW}" height="${finalH}" fill="${escapeHtml(bgColor)}"/>`);
 
-    const fill = fgColor2 ? 'url(#qrGrad)' : _svgEscape(fgColor);
+    const fill = fgColor2 ? 'url(#qrGrad)' : escapeHtml(fgColor);
 
     // Data modules (skip finder regions)
     let modulesSvg = '';
@@ -176,7 +174,7 @@ export function generateStyledSVG(data, opts) {
         svgParts.push(_svgOuterFinder(outerType, fx, fy, outerS));
 
         // Cut out inner region using bgColor
-        svgParts.push(`<g fill="${_svgEscape(bgColor)}">`);
+        svgParts.push(`<g fill="${escapeHtml(bgColor)}">`);
         svgParts.push(_svgOuterFinder(outerType, fx + mSize, fy + mSize, outerS - mSize * 2));
         svgParts.push(`</g>`);
 
@@ -190,7 +188,7 @@ export function generateStyledSVG(data, opts) {
         const fp = FRAME_PAD;
         const fw = size;
         const fh = size;
-        svgParts.push(`<g fill="none" stroke="${_svgEscape(frameColor)}" shape-rendering="auto">`);
+        svgParts.push(`<g fill="none" stroke="${escapeHtml(frameColor)}" shape-rendering="auto">`);
         switch (frameStyle) {
             case 'simple':
                 svgParts.push(`<rect x="${fp}" y="${fp}" width="${fw}" height="${fh}" stroke-width="2"/>`);
@@ -215,8 +213,8 @@ export function generateStyledSVG(data, opts) {
         const barPad = 8;
         const barR = 8;
         const fontSize = Math.min(16, Math.floor(TEXT_BAR_H * 0.5));
-        svgParts.push(`<path d="${_svgRoundRect(barPad, barY + 4, finalW - barPad * 2, TEXT_BAR_H - 8, barR)}" fill="${_svgEscape(frameColor)}" shape-rendering="auto"/>`);
-        svgParts.push(`<text x="${finalW / 2}" y="${barY + TEXT_BAR_H / 2 + 2}" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="${fontSize}" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" shape-rendering="auto">${_svgEscape(frameText)}</text>`);
+        svgParts.push(`<path d="${_svgRoundRect(barPad, barY + 4, finalW - barPad * 2, TEXT_BAR_H - 8, barR)}" fill="${escapeHtml(frameColor)}" shape-rendering="auto"/>`);
+        svgParts.push(`<text x="${finalW / 2}" y="${barY + TEXT_BAR_H / 2 + 2}" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="${fontSize}" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" shape-rendering="auto">${escapeHtml(frameText)}</text>`);
     }
 
     // Logo
@@ -226,10 +224,10 @@ export function generateStyledSVG(data, opts) {
         const lx = (size - logoPx) / 2 + qrX;
         const ly = (size - logoPx) / 2 + qrY;
         // White backing rect
-        svgParts.push(`<rect x="${lx - logoMargin}" y="${ly - logoMargin}" width="${logoPx + logoMargin * 2}" height="${logoPx + logoMargin * 2}" fill="${_svgEscape(bgColor)}" shape-rendering="auto"/>`);
-        svgParts.push(`<image x="${lx}" y="${ly}" width="${logoPx}" height="${logoPx}" href="${_svgEscape(logoDataUrl)}" shape-rendering="auto"/>`);
+        svgParts.push(`<rect x="${lx - logoMargin}" y="${ly - logoMargin}" width="${logoPx + logoMargin * 2}" height="${logoPx + logoMargin * 2}" fill="${escapeHtml(bgColor)}" shape-rendering="auto"/>`);
+        svgParts.push(`<image x="${lx}" y="${ly}" width="${logoPx}" height="${logoPx}" href="${escapeHtml(logoDataUrl)}" shape-rendering="auto"/>`);
         if (logoColor && logoColor !== '#000000') {
-            svgParts.push(`<rect x="${lx}" y="${ly}" width="${logoPx}" height="${logoPx}" fill="${_svgEscape(logoColor)}" opacity="0.5" style="mix-blend-mode:multiply" shape-rendering="auto"/>`);
+            svgParts.push(`<rect x="${lx}" y="${ly}" width="${logoPx}" height="${logoPx}" fill="${escapeHtml(logoColor)}" opacity="0.5" style="mix-blend-mode:multiply" shape-rendering="auto"/>`);
         }
     }
 

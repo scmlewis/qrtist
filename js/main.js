@@ -1,6 +1,6 @@
 ﻿import { st } from './core/state.js';
 import { qrType, fgColorInput, fgColorText, bgColorInput, bgColorText, frameColorInput, frameColorTextInput, frameTextInput, qrSize, qrSizeValue, contrastWarning, contrastWarningText, scannabilityInfo, qrSizeLabel, qrSizeLabel2, qrCodeContainer, logoInput, logoPreview, logoImg, logoRemove, logoControls, customLogoBtn, logoSize, logoSizeValue, logoMargin, logoMarginValue, logoColorInput, logoColorText, frameBtns, downloadPng, downloadSvg } from './core/dom.js';
-import { getLuminance, getContrastRatio } from './core/color.js';
+import { getContrastRatio } from './core/color.js';
 import { showToast } from './core/toast.js';
 import { encodeConfigHash, decodeConfigHash } from './core/hash.js';
 import { getConfig, applyConfig } from './core/config.js';
@@ -647,25 +647,7 @@ if (logoColorText) {
 }
 
 function copyShareLink() {
-    const hash = encodeConfigHash({
-        type: qrType.value,
-        values: getInputValues(),
-        fg: fgColorInput.value,
-        bg: bgColorInput.value,
-        pattern: st.currentPattern,
-        outerCorner: st.currentOuterCorner,
-        innerCorner: st.currentInnerCorner,
-        useGradient: st.useGradient,
-        gradientColor2: st.gradientColor2,
-        size: st.currentQRSize,
-        logoSize: logoSize.value,
-        logoMargin: logoMargin.value,
-        logoPreset: st.currentLogoPreset,
-        logoColor: st.logoColor,
-        frame: st.selectedFrame,
-        frameColor: frameColorInput.value,
-        frameText: frameTextInput.value
-    });
+    const hash = encodeConfigHash(getConfig());
     const url = window.location.href.split('#')[0] + '#' + hash;
     navigator.clipboard.writeText(url).then(() => {
         const btn = document.getElementById('copyShareLink');
@@ -676,29 +658,9 @@ function copyShareLink() {
 }
 
 function exportConfig() {
-    const type = qrType.value;
-    const values = getInputValues();
-    const configObj = {
-        type: type,
-        values: values,
-        fg: fgColorInput.value,
-        bg: bgColorInput.value,
-        pattern: st.currentPattern,
-        outerCorner: st.currentOuterCorner,
-        innerCorner: st.currentInnerCorner,
-        useGradient: st.useGradient,
-        gradientColor2: st.gradientColor2,
-        size: st.currentQRSize,
-        logoSize: logoSize.value,
-        logoMargin: logoMargin.value,
-        logoPreset: st.currentLogoPreset,
-        logoColor: st.logoColor,
-        frame: st.selectedFrame,
-        frameColor: frameColorInput.value,
-        frameText: frameTextInput.value,
-        logo: st.logoDataUrl
-    };
-    const json = JSON.stringify(configObj, null, 2);
+    const cfg = getConfig();
+    cfg.logo = cfg.logoDataUrl;
+    const json = JSON.stringify(cfg, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

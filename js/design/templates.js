@@ -1,3 +1,6 @@
+import { drawModule } from './renderer.js';
+import { drawFinderOuter, drawFinderInner } from './finder.js';
+
 export const TEMPLATES = [
     { id: 'classic-black', name: 'Classic', fg: '#000000', bg: '#ffffff', dots: 'square', outer: 'square', inner: 'square', frame: 'none', frameColor: '#000000' },
     { id: 'corporate-blue', name: 'Corporate', fg: '#1a56db', bg: '#ffffff', dots: 'rounded', outer: 'rounded', inner: 'dot', frame: 'none', frameColor: '#1a56db' },
@@ -36,61 +39,6 @@ export function renderTemplates(deps) {
     }
 }
 
-function _miniFinderMod(ctx, pattern, x, y, mSize) {
-    window.drawModule(ctx, pattern, x, y, mSize);
-}
-
-function _miniFinderPattern(ctx, px, py, mSize, outerType, innerType, fgColor) {
-    const sz = mSize * 7;
-    const cx = sz / 2, cy = sz / 2;
-    const in3s = mSize * 3;
-    ctx.fillStyle = fgColor;
-
-    function drawOuter(c, inset, type) {
-        const s = sz - inset * 2;
-        const x0 = inset, y0 = inset;
-        const lx = x0 + s / 2, ly = y0 + s / 2;
-        switch (type) {
-            case 'circle': c.beginPath(); c.arc(lx, ly, s / 2, 0, Math.PI * 2); c.fill(); break;
-            case 'rounded': c.beginPath(); c.roundRect(x0, y0, s, s, s * 0.22); c.fill(); break;
-            case 'diamond': c.beginPath(); c.moveTo(lx, y0); c.lineTo(x0 + s, ly); c.lineTo(lx, y0 + s); c.lineTo(x0, ly); c.closePath(); c.fill(); break;
-            case 'octagon': {
-                const cut = s * 0.22; c.beginPath();
-                c.moveTo(x0 + cut, y0); c.lineTo(x0 + s - cut, y0); c.lineTo(x0 + s, y0 + cut);
-                c.lineTo(x0 + s, y0 + s - cut); c.lineTo(x0 + s - cut, y0 + s); c.lineTo(x0 + cut, y0 + s);
-                c.lineTo(x0, y0 + s - cut); c.lineTo(x0, y0 + cut); c.closePath(); c.fill(); break;
-            }
-            case 'squircle': c.beginPath(); c.roundRect(x0, y0, s, s, s * 0.38); c.fill(); break;
-            default: c.fillRect(x0, y0, s, s);
-        }
-    }
-
-    drawOuter(ctx, 0, outerType);
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.fillStyle = 'rgba(0,0,0,1)';
-    drawOuter(ctx, mSize, outerType);
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = fgColor;
-
-    switch (innerType) {
-        case 'dot': ctx.beginPath(); ctx.arc(cx, cy, in3s / 2, 0, Math.PI * 2); ctx.fill(); break;
-        case 'rounded': ctx.beginPath(); ctx.roundRect(cx - in3s / 2, cy - in3s / 2, in3s, in3s, in3s * 0.28); ctx.fill(); break;
-        case 'star': {
-            ctx.beginPath();
-            for (let i = 0; i < 10; i++) {
-                const angle = (i * Math.PI / 5) - Math.PI / 2;
-                const rad = i % 2 === 0 ? in3s * 0.56 : in3s * 0.22;
-                if (i === 0) ctx.moveTo(cx + rad * Math.cos(angle), cy + rad * Math.sin(angle));
-                else ctx.lineTo(cx + rad * Math.cos(angle), cy + rad * Math.sin(angle));
-            }
-            ctx.closePath(); ctx.fill(); break;
-        }
-        case 'diamond': ctx.beginPath(); ctx.moveTo(cx, cy - in3s / 2); ctx.lineTo(cx + in3s / 2, cy); ctx.lineTo(cx, cy + in3s / 2); ctx.lineTo(cx - in3s / 2, cy); ctx.closePath(); ctx.fill(); break;
-        case 'cross': ctx.fillRect(cx - in3s / 6, cy - in3s / 2, in3s / 3, in3s); ctx.fillRect(cx - in3s / 2, cy - in3s / 6, in3s, in3s / 3); break;
-        default: ctx.fillRect(cx - in3s / 2, cy - in3s / 2, in3s, in3s);
-    }
-}
-
 function renderTemplatePreviews() {
     TEMPLATES.forEach(t => {
         const canvas = document.querySelector(`canvas[data-template-id="${t.id}"]`);
@@ -120,7 +68,7 @@ function renderTemplatePreviews() {
                 if (qr.modules.data[row * numModules + col]) {
                     const x = (col + m) * mSize + 2;
                     const y = (row + m) * mSize + 2;
-                    _miniFinderMod(ctx, t.dots, x, y, mSize);
+                    drawModule(ctx, t.dots, x, y, mSize);
                 }
             }
         }
@@ -128,7 +76,18 @@ function renderTemplatePreviews() {
         const finderSz = mSize * 7;
         const offsets = [[0, 0], [numModules - 7, 0], [0, numModules - 7]];
         offsets.forEach(([r, c]) => {
-            _miniFinderPattern(ctx, (c + m) * mSize + 2, (r + m) * mSize + 2, mSize, t.outer, t.inner, t.fg);
+            const px = (c + m) * mSize + 2;
+            const py = (r + m) * mSize + 2;
+            const cx = px + finderSz / 2;
+            const cy = py + finderSz / 2;
+            ctx.fillStyle = t.fg;
+            drawFinderOuter(ctx, 0, t.outer, finderSz);
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = 'rgba(0,0,0,1)';
+            drawFinderOuter(ctx, mSize, t.outer, finderSz);
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = t.fg;
+            drawFinderInner(ctx, t.inner, cx, cy, mSize * 3);
         });
     });
 }

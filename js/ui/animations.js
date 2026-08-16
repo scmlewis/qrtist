@@ -1,4 +1,4 @@
-export function initStaggerAnimation() {
+function initStaggerAnimation() {
     const panels = document.querySelectorAll('.grid-layout > .panel-card');
     if (panels.length) {
         panels.forEach((panel, i) => {
@@ -14,7 +14,7 @@ export function initStaggerAnimation() {
     }
 }
 
-export function initAccordionAnimations() {
+function initAccordionAnimations() {
     const panels = document.querySelectorAll('#panelDesign, #panelData');
     if (!panels.length) return;
 

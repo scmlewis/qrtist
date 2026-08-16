@@ -1,4 +1,20 @@
 import { showToast } from '../core/toast.js';
+import { st } from '../core/state.js';
+import { fgColorInput, bgColorInput, qrSize } from '../core/dom.js';
+
+function createBatchQR(data, opts) {
+    return new QRCodeStyling({
+        width: opts.width,
+        height: opts.height,
+        data: data.substring(0, 200),
+        dotsOptions: { color: opts.color || fgColorInput.value, type: st.currentPattern },
+        backgroundOptions: { color: bgColorInput.value },
+        cornersSquareOptions: { type: st.currentOuterCorner },
+        cornersDotOptions: { type: st.currentInnerCorner },
+        margin: opts.margin ?? 2,
+        errorCorrectionLevel: 'M'
+    });
+}
 
 export function initBatch() {
     const batchBtn = document.getElementById('batchModeBtn');
@@ -102,13 +118,7 @@ export function initBatch() {
         downloadZip.classList.remove('hidden');
         downloadSheet.classList.remove('hidden');
 
-        const fgColor = document.getElementById('fgColor').value;
-        const bgColor = document.getElementById('bgColor').value;
-        const currentPattern = document.querySelector('.shape-btn.selected')?.dataset.pattern || 'square';
-        const currentOuterCorner = document.querySelector('#outerCornerGrid .corner-btn.selected')?.dataset.outer || 'square';
-        const currentInnerCorner = document.querySelector('#innerCornerGrid .corner-btn.selected')?.dataset.inner || 'square';
-
-        batchItems.forEach((item, idx) => {
+        batchItems.forEach((item) => {
             const thumb = document.createElement('div');
             thumb.className = 'flex flex-col items-center gap-1';
             const canvasWrap = document.createElement('div');
@@ -127,17 +137,7 @@ export function initBatch() {
             thumb.appendChild(label);
             grid.appendChild(thumb);
 
-            const miniQr = new QRCodeStyling({
-                width: 80,
-                height: 80,
-                data: item.data.substring(0, 200),
-                dotsOptions: { color: item.color || fgColor, type: currentPattern },
-                backgroundOptions: { color: bgColor },
-                cornersSquareOptions: { type: currentOuterCorner },
-                cornersDotOptions: { type: currentInnerCorner },
-                margin: 2,
-                errorCorrectionLevel: 'M'
-            });
+            const miniQr = createBatchQR(item.data, { width: 80, height: 80, color: item.color });
             miniQr.append(canvasWrap);
         });
     }
@@ -145,12 +145,7 @@ export function initBatch() {
     downloadZip.addEventListener('click', async () => {
         if (!batchItems.length || typeof JSZip === 'undefined') return;
         const zip = new JSZip();
-        const fgColor = document.getElementById('fgColor').value;
-        const bgColor = document.getElementById('bgColor').value;
-        const currentPattern = document.querySelector('.shape-btn.selected')?.dataset.pattern || 'square';
-        const currentOuterCorner = document.querySelector('#outerCornerGrid .corner-btn.selected')?.dataset.outer || 'square';
-        const currentInnerCorner = document.querySelector('#innerCornerGrid .corner-btn.selected')?.dataset.inner || 'square';
-        const size = parseInt(document.getElementById('qrSize').value) || 300;
+        const size = parseInt(qrSize.value) || 300;
 
         downloadZip.textContent = 'Generating...';
         downloadZip.disabled = true;
@@ -158,17 +153,7 @@ export function initBatch() {
         let skipped = 0;
         for (const item of batchItems) {
             try {
-                const qr = new QRCodeStyling({
-                    width: size,
-                    height: size,
-                    data: item.data.substring(0, 200),
-                    dotsOptions: { color: item.color || fgColor, type: currentPattern },
-                    backgroundOptions: { color: bgColor },
-                    cornersSquareOptions: { type: currentOuterCorner },
-                    cornersDotOptions: { type: currentInnerCorner },
-                    margin: 10,
-                    errorCorrectionLevel: 'M'
-                });
+                const qr = createBatchQR(item.data, { width: size, height: size, color: item.color, margin: 10 });
                 const wrap = document.createElement('div');
                 wrap.style.width = size + 'px';
                 wrap.style.height = size + 'px';
@@ -198,8 +183,7 @@ export function initBatch() {
 
     downloadSheet.addEventListener('click', () => {
         if (!batchItems.length) return;
-        const fgColor = document.getElementById('fgColor').value;
-        const bgColor = document.getElementById('bgColor').value;
+        const bgColor = bgColorInput.value;
         const cols = 4;
         const cellSize = 200;
         const padding = 20;

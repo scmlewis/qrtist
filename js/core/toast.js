@@ -1,8 +1,5 @@
 import { toastContainer } from './dom.js';
-
-function escapeHtml(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
+import { escapeHtml } from './sanitize.js';
 
 export function showToast(message, type = 'info', duration = 3200) {
     const container = toastContainer;

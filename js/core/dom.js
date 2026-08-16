@@ -1,5 +1,4 @@
 export const qrType = document.getElementById('qrType');
-export const inputFields = document.getElementById('inputFields');
 export const fgColorInput = document.getElementById('fgColor');
 export const fgColorText = document.getElementById('fgColorText');
 export const bgColorInput = document.getElementById('bgColor');

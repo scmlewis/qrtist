@@ -1,6 +1,6 @@
 # QRtist — Create Beautiful, Scannable QR Codes
 
-QRtist helps you make attractive, reliable QR codes quickly — no signups, no servers, and no tracking. Everything runs in your browser so your data stays private. Use it for posters, business cards, event signs, and more.
+QRtist is a free, fully client-side QR code generator for creating custom, scannable QR codes with colors, patterns, frames, frames text, gradients, and logos. Export as PNG or SVG. No signups, no servers, and no tracking — everything runs in your browser so your data stays private.
 
 ---
 
@@ -10,26 +10,31 @@ QRtist helps you make attractive, reliable QR codes quickly — no signups, no s
 - Private: All generation happens locally; nothing is uploaded.
 - Offline-capable: Install as a PWA and use without an internet connection.
 - Flexible: Export PNG for web or SVG for high-quality print.
+- Feature-rich: 11 QR types, 13 design templates, logo presets, gradients, batch generation, and a built-in scanner.
 
 ---
 
 ## Quick Start (30 seconds)
 
 1. Open [index.html](index.html) in your browser.
-2. Choose a QR type: URL, Text, Email, Phone, WiFi, or vCard.
+2. Choose a QR type: URL, Text, Email, Phone, WiFi, vCard, Google Maps, Calendar Event, SMS, Crypto, or Social Profile.
 3. Enter your content and watch the live preview update.
-4. Style: pick colors, a pattern, a frame, and optionally add a logo.
+4. Style: pick a template or customize colors, pattern, corners, frame, frame text, and optionally add a logo.
 5. Click Download (PNG or SVG) or Copy Share Link to share your design.
 
 ---
 
 ## Features
 
-- Multiple QR types (URL, text, email, phone, WiFi, vCard).
-- Design controls: color pickers, pattern styles, frames, and gradients.
-- Logo support: drag & drop a logo, then resize and center it.
-- Export: PNG and SVG; full JSON export/import for saving designs.
-- Accessibility helpers: contrast warnings to help keep codes scannable.
+- **11 QR types** — URL, text, email, phone, WiFi, vCard, Google Maps, calendar event, SMS, crypto (BTC/ETH), and social profiles (Instagram, X/Twitter, TikTok, LinkedIn, YouTube, GitHub).
+- **Design controls** — foreground/background color pickers, gradients, dot/pattern styles, outer & inner corner styles, and frame styles (none, simple, rounded-rect, thick-border, double) with an optional frame text bar.
+- **13 ready-made templates** — Classic, Corporate, Facebook, X, Instagram, YouTube, Spotify, TikTok, WhatsApp, Discord, LinkedIn, Ocean, and Minimal.
+- **Logo support** — upload your own logo (or drag & drop), pick from built-in brand/icon presets, then resize, recolor, and adjust margin.
+- **Scanner** — scan QR codes from an uploaded image (or drop one in), then copy, open, or regenerate the result.
+- **Batch generation** — paste a list or upload a CSV, preview the grid, and download as a ZIP or a spreadsheet.
+- **Export & share** — PNG and SVG download, full JSON export/import for saving designs, and a Copy Share Link (URL hash) for sharing.
+- **Undo/redo & reset** — step backward/forward through changes, or reset the design.
+- **Accessibility helpers** — contrast warnings and scannability feedback to help keep codes scannable.
 
 ---
 
@@ -38,6 +43,8 @@ QRtist helps you make attractive, reliable QR codes quickly — no signups, no s
 - Marketing: branded QR on flyers and posters that matches your colors.
 - Business cards: vCard QR with your logo for instant contact sharing.
 - Events: a WiFi QR so guests can join the network with one scan.
+- E-commerce: crypto address QR for accepting payments.
+- Menus & signage: maps QR to point customers to your location.
 
 ---
 
@@ -53,6 +60,7 @@ QRtist helps you make attractive, reliable QR codes quickly — no signups, no s
 
 - If a scanner has trouble, reduce logo size, increase contrast, or add margin.
 - For print, test at the final physical size to confirm scannability.
+- Use the contrast warning to catch low-contrast combinations before downloading.
 
 ---
 
@@ -75,6 +83,7 @@ QRtist helps you make attractive, reliable QR codes quickly — no signups, no s
 
 - Blurry or pixelated preview: export SVG for a crisp result.
 - Scanner fails: try a different phone app, increase quiet zone, or simplify design.
+- Stale version after an update: do a hard refresh (Ctrl+Shift+R) or unregister the service worker (DevTools → Application → Service Workers → Unregister).
 
 ---
 
@@ -87,16 +96,22 @@ QRtist helps you make attractive, reliable QR codes quickly — no signups, no s
 
 ## Credits & Links
 
-- qrcode-styling (used for rendering & exports): https://github.com/kozaksylwester/qrcode-styling
+- QR generation library (`QRCodeLib`, bundled in `qr-bundle.js`) and QR styling renderer (bundled in `js/design/renderer.js`).
+- jsQR — QR decoding for the built-in scanner: https://github.com/cozmo/jsQR
+- JSZip — ZIP generation for batch downloads: https://stuk.github.io/jszip/
 - Deployment guide: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ---
 
 ## Tech Stack
 
-- `qrcode-styling` — renders QR codes to Canvas/SVG and supports styling and exports (CDN): https://github.com/kozaksylwester/qrcode-styling
+- Vanilla JavaScript (ES modules, no build step), HTML, and CSS
+- `QRCodeLib` — QR code data generation (bundled locally)
+- Custom canvas/SVG renderer — styling, frames, logos, and exports (bundled locally)
 - Tailwind CSS (via CDN) — utility-first styles used in the UI
-- Vanilla JavaScript, HTML, and CSS — no build step required
+- lucide (via CDN) — UI icons
+- jsQR (via CDN) — QR scanning
+- JSZip (via CDN) — ZIP downloads for batch mode
 - Service worker — offline caching and PWA support
 - Exports: SVG (vector) and PNG (raster) via browser APIs
 
