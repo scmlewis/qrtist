@@ -1,4 +1,4 @@
-import './core/polyfill.js';
+import '../core/polyfill.js';
 import { generateStyledSVG } from './render-svg.js';
 window.QRCodeStyling = (function () {
     function QRCodeStyling(options) {
