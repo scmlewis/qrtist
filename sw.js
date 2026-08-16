@@ -4,7 +4,7 @@
  * GitHub Pages optimized with automatic cache busting
  */
 
-const CACHE_VERSION = 'v13'; // Increment this to bust all caches
+const CACHE_VERSION = 'v14'; // Increment this to bust all caches
 const CACHE_NAME = 'qrtist-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'qrtist-runtime-' + CACHE_VERSION;
 
@@ -27,6 +27,13 @@ const FILES_TO_CACHE = [
     './js/design/render-svg.js',
     './js/design/renderer.js',
     './js/ui/controls.js',
+    './js/design/logo.js',
+    './js/design/templates.js',
+    './js/ui/panels.js',
+    './js/ui/menu.js',
+    './js/ui/animations.js',
+    './js/features/scanner.js',
+    './js/features/batch.js',
     './styles.css',
     './qr-bundle.js',
     'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js',
