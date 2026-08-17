@@ -20,12 +20,21 @@ function initAccordionAnimations() {
 
     const DURATION = 300;
 
+    function measureHeight(body) {
+        body.style.transition = 'none';
+        body.style.maxHeight = 'none';
+        body.style.overflow = 'visible';
+        void body.offsetHeight;
+        const h = body.scrollHeight;
+        body.style.transition = '';
+        body.style.overflow = '';
+        return h;
+    }
+
     function initOpenState(details, body) {
         if (details.open) {
             details.classList.add('acc-open');
-            requestAnimationFrame(() => {
-                body.style.maxHeight = body.scrollHeight + 'px';
-            });
+            body.style.maxHeight = 'none';
         }
     }
 
@@ -41,11 +50,10 @@ function initAccordionAnimations() {
             if (details.classList.contains('acc-open')) {
                 if (details._collapseTimer) clearTimeout(details._collapseTimer);
                 body.style.maxHeight = body.scrollHeight + 'px';
+                void body.offsetHeight;
                 details.removeAttribute('open');
                 requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        body.style.maxHeight = '0';
-                    });
+                    body.style.maxHeight = '0';
                 });
                 details._collapseTimer = setTimeout(() => {
                     details.classList.remove('acc-open');
@@ -58,7 +66,7 @@ function initAccordionAnimations() {
                 details.setAttribute('open', '');
                 details.classList.add('acc-open');
                 requestAnimationFrame(() => {
-                    body.style.maxHeight = body.scrollHeight + 'px';
+                    body.style.maxHeight = measureHeight(body) + 'px';
                 });
             }
         });
