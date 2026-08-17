@@ -33,7 +33,9 @@ function initAccordionAnimations() {
         wrap.appendChild(body);
 
         const inner = document.createElement('div');
-        inner.className = body.className; // carry px-1 pt-3 pb-2 space-y-4
+        // Carry only the Tailwind spacing/padding utilities — NOT the `acc-body`
+        // hook class, otherwise the inner would inherit `opacity: 0` and render blank.
+        inner.className = body.className.replace('acc-body', '').trim();
         body.className = 'acc-body';      // keep only the hook class (CSS adds overflow/min-height)
         while (body.firstChild) inner.appendChild(body.firstChild);
         body.appendChild(inner);
