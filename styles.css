@@ -98,7 +98,6 @@ body {
     min-height: 100vh;
     background: var(--md-surface);
     color: var(--md-on-surface);
-    overflow-x: hidden;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -310,6 +309,7 @@ header {
     flex-direction: column;
     min-height: 0;
     padding: 16px 16px;
+    overflow-x: clip;
 }
 @media (min-width: 769px) and (max-width: 1023px) {
     .main-container { padding: 20px 28px; }
@@ -605,7 +605,7 @@ details.acc-open .acc-chevron {
     max-height: 0;
     opacity: 0;
     transform: translateY(-8px);
-    transition: max-height 0.3s var(--spring-smooth), opacity 0.25s ease, transform 0.25s ease;
+    transition: max-height 0.3s var(--spring-smooth), opacity 0.3s var(--spring-smooth), transform 0.3s var(--spring-smooth);
 }
 details.acc-open .acc-body {
     opacity: 1;

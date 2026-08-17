@@ -37,19 +37,25 @@ function initAccordionAnimations() {
         summary.addEventListener('click', (e) => {
             e.preventDefault();
             if (details.classList.contains('acc-open')) {
+                if (details._collapseTimer) clearTimeout(details._collapseTimer);
                 body.style.maxHeight = body.scrollHeight + 'px';
+                details.removeAttribute('open');
                 requestAnimationFrame(() => {
-                    body.style.maxHeight = '0';
+                    requestAnimationFrame(() => {
+                        body.style.maxHeight = '0';
+                    });
                 });
-                details.classList.remove('acc-open');
-                setTimeout(() => {
-                    details.removeAttribute('open');
+                details._collapseTimer = setTimeout(() => {
+                    details.classList.remove('acc-open');
                 }, DURATION);
             } else {
+                if (details._collapseTimer) {
+                    clearTimeout(details._collapseTimer);
+                    details._collapseTimer = null;
+                }
                 details.setAttribute('open', '');
                 details.classList.add('acc-open');
                 body.style.maxHeight = body.scrollHeight + 'px';
-                summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
     }));
