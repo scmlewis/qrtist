@@ -110,6 +110,11 @@ header {
     padding: 8px 16px;
     background: var(--md-surface-container);
     border-bottom: 1px solid var(--md-outline-variant);
+}
+
+/* Sticky top app bar — does not depend on Tailwind utility classes so it can't
+   be accidentally overridden. Frosted glass on mobile for legibility over scroll. */
+.app-header {
     position: sticky;
     top: 0;
     z-index: 50;
@@ -121,7 +126,7 @@ header {
     header { padding: 8px 32px; }
 }
 @media (max-width: 768px) {
-    header {
+    .app-header {
         box-shadow: var(--md-elevation-2);
         background: rgba(23, 28, 40, 0.85);
         backdrop-filter: blur(12px);
@@ -597,14 +602,24 @@ details > summary:hover {
 details.acc-open .acc-chevron {
     transform: rotate(180deg);
 }
+/* Grid-based height animation: 0fr -> 1fr animates without measuring content.
+   Robust inside hidden panels and immune to content-size race conditions. */
+.acc-body-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s var(--spring-smooth);
+}
+details.acc-open > .acc-body-wrap {
+    grid-template-rows: 1fr;
+}
 .acc-body {
     overflow: hidden;
-    max-height: 0;
+    min-height: 0;
     opacity: 0;
     transform: translateY(-8px);
-    transition: max-height 0.3s var(--spring-smooth), opacity 0.3s var(--spring-smooth), transform 0.3s var(--spring-smooth);
+    transition: opacity 0.3s var(--spring-smooth), transform 0.3s var(--spring-smooth);
 }
-details.acc-open .acc-body {
+details.acc-open > .acc-body-wrap > .acc-body {
     opacity: 1;
     transform: translateY(0);
 }

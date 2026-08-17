@@ -4,7 +4,7 @@
  * GitHub Pages optimized with automatic cache busting
  */
 
-const CACHE_VERSION = 'v16'; // Increment this to bust all caches
+const CACHE_VERSION = 'v17'; // Increment this to bust all caches
 const CACHE_NAME = 'qrtist-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'qrtist-runtime-' + CACHE_VERSION;
 
@@ -79,7 +79,7 @@ self.addEventListener('activate', (event) => {
     self.clients.claim();
 });
 
-// Fetch event: cache-first strategy for app, network-first for CDN
+// Fetch event: network-first for app (so edits propagate) and CDN resources
 self.addEventListener('fetch', (event) => {
     // Skip non-GET requests
     if (event.request.method !== 'GET') {
@@ -119,13 +119,10 @@ self.addEventListener('fetch', (event) => {
                 }
             }
 
-            // Cache-first strategy for app files
+            // Network-first strategy for same-origin app files so edits show up
+            // immediately; fall back to cache only when offline. This prevents
+            // stale CSS/JS from being served after a deploy.
             try {
-                const cachedResponse = await caches.match(event.request);
-                if (cachedResponse) {
-                    return cachedResponse;
-                }
-
                 const networkResponse = await fetch(event.request);
                 if (networkResponse && networkResponse.status === 200) {
                     const cache = await caches.open(CACHE_NAME);
@@ -135,6 +132,10 @@ self.addEventListener('fetch', (event) => {
                 }
                 return networkResponse;
             } catch (err) {
+                const cachedResponse = await caches.match(event.request);
+                if (cachedResponse) {
+                    return cachedResponse;
+                }
                 console.warn('[SW] Fetch failed:', err);
                 // Return offline fallback
                 return new Response(

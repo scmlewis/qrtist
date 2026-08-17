@@ -19,6 +19,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "http-server": "^14.1.1",
     "vitest": "^3.2.7"
   },
