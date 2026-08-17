@@ -23,7 +23,9 @@ function initAccordionAnimations() {
     function initOpenState(details, body) {
         if (details.open) {
             details.classList.add('acc-open');
-            body.style.maxHeight = body.scrollHeight + 'px';
+            requestAnimationFrame(() => {
+                body.style.maxHeight = body.scrollHeight + 'px';
+            });
         }
     }
 
@@ -55,7 +57,9 @@ function initAccordionAnimations() {
                 }
                 details.setAttribute('open', '');
                 details.classList.add('acc-open');
-                body.style.maxHeight = body.scrollHeight + 'px';
+                requestAnimationFrame(() => {
+                    body.style.maxHeight = body.scrollHeight + 'px';
+                });
             }
         });
     }));

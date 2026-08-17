@@ -110,8 +110,10 @@ header {
     padding: 8px 16px;
     background: var(--md-surface-container);
     border-bottom: 1px solid var(--md-outline-variant);
+    position: sticky;
+    top: 0;
+    z-index: 50;
 }
-
 @media (min-width: 769px) and (max-width: 1023px) {
     header { padding: 8px 24px; }
 }
@@ -120,10 +122,6 @@ header {
 }
 @media (max-width: 768px) {
     header {
-        margin-bottom: 0;
-        position: sticky;
-        top: 0;
-        z-index: 50;
         box-shadow: var(--md-elevation-2);
         background: rgba(23, 28, 40, 0.85);
         backdrop-filter: blur(12px);
@@ -309,7 +307,6 @@ header {
     flex-direction: column;
     min-height: 0;
     padding: 16px 16px;
-    overflow-x: clip;
 }
 @media (min-width: 769px) and (max-width: 1023px) {
     .main-container { padding: 20px 28px; }
