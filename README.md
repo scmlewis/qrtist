@@ -4,6 +4,12 @@ QRtist is a free, fully client-side QR code generator for creating custom, scann
 
 ---
 
+---
+
+## Why this exists
+
+Most QR generators are either bare or bloated. QRtist is a small, customizable generator with a built-in scanner and batch export — the tool I wanted and couldn't find.
+
 ## Highlights
 
 - Quick: Generate a QR in moments — choose type, add content, style, and download.
@@ -130,3 +136,6 @@ QRtist is a free, fully client-side QR code generator for creating custom, scann
 ---
 
 Made with ❤️ — enjoy creating QR codes!
+---
+
+If this saved you time or gave you an idea, a ⭐ on the repo is appreciated — it helps others find it.
