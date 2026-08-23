@@ -20,16 +20,6 @@ Most QR generators are either bare or bloated. QRtist is a small, customizable g
 
 ---
 
-## Quick Start (30 seconds)
-
-1. Open [index.html](index.html) in your browser.
-2. Choose a QR type: URL, Text, Email, Phone, WiFi, vCard, Google Maps, Calendar Event, SMS, Crypto, or Social Profile.
-3. Enter your content and watch the live preview update.
-4. Style: pick a template or customize colors, pattern, corners, frame, frame text, and optionally add a logo.
-5. Click Download (PNG or SVG) or Copy Share Link to share your design.
-
----
-
 ## Features
 
 - **11 QR types** — URL, text, email, phone, WiFi, vCard, Google Maps, calendar event, SMS, crypto (BTC/ETH), and social profiles (Instagram, X/Twitter, TikTok, LinkedIn, YouTube, GitHub).
@@ -41,6 +31,37 @@ Most QR generators are either bare or bloated. QRtist is a small, customizable g
 - **Export & share** — PNG and SVG download, full JSON export/import for saving designs, and a Copy Share Link (URL hash) for sharing.
 - **Undo/redo & reset** — step backward/forward through changes, or reset the design.
 - **Accessibility helpers** — contrast warnings and scannability feedback to help keep codes scannable.
+
+---
+
+## Quick Start (30 seconds)
+
+1. Open [index.html](index.html) in your browser.
+2. Choose a QR type: URL, Text, Email, Phone, WiFi, vCard, Google Maps, Calendar Event, SMS, Crypto, or Social Profile.
+3. Enter your content and watch the live preview update.
+4. Style: pick a template or customize colors, pattern, corners, frame, frame text, and optionally add a logo.
+5. Click Download (PNG or SVG) or Copy Share Link to share your design.
+
+---
+
+## Install (optional)
+
+- Desktop: Chrome/Edge show an install option in the address bar.
+- Mobile: use "Add to Home Screen" in your browser menu.
+
+---
+
+## Tech Stack
+
+- Vanilla JavaScript (ES modules, no build step), HTML, and CSS
+- `QRCodeLib` — QR code data generation (bundled locally)
+- Custom canvas/SVG renderer — styling, frames, logos, and exports (bundled locally)
+- Tailwind CSS (via CDN) — utility-first styles used in the UI
+- lucide (via CDN) — UI icons
+- jsQR (via CDN) — QR scanning
+- JSZip (via CDN) — ZIP downloads for batch mode
+- Service worker — offline caching and PWA support
+- Exports: SVG (vector) and PNG (raster) via browser APIs
 
 ---
 
@@ -67,13 +88,6 @@ Most QR generators are either bare or bloated. QRtist is a small, customizable g
 - If a scanner has trouble, reduce logo size, increase contrast, or add margin.
 - For print, test at the final physical size to confirm scannability.
 - Use the contrast warning to catch low-contrast combinations before downloading.
-
----
-
-## Install (optional)
-
-- Desktop: Chrome/Edge show an install option in the address bar.
-- Mobile: use "Add to Home Screen" in your browser menu.
 
 ---
 
@@ -109,33 +123,19 @@ Most QR generators are either bare or bloated. QRtist is a small, customizable g
 
 ---
 
-## Tech Stack
-
-- Vanilla JavaScript (ES modules, no build step), HTML, and CSS
-- `QRCodeLib` — QR code data generation (bundled locally)
-- Custom canvas/SVG renderer — styling, frames, logos, and exports (bundled locally)
-- Tailwind CSS (via CDN) — utility-first styles used in the UI
-- lucide (via CDN) — UI icons
-- jsQR (via CDN) — QR scanning
-- JSZip (via CDN) — ZIP downloads for batch mode
-- Service worker — offline caching and PWA support
-- Exports: SVG (vector) and PNG (raster) via browser APIs
-
----
-
-## Contributing
-
-- Found a bug or have an idea? Open an issue or submit a pull request.
-
----
-
 ## License
 
 - Open source — attribution appreciated.
 
 ---
 
-Made with ❤️ — enjoy creating QR codes!
+Made with  — enjoy creating QR codes!
 ---
 
 If this saved you time or gave you an idea, a ⭐ on the repo is appreciated — it helps others find it.
+
+## Contributing
+
+- Found a bug or have an idea? Open an issue or submit a pull request.
+
+---
